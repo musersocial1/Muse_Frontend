@@ -103,7 +103,7 @@ export const env: EnvConfig = {
   APP_NAME: Constants.expoConfig?.name || "My Expo App",
   APP_VERSION: Constants.expoConfig?.version || "1.0.0",
   APP_ENV,
-  APP_SCHEME: Constants.expoConfig?.scheme || "myapp",
+  APP_SCHEME: Constants.expoConfig?.scheme || "muse",
   BUNDLE_ID:
     Constants.expoConfig?.ios?.bundleIdentifier || "com.company.myexpoapp",
 

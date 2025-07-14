@@ -7,13 +7,13 @@ module.exports = {
       colors: {
         primary: "#121212",
         secondary: "#0368FF",
-        gray: {
+        grayish: {
           100: "#1C1C1C",
           200: "#363636",
           300: "#F3F3F3",
         },
         light: {
-          blue: "#0368FF",
+          blue: "#F3F7FF",
           green: "#F3FFF6",
           red: "#FFF3F3",
         },
@@ -24,6 +24,24 @@ module.exports = {
           red: "#FF03037D",
         },
         disabled: "#F2F2F2",
+      },
+      fontFamily: {
+        sans: ["NeutralSans-Regular"],
+
+        "neutral-regular": ["NeutralSans-Regular"],
+        "neutral-bold": ["NeutralSans-Bold"],
+        "neutral-black": ["NeutralSans-Black"],
+        "neutral-medium": ["NeutralSans-Medium"],
+
+        "sfpro-regular": ["SFProDisplay-Regular"],
+        "sfpro-bold": ["SFProDisplay-Bold"],
+        "sfpro-medium": ["SFProDisplay-Medium"],
+        "sfpro-light-italic": ["SFProDisplay-LightItalic"],
+        "sfpro-semibold-italic": ["SFProDisplay-SemiboldItalic"],
+        "sfpro-ultralight-italic": ["SFProDisplay-UltralightItalic"],
+        "sfpro-black-italic": ["SFProDisplay-BlackItalic"],
+        "sfpro-heavy-italic": ["SFProDisplay-HeavyItalic"],
+        "sfpro-thin-italic": ["SFProDisplay-ThinItalic"],
       },
     },
   },
