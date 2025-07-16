@@ -1,24 +1,61 @@
 import { Tabs } from "expo-router";
-import { Image, Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Image } from "react-native";
 
 import { icons } from "@/constants/icons";
 
-function TabIcon({ focused, icon, title }: any) {
-  if (focused) {
+function TabIcon({ focused, icon, title, isProfile }: any) {
+  const scaleValue = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
+  const opacityValue = useRef(new Animated.Value(focused ? 1 : 0.7)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.spring(scaleValue, {
+        toValue: focused ? 1.1 : 1,
+        useNativeDriver: true,
+        tension: 150,
+        friction: 8,
+      }),
+      Animated.timing(opacityValue, {
+        toValue: focused ? 1 : 0.7,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [focused]);
+
+  if (isProfile) {
     return (
-      <View className="size-full justify-center items-center mt-4 rounded-full bg-white">
-        <Image source={icon} tintColor="#151312" className="size-5" />
-        <Text className="text-secondary text-base font-semibold ml-2">
-          {title}
-        </Text>
-      </View>
+      <Animated.View
+        style={{
+          transform: [{ scale: scaleValue }],
+          opacity: opacityValue,
+        }}
+        className="w-16 h-16 rounded-full overflow-hidden"
+      >
+        <Image source={icon} className="w-full h-full" resizeMode="cover" />
+      </Animated.View>
     );
   }
 
+  // Regular tabs - icon in circle
   return (
-    <View className="size-full justify-center items-center mt-4 rounded-full bg-gray-100">
-      <Image source={icon} tintColor="#A8B5DB" className="size-5" />
-    </View>
+    <Animated.View
+      style={{
+        transform: [{ scale: scaleValue }],
+        opacity: opacityValue,
+      }}
+      className={`w-16 h-16 rounded-full justify-center items-center border ${
+        focused ? "bg-white border-white" : "bg-[#80808099]  border-[#FFFFFF29]"
+      }`}
+    >
+      <Image
+        source={icon}
+        tintColor={focused ? "#151312" : "#ffffff"}
+        className="w-6 h-6"
+        resizeMode="contain"
+      />
+    </Animated.View>
   );
 }
 
@@ -28,31 +65,38 @@ export default function TabsLayout() {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarItemStyle: {
-          width: "100%",
-          height: "100%",
           justifyContent: "center",
           alignItems: "center",
+          height: 60,
+          flex: 1,
         },
         tabBarStyle: {
-          backgroundColor: "#0F0D23",
-          borderRadius: 50,
-          marginHorizontal: 20,
+          backgroundColor: "transparent",
+          borderTopWidth: 0,
+          borderRadius: 30,
+          marginHorizontal: 10,
           marginBottom: 36,
-          height: 52,
+          height: 60,
           position: "absolute",
-          overflow: "hidden",
-          borderWidth: 1,
-          borderColor: "#0F0D23",
+          borderWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+          paddingHorizontal: 0,
         },
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: "index",
+          title: "home",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.home} title="Home" />
+            <TabIcon
+              focused={focused}
+              icon={icons.home}
+              title="Home"
+              isProfile={false}
+            />
           ),
         }}
       />
@@ -63,39 +107,60 @@ export default function TabsLayout() {
           title: "Search",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.search} title="Search" />
+            <TabIcon
+              focused={focused}
+              icon={icons.search}
+              title="Search"
+              isProfile={false}
+            />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="save"
+        name="community"
         options={{
-          title: "Save",
+          title: "Community",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.asana} title="Save" />
+            <TabIcon
+              focused={focused}
+              icon={icons.asana}
+              title="Community"
+              isProfile={false}
+            />
           ),
         }}
       />
 
       <Tabs.Screen
-        name="star"
+        name="group"
         options={{
-          title: "Star",
+          title: "Group",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.star} title="Star" />
+            <TabIcon
+              focused={focused}
+              icon={icons.star}
+              title="Groups"
+              isProfile={false}
+            />
           ),
         }}
       />
+
       <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.user} title="Profile" />
+            <TabIcon
+              focused={focused}
+              icon={icons.user}
+              title="Profile"
+              isProfile={true}
+            />
           ),
         }}
       />
