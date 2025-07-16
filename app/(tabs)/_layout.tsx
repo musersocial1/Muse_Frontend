@@ -1,8 +1,7 @@
+import { icons } from "@/constants/icons";
 import { Tabs } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Image } from "react-native";
-
-import { icons } from "@/constants/icons";
 
 function TabIcon({ focused, icon, title, isProfile }: any) {
   const scaleValue = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
@@ -13,7 +12,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
       Animated.spring(scaleValue, {
         toValue: focused ? 1.1 : 1,
         useNativeDriver: true,
-        tension: 150,
+        tension: 120,
         friction: 8,
       }),
       Animated.timing(opacityValue, {
@@ -24,12 +23,19 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
     ]).start();
   }, [focused]);
 
+  // If you want to animate a "shadow" on focus, you can add that too
+  // (Optional: Uncomment the below for a shadow pop effect)
+  // const shadowStyle = focused
+  //   ? { shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }
+  //   : {};
+
   if (isProfile) {
     return (
       <Animated.View
         style={{
           transform: [{ scale: scaleValue }],
           opacity: opacityValue,
+          // ...shadowStyle,
         }}
         className="w-16 h-16 rounded-full overflow-hidden"
       >
@@ -44,14 +50,17 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
       style={{
         transform: [{ scale: scaleValue }],
         opacity: opacityValue,
+        // ...shadowStyle,
       }}
-      className={`w-16 h-16 rounded-full justify-center items-center border ${
-        focused ? "bg-white border-white" : "bg-[#80808099]  border-[#FFFFFF29]"
+      className={`w-16 h-16 rounded-full justify-center items-center border-2 ${
+        focused
+          ? "bg-white border-white"
+          : "bg-[#808080]/50 border-[#FFFFFF]/50"
       }`}
     >
       <Image
         source={icon}
-        tintColor={focused ? "#151312" : "#ffffff"}
+        style={{ tintColor: focused ? "#151312" : "#ffffff" }} // <-- Use style prop for tintColor!
         className="w-6 h-6"
         resizeMode="contain"
       />
@@ -100,7 +109,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="search"
         options={{
@@ -116,7 +124,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="community"
         options={{
@@ -132,7 +139,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="group"
         options={{
@@ -148,7 +154,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="profile"
         options={{
