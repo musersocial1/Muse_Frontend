@@ -2,13 +2,14 @@ import MoreInfoModal from "@/components/modals/MoreInfo";
 import OnboardingModal from "@/components/modals/OnboardingModal";
 import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
+
 import {
   Alert,
   Animated,
   Image,
-  ImageBackground,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -117,17 +118,36 @@ export default function Index() {
   };
 
   return (
-    <>
+    <View className="flex-1">
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
         translucent
       />
-      <ImageBackground
-        source={images.splash}
-        resizeMode="cover"
-        className="flex-1"
+      <View
+        // source={images.splash}
+        // resizeMode="cover"
+        className="flex-1 relative"
       >
+        <Image
+          source={images.splash}
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            resizeMode: "cover",
+          }}
+        />
+        <BlurView
+          intensity={100}
+          tint="dark"
+          className="absolute inset-0"
+          // style={{ backgroundColor: "rgba(0,0,0,0.7)" }} // add extra darkness if needed
+        />{" "}
         <View className="flex-1 px-6">
           {/* Bottom section with content */}
           <Animated.View
@@ -155,6 +175,7 @@ export default function Index() {
               <TouchableOpacity
                 className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                 activeOpacity={0.8}
+                onPress={() => router.replace("/home")} // Or "/(tabs)/home" if needed
               >
                 <Text className="text-white text-center font-medium text-base">
                   Already have an account
@@ -173,7 +194,8 @@ export default function Index() {
             </View>
           </Animated.View>
         </View>
-      </ImageBackground>
+        {/* </BlurView> */}
+      </View>
 
       <OnboardingModal
         visible={modalVisible}
@@ -204,6 +226,6 @@ export default function Index() {
         onClose={handleMoreInfoClose}
         onComplete={handleMoreInfoComplete}
       />
-    </>
+    </View>
   );
 }

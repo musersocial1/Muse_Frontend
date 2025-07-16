@@ -335,7 +335,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         return (
           <View
             className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 500 : 300 }}
+            // style={{ minHeight: isKeyboardVisible ? "40%" : "40%" }}
           >
             <View className="px-6 pt-6 pb-6">
               <View className="flex-row justify-between items-center mb-6">
@@ -375,7 +375,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 ) : null}
               </View>
 
-              <Text className="text-gray-500 text-md text-center mb-8 leading-5 my-10">
+              <Text className="text-gray-500 text-md text-center mb-8 leading-5 mt-5">
                 Enter your number so we can send a{"\n"}confirmation code to
                 proceed
               </Text>
@@ -913,11 +913,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           />
 
           {/* Progress indicator */}
-          <View className="flex-row px-6 mb-4 pt-16">
+          <View className="flex-row gap-2 w-full  justify-center flex  px-6 mb-4 pt-7">
             {[0, 1, 2, 3, 4].map((step) => (
               <View
                 key={step}
-                className={`flex-1 h-[2px] mx-1 rounded ${
+                className={` w-[12%] h-[2px]  mx-1 rounded ${
                   step <= currentStep ? "bg-[#FFFFFF]" : "bg-[#FFFFFF]/30"
                 }`}
               />
@@ -933,7 +933,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <Animated.View
               style={{
                 transform: [{ translateY: slideAnim }],
-                paddingBottom: isKeyboardVisible ? keyboardHeight * 0.1 : 0,
+                paddingBottom: isKeyboardVisible ? keyboardHeight * 0 : 0,
               }}
             >
               {renderModalContent()}
