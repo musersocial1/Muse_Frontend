@@ -26,7 +26,7 @@ export default function Index() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [moreInfoVisible, setMoreInfoVisible] = useState(true);
+  const [moreInfoVisible, setMoreInfoVisible] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
