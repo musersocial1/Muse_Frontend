@@ -1,18 +1,26 @@
 import { AuthProvider } from "@/context/AuthContext";
+import { customFonts } from "@/lib/fonts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
-// import { customFonts } from "@/lib/fonts";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 import { StatusBar } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./globals.css";
 
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  // const [fontsLoaded] = useFonts(customFonts);
+  const [fontsLoaded, error] = useFonts(customFonts);
 
-  // if (!fontsLoaded) return null;
+  useEffect(() => {
+    if (fontsLoaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, error]);
+
+  if (!fontsLoaded || error) return null;
 
   return (
     <SafeAreaProvider>
@@ -26,6 +34,7 @@ export default function RootLayout() {
           >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(profile)" options={{ headerShown: false }} />
             <Stack.Screen name="modal" options={{ presentation: "modal" }} />
           </Stack>
           {/* <StatusBar style="auto" /> */}

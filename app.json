@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.moseley.muse",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/muse-logo.png",
         "backgroundColor": "#ffffff"
@@ -33,10 +34,17 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a094832f-e025-4f8d-b5f7-7548fa7c60be"
+      }
     }
   }
 }

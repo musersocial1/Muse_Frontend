@@ -6,13 +6,8 @@ export const customFonts = {
   "NeutralSans-Medium": require("../../assets/fonts/neutral-sans/NeutralSans-Medium.otf"),
 
   // SF Pro Display
-  "SFProDisplay-Regular": require("../../assets/fonts/sfpro/SFPRODISPLAYREGULAR.OTF"),
-  "SFProDisplay-Bold": require("../../assets/fonts/sfpro/SFPRODISPLAYBOLD.OTF"),
-  "SFProDisplay-Medium": require("../../assets/fonts/sfpro/SFPRODISPLAYMEDIUM.OTF"),
-  "SFProDisplay-LightItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYLIGHTITALIC.OTF"),
-  "SFProDisplay-SemiboldItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYSEMIBOLDITALIC.OTF"),
-  "SFProDisplay-UltralightItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYULTRALIGHTITALIC.OTF"),
-  "SFProDisplay-BlackItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYBLACKITALIC.OTF"),
-  "SFProDisplay-HeavyItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYHEAVYITALIC.OTF"),
-  "SFProDisplay-ThinItalic": require("../../assets/fonts/sfpro/SFPRODISPLAYTHINITALIC.OTF"),
+  "SFProDisplay-Regular": require("../../assets/fonts/sfpro/SF-Pro-Display-Regular.otf"),
+  "SFProDisplay-Bold": require("../../assets/fonts/sfpro/SF-Pro-Display-Bold.otf"),
+  "SFProDisplay-Medium": require("../../assets/fonts/sfpro/SF-Pro-Display-Medium.otf"),
+  "SFProDisplay-Semibold": require("../../assets/fonts/sfpro/SF-Pro-Display-Semibold.otf"),
 };

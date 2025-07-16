@@ -1,6 +1,8 @@
 import MoreInfoModal from "@/components/modals/MoreInfo";
 import OnboardingModal from "@/components/modals/OnboardingModal";
 import { images } from "@/constants/images";
+import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   Alert,
@@ -24,10 +26,12 @@ export default function Index() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [moreInfoVisible, setMoreInfoVisible] = useState(false);
+  const [moreInfoVisible, setMoreInfoVisible] = useState(true);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+
+  const router = useRouter();
 
   React.useEffect(() => {
     Animated.parallel([
@@ -85,7 +89,7 @@ export default function Index() {
       {
         text: "OK",
         onPress: () => {
-          setModalVisible(true);
+          setMoreInfoVisible(true);
           resetForm();
         },
       },
@@ -102,6 +106,7 @@ export default function Index() {
         onPress: () => {
           resetForm();
           setMoreInfoVisible(false);
+          router.push(RouterConstantUtil.tabs.home as any);
         },
       },
     ]);
