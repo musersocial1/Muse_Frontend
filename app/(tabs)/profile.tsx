@@ -73,13 +73,16 @@ const Profile = () => {
             <Text className="text-gray-400 text-base">{item.label}</Text>
           </View>
           <View className="flex-row items-center max-w-[50%]">
-            <Text
-              numberOfLines={1}
-              className="text-white text-base font-medium mr-2"
-            >
-              {item.rightText}
-            </Text>
-            <ChevronRight color={"white"} opacity={30} size={20} />
+            <View className="flex-row items-center flex-shrink">
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                className="text-white text-base font-medium mr-2 flex-shrink"
+              >
+                {item.rightText}
+              </Text>
+              <ChevronRight color={"white"} opacity={30} size={20} />
+            </View>
           </View>
         </TouchableOpacity>
       ))}

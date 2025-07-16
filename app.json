@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/muse-logo.png",
     "scheme": "muse",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true

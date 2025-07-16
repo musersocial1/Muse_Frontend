@@ -155,10 +155,6 @@ const NotificationsSettings = () => {
             </View>
           </View>
         </ScrollView>
-
-        <View className="flex items-center justify-center pb-8">
-          <View className="w-32 h-1 bg-white rounded-full" />
-        </View>
       </SafeAreaView>
     </View>
   );

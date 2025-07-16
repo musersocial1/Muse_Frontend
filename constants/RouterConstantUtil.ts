@@ -20,9 +20,8 @@ export const RouterConstantUtil = {
     tags: "/(profile)/tags",
   },
 
-  // not implemented
   auth: {
-    login: "/login",
-    register: "/register",
+    login: "/(auth)",
+    register: "/(auth)",
   },
 };

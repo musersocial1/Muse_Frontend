@@ -1,7 +1,7 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useRouter } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
+import { ChevronRight, LogOut } from "lucide-react-native";
 import React from "react";
 import {
   Image,
@@ -18,36 +18,49 @@ const SETTINGS_ITEMS = [
     label: "Change your password",
     icon: icons.lock,
     route: RouterConstantUtil.profile.changepassword,
+    type: "normal",
   },
   {
     label: "Terms of use",
     icon: icons.terms,
     route: RouterConstantUtil.profile.termsofuse,
+    type: "normal",
   },
   {
     label: "Help desk",
     icon: icons.helpdesk,
     route: RouterConstantUtil.profile.helpdesk,
+    type: "normal",
   },
   {
     label: "Notifications",
     icon: icons.notifications,
     route: RouterConstantUtil.profile.notifications,
+    type: "normal",
   },
   {
     label: "Tags",
     icon: icons.tags,
     route: RouterConstantUtil.profile.tags,
+    type: "normal",
   },
   {
     label: "Privacy",
     icon: icons.eyeclose,
     route: RouterConstantUtil.profile.privacy,
+    type: "normal",
   },
   {
     label: "Communities and invoice",
     icon: icons.communities,
     route: RouterConstantUtil.profile.communities,
+    type: "normal",
+  },
+  {
+    label: "Log out",
+    icon: null,
+    route: "/",
+    type: "logout",
   },
 ];
 
@@ -55,27 +68,54 @@ const SettingsItem = ({
   label,
   icon,
   route,
+  type,
 }: {
   label: string;
   icon: any;
   route: string;
+  type: "normal" | "logout";
 }) => {
   const router = useRouter();
 
+  const handlePress = () => {
+    if (type === "logout") {
+      router.dismissAll();
+      router.replace("/(auth)" as any);
+    } else {
+      router.push(route as any);
+    }
+  };
+
   return (
     <TouchableOpacity
-      onPress={() => router.push(route as any)}
-      className="flex-row items-center py-4 px-5 bg-[#1C1C1C] rounded-full"
+      onPress={handlePress}
+      className={`flex-row items-center py-4 px-5 rounded-full ${
+        type === "logout" ? "bg-red-500/10" : "bg-[#1C1C1C]"
+      }`}
     >
-      <View className="w-12 h-12 rounded-full bg-white/10 items-center justify-center mr-4">
-        <Image source={icon} className="w-6 h-6" resizeMode="contain" />
+      <View
+        className={`w-12 h-12 rounded-full items-center justify-center mr-4 ${
+          type === "logout" ? "bg-red-500/20" : "bg-white/10"
+        }`}
+      >
+        {type === "logout" ? (
+          <LogOut color="#EF4444" size={24} />
+        ) : (
+          <Image source={icon} className="w-6 h-6" resizeMode="contain" />
+        )}
       </View>
 
       <View className="flex-1">
-        <Text className="text-white text-base font-medium">{label}</Text>
+        <Text
+          className={`text-base font-medium ${
+            type === "logout" ? "text-red-400" : "text-white"
+          }`}
+        >
+          {label}
+        </Text>
       </View>
 
-      <ChevronRight color="gray" size={20} />
+      <ChevronRight color={type === "logout" ? "#EF4444" : "gray"} size={20} />
     </TouchableOpacity>
   );
 };
@@ -108,6 +148,7 @@ const Settings = () => {
                 label={item.label}
                 icon={item.icon}
                 route={item.route}
+                type={item.type as any}
               />
             ))}
           </View>

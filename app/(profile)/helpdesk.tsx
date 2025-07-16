@@ -51,50 +51,54 @@ export default function HelpDesk() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
-        <ScrollView
-          className="flex-1 px-6"
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text className="text-white text-[18px] font-medium mt-8 mb-12">
-            Leave us a message
-          </Text>
-
-          <View className="mb-6">
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-              placeholderTextColor="#6B7280"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              className="bg-grayish-100 text-white px-4 py-4 rounded-full text-[16px]"
-            />
-          </View>
-
-          <View className="mb-8">
-            <TextInput
-              value={complaint}
-              onChangeText={setComplaint}
-              placeholder="Write your complaint"
-              placeholderTextColor="#6B7280"
-              multiline
-              numberOfLines={10}
-              textAlignVertical="top"
-              className="bg-grayish-100 text-brandWhite px-4 py-4 rounded-lg text-[16px] min-h-[200px]"
-            />
-          </View>
-        </ScrollView>
-
-        <View className="px-6 pb-8">
-          <TouchableOpacity
-            onPress={handleSend}
-            className="bg-secondary py-4 rounded-full items-center justify-center"
-            activeOpacity={0.8}
+        <View className="flex-1">
+          <ScrollView
+            className="flex-1 px-6"
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ flexGrow: 1 }}
           >
-            <Text className="text-white text-base font-medium">Send</Text>
-          </TouchableOpacity>
+            <Text className="text-white text-[18px] font-medium mt-8 mb-12">
+              Leave us a message
+            </Text>
+
+            <View className="mb-6">
+              <TextInput
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                placeholderTextColor="#6B7280"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                className="bg-grayish-100 text-white px-4 py-4 rounded-full text-[16px]"
+              />
+            </View>
+
+            <View className="flex-1 mb-8">
+              <TextInput
+                value={complaint}
+                onChangeText={setComplaint}
+                placeholder="Write your complaint"
+                placeholderTextColor="#6B7280"
+                multiline
+                textAlignVertical="top"
+                className="bg-grayish-100 text-brandWhite px-4 py-4 rounded-lg text-[16px] flex-1"
+                style={{ minHeight: 150 }}
+              />
+            </View>
+          </ScrollView>
+
+          {/* Button Container */}
+          <View className="px-6 pb-8 pt-4">
+            <TouchableOpacity
+              onPress={handleSend}
+              className="bg-secondary py-4 rounded-full items-center justify-center"
+              activeOpacity={0.8}
+            >
+              <Text className="text-white text-base font-medium">Send</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

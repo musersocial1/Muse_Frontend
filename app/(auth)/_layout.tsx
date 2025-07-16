@@ -5,7 +5,11 @@ import { StatusBar, StyleSheet } from "react-native";
 const AuthLayout = () => {
   return (
     <>
-      <StatusBar hidden={true} />
+      <StatusBar
+        hidden={false}
+        barStyle="light-content"
+        showHideTransition="fade"
+      />
       <Stack
         screenOptions={{
           headerShown: false,
