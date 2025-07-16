@@ -31,6 +31,7 @@ export default function Index() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+  const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
   const router = useRouter();
 
@@ -48,11 +49,27 @@ export default function Index() {
       }),
     ]).start();
   }, []);
+  const blurAnim = useRef(new Animated.Value(0)).current;
 
   const handleGetStarted = () => {
     setModalVisible(true);
     setCurrentStep(0);
     setPhoneNumber("");
+    Animated.timing(blurAnim, {
+      toValue: 100,
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    resetForm();
+    Animated.timing(blurAnim, {
+      toValue: 0,
+      duration: 600,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handleContinue = () => {
@@ -65,11 +82,6 @@ export default function Index() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
-  };
-
-  const handleModalClose = () => {
-    setModalVisible(false);
-    resetForm();
   };
 
   const resetForm = () => {
@@ -142,12 +154,11 @@ export default function Index() {
             resizeMode: "cover",
           }}
         />
-        <BlurView
-          intensity={100}
+        <AnimatedBlurView
+          intensity={blurAnim}
           tint="dark"
           className="absolute inset-0"
-          // style={{ backgroundColor: "rgba(0,0,0,0.7)" }} // add extra darkness if needed
-        />{" "}
+        />
         <View className="flex-1 px-6">
           {/* Bottom section with content */}
           <Animated.View
