@@ -29,9 +29,11 @@ export default function Index() {
   const [username, setUsername] = useState("");
   const [moreInfoVisible, setMoreInfoVisible] = useState(false);
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+  const blurAnim = useRef(new Animated.Value(0)).current;
+  const [blurIntensity, setBlurIntensity] = useState(0);
 
   const router = useRouter();
 
@@ -49,7 +51,38 @@ export default function Index() {
       }),
     ]).start();
   }, []);
-  const blurAnim = useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    if (modalVisible) {
+      // Animate OUT: fade to 0, slide down (e.g., +50px)
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 50,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Animate IN: fade to 1, slide to original
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [modalVisible]);
 
   const handleGetStarted = () => {
     setModalVisible(true);
@@ -129,6 +162,20 @@ export default function Index() {
     setMoreInfoVisible(false);
   };
 
+  React.useEffect(() => {
+    const listener = blurAnim.addListener(({ value }) => {
+      setBlurIntensity(value);
+    });
+
+    Animated.timing(blurAnim, {
+      toValue: modalVisible ? 100 : 0,
+      duration: 600,
+      useNativeDriver: false, // must be false for blur intensity
+    }).start();
+
+    return () => blurAnim.removeListener(listener);
+  }, [modalVisible]);
+
   return (
     <View className="flex-1">
       <StatusBar
@@ -154,58 +201,57 @@ export default function Index() {
             resizeMode: "cover",
           }}
         />
-        <AnimatedBlurView
-          intensity={blurAnim}
-          tint="light" // <--- as close to white as you can get
-          className="absolute inset-0"
-        />
-        <View className="flex-1 px-6">
-          {/* Bottom section with content */}
-          <Animated.View
-            style={{
-              opacity: fadeAnim,
-              transform: [{ translateY: slideAnim }],
-            }}
-            className="flex-1 justify-end pb-20"
-          >
-            <View className="items-center">
-              <Image
-                source={images.logo}
-                className="w-52 h-20"
-                resizeMode="contain"
-              />
-            </View>
-            <View className="items-center mb-10">
-              <Text className="text-[#FFFFFF] text-3xl font-bold text-center leading-tight mb-2">
-                Access over 1000+{"\n"}tailored{" "}
-                <Text className="text-[#FFFFFF]">communities</Text>
-              </Text>
-            </View>
 
-            <View className="w-full space-y-3">
-              <TouchableOpacity
-                className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
-                activeOpacity={0.8}
-                onPress={() => router.replace("/home")} // Or "/(tabs)/home" if needed
-              >
-                <Text className="text-white text-center font-medium text-base">
-                  Already have an account
-                </Text>
-              </TouchableOpacity>
+        <BlurView intensity={blurIntensity} tint="dark" className="   flex-1">
+          {/* <View className=" bg-black h-full  flex-1 inset-0 z-[100]" /> */}
 
-              <TouchableOpacity
-                onPress={handleGetStarted}
-                className="bg-secondary rounded-2xl py-5 px-6 shadow-lg mt-4"
-                activeOpacity={0.9}
-              >
-                <Text className="text-white text-center font-medium text-base">
-                  Get started
+          <View className="flex-1 px-6">
+            {/* Bottom section with content */}
+            <Animated.View
+              style={{
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              }}
+              className="flex-1 justify-end pb-20"
+            >
+              <View className="items-center">
+                <Image
+                  source={images.logo}
+                  className="w-52 h-20"
+                  resizeMode="contain"
+                />
+              </View>
+              <View className="items-center mb-10">
+                <Text className="text-[#FFFFFF] text-3xl font-bold text-center leading-tight mb-2">
+                  Access over 1000+{"\n"}tailored{" "}
+                  <Text className="text-[#FFFFFF]">communities</Text>
                 </Text>
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-        {/* </BlurView> */}
+              </View>
+
+              <View className="w-full space-y-3">
+                <TouchableOpacity
+                  className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
+                  activeOpacity={0.8}
+                  onPress={() => router.replace("/home")} // Or "/(tabs)/home" if needed
+                >
+                  <Text className="text-white text-center font-medium text-base">
+                    Already have an account
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleGetStarted}
+                  className="bg-secondary rounded-2xl py-5 px-6 shadow-lg mt-4"
+                  activeOpacity={0.9}
+                >
+                  <Text className="text-white text-center font-medium text-base">
+                    Get started
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Animated.View>
+          </View>
+        </BlurView>
       </View>
 
       <OnboardingModal

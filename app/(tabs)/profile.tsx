@@ -1,7 +1,8 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
+
 import React from "react";
 import {
   Dimensions,
@@ -112,7 +113,13 @@ const ProfileStats = ({ router }: any) => (
               >
                 {item.rightText}
               </Text>
-              <ChevronRight color={"white"} opacity={30} size={20} />
+              <Feather
+                name="chevron-right"
+                size={20}
+                color="white"
+                style={{ opacity: 0.7 }}
+              />
+              {/* <ChevronRight color={"white"} opacity={30} size={20} /> */}
             </View>
           </View>
         </TouchableOpacity>

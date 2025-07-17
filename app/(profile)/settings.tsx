@@ -1,7 +1,8 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ChevronRight, LogOut } from "lucide-react-native";
+
 import React from "react";
 import {
   Image,
@@ -115,7 +116,7 @@ const SettingsItem = ({
           }`}
         >
           {type === "logout" ? (
-            <LogOut color="#EF4444" size={24} />
+            <Feather name="log-out" color="#EF4444" size={24} />
           ) : (
             <Image source={icon} className="w-6 h-6" resizeMode="contain" />
           )}
@@ -130,7 +131,8 @@ const SettingsItem = ({
             {label}
           </Text>
         </View>
-        <ChevronRight
+        <Feather
+          name="chevron-right"
           color={type === "logout" ? "#EF4444" : "gray"}
           size={20}
         />

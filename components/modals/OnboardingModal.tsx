@@ -1,10 +1,13 @@
 import { BlurView as ExpoBlurView } from "expo-blur";
-import { ArrowLeft, Eye, EyeOff, X } from "lucide-react-native";
+// import { ArrowLeft, Eye, EyeOff, X } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
+
 import React, { useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Platform,
   Text,
@@ -138,6 +141,19 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     };
   }, []);
 
+  const phoneInputRef = useRef<TextInput>(null);
+  React.useEffect(() => {
+    if (!visible) return;
+    // Auto-focus logic based on step
+    if (currentStep === 0 && phoneInputRef.current) {
+      setTimeout(() => phoneInputRef.current?.focus(), 200); // Delay for modal open
+    }
+    if (currentStep === 1 && otpRefs.current[0]) {
+      setTimeout(() => otpRefs.current[0]?.focus(), 200); // Focus first OTP input
+    }
+    // Add similar blocks for other steps if needed
+  }, [visible, currentStep]);
+
   const validatePhoneNumber = (phone: string) => {
     const cleaned = phone.replace(/\D/g, "");
     if (cleaned.length === 0) return "Phone number is required";
@@ -193,19 +209,37 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleOTPChange = (text: string, index: number) => {
+    text = text.replace(/\D/g, "");
+
+    // PASTE (multi-char, e.g., "12345")
+    if (text.length > 1) {
+      const chars = text.slice(0, 5).split("");
+      setOtpValues(chars.concat(Array(5 - chars.length).fill("")));
+
+      // Blur the last box if all are filled
+      if (chars.length >= 5) {
+        setTimeout(() => otpRefs.current[4]?.blur(), 10);
+      } else {
+        setTimeout(() => otpRefs.current[chars.length]?.focus(), 10);
+      }
+      if (inputError) setInputError("");
+      return;
+    }
+
+    // SINGLE ENTRY
     const newOtpValues = [...otpValues];
-    newOtpValues[index] = text;
+    newOtpValues[index] = text[0] || "";
     setOtpValues(newOtpValues);
 
-    // Auto-focus next input
+    // Move focus to next input only if not last
     if (text && index < 4) {
       otpRefs.current[index + 1]?.focus();
     }
-
-    // Clear error if exists
-    if (inputError) {
-      setInputError("");
+    // If we're on the last box, BLUR (and do NOT focus anything else)
+    if (index === 4 && text) {
+      setTimeout(() => otpRefs.current[4]?.blur(), 10);
     }
+    if (inputError) setInputError("");
   };
 
   const handleOTPKeyPress = (key: string, index: number) => {
@@ -337,10 +371,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 0:
         return (
           <View
-            className="bg-white rounded-t-3xl pb-10 shadow-2xl"
+            className="bg-white rounded-t-3xl py-[8%] shadow-2xl"
             // style={{ minHeight: isKeyboardVisible ? "40%" : "40%" }}
           >
-            <View className="px-6 pt-6 pb-6">
+            <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -349,13 +383,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
               <View className="mb-4">
                 <TextInput
                   value={phoneNumber}
+                  ref={phoneInputRef}
                   onChangeText={(text) => handleInputChange(text, "phone")}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setIsInputFocused(false)}
@@ -415,7 +450,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <ArrowLeft size={20} color="#666" />
+                  <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -424,7 +459,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
@@ -434,16 +469,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <TextInput
                       key={index}
                       ref={(ref) => (otpRefs.current[index] = ref!) as any}
-                      value={value}
-                      onChangeText={(text) =>
-                        handleOTPChange(text.slice(-1), index)
-                      }
+                      value={value ? value[0] : ""}
+                      onChangeText={(text) => handleOTPChange(text, index)}
                       onKeyPress={({ nativeEvent }) =>
                         handleOTPKeyPress(nativeEvent.key, index)
                       }
                       className={otpInputStyle(!!inputError, false, !!value)}
                       keyboardType="number-pad"
-                      maxLength={1}
+                      // maxLength={1}
                       selectTextOnFocus
                     />
                   ))}
@@ -492,7 +525,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <ArrowLeft size={20} color="#666" />
+                  <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -501,7 +534,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
@@ -529,9 +562,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className="absolute right-4 top-4"
                   >
                     {showPassword ? (
-                      <EyeOff size={20} color="#666" />
+                      <Feather name="eye-off" size={20} color="#666" />
                     ) : (
-                      <Eye size={20} color="#666" />
+                      <Feather name="eye" size={20} color="#666" />
                     )}
                   </TouchableOpacity>
                 </View>
@@ -560,9 +593,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className="absolute right-4 top-4"
                   >
                     {showPassword ? (
-                      <EyeOff size={20} color="#666" />
+                      <Feather name="eye-off" size={20} color="#666" />
                     ) : (
-                      <Eye size={20} color="#666" />
+                      <Feather name="eye" size={20} color="#666" />
                     )}
                   </TouchableOpacity>
                 </View>
@@ -610,7 +643,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <ArrowLeft size={20} color="#666" />
+                  <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -619,7 +652,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
@@ -723,7 +756,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <ArrowLeft size={20} color="#666" />
+                  <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -732,7 +765,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
@@ -759,9 +792,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className="absolute right-4 top-4"
                   >
                     {showPassword ? (
-                      <EyeOff size={20} color="#666" />
+                      <Feather name="eye-off" size={20} color="#666" />
                     ) : (
-                      <Eye size={20} color="#666" />
+                      <Feather name="eye" size={20} color="#666" />
                     )}
                   </TouchableOpacity>
                 </View>
@@ -789,9 +822,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className="absolute right-4 top-4"
                   >
                     {showPassword ? (
-                      <EyeOff size={20} color="#666" />
+                      <Feather name="eye-off" size={20} color="#666" />
                     ) : (
-                      <Eye size={20} color="#666" />
+                      <Feather name="eye" size={20} color="#666" />
                     )}
                   </TouchableOpacity>
                 </View>
@@ -831,15 +864,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         return (
           <View
             className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 550 : 260 }}
+            // style={{ minHeight: isKeyboardVisible ? 550 : 260 }}
           >
-            <View className="px-6 pt-6 pb-6">
+            <View className="px-6 pt-6 pb-8">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <ArrowLeft size={20} color="#666" />
+                  <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
                   {stepTitles[currentStep]}
@@ -848,7 +881,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={handleModalClose}
                   className="p-2 bg-gray-100 rounded-full"
                 >
-                  <X size={20} color="#666" />
+                  <Feather name="x" size={20} color="#666" />
                 </TouchableOpacity>
               </View>
 
@@ -933,13 +966,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               />
             ))}
           </View>
-
-          <View className="flex-1 justify-end">
-            <TouchableOpacity
-              className="flex-1"
-              activeOpacity={1}
-              // onPress={handleModalClose}
-            />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} // adjust as needed for your modal header
+            style={{ flex: 1, justifyContent: "flex-end" }}
+          >
+            <TouchableOpacity className="flex-1" activeOpacity={1} />
             <Animated.View
               style={{
                 transform: [{ translateY: slideAnim }],
@@ -948,7 +980,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             >
               {renderModalContent()}
             </Animated.View>
-          </View>
+          </KeyboardAvoidingView>
         </Animated.View>
       </TouchableWithoutFeedback>
     </Modal>
