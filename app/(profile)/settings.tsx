@@ -11,7 +11,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const SETTINGS_ITEMS = [
   {
@@ -89,7 +92,7 @@ const SettingsItem = ({
   return (
     <TouchableOpacity
       onPress={handlePress}
-      className={`flex-row items-center py-4 px-5 rounded-full ${
+      className={`flex-row items-center p-3 rounded-full ${
         type === "logout" ? "bg-red-500/10" : "bg-[#1C1C1C]"
       }`}
     >
@@ -122,12 +125,16 @@ const SettingsItem = ({
 
 const Settings = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets(); // Handles iPhone home indicator space
 
   return (
-    <View className="flex-1 bg-[#121212]">
+    <View
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      className="flex-1 bg-[#121212]"
+    >
       <StatusBar barStyle="light-content" />
       <SafeAreaView className="flex-1">
-        <View className="flex-row items-center justify-between px-6 py-4">
+        <View className="flex-row items-center justify-between px-6 pb-4">
           <TouchableOpacity
             onPress={() =>
               router.replace(RouterConstantUtil.tabs.profile as any)

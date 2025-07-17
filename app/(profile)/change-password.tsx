@@ -7,13 +7,18 @@ import React, { useState } from "react";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const ResetPassword = () => {
   const [showOTP, setShowOTP] = useState(false);
@@ -77,96 +82,106 @@ const ResetPassword = () => {
       ) : (
         <XCircle size={18} color="red" className="mr-2" />
       )}
-      <Text className="text-white text-sm ml-1">{label}</Text>
+      <Text className="text-white text-[20px] font-sfpro-regular capitalize text-sm ml-1">
+        {label}
+      </Text>
     </View>
   );
 
+  const insets = useSafeAreaInsets();
   return (
-    <View className="flex-1 bg-[#121212]">
-      <StatusBar barStyle="light-content" />
-      <SafeAreaView className="flex-1">
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4">
-          <TouchableOpacity
-            onPress={() =>
-              router.replace(RouterConstantUtil.profile.settings as any)
-            }
-            className="w-10 h-10 rounded-full items-center justify-center"
-          >
-            <Image source={icons.back} className="w-14 h-14" />
-          </TouchableOpacity>
-          <Text className="text-[#FFFFFF] text-[20px] font-bold">
-            Reset Password
-          </Text>
-          <View className="w-10" />
-        </View>
-
-        {/* Inputs */}
-        <View className="flex-1 px-6 pt-8">
-          <View className="bg-[#2A2A2A] rounded-full p-5 mb-4">
-            <TextInput
-              className="text-gray-200 font-medium text-[18px]"
-              value={currentPassword}
-              onChangeText={setCurrentPassword}
-              placeholder="Current Password"
-              placeholderTextColor="#666"
-              secureTextEntry
-            />
-          </View>
-
-          <View className="bg-[#2A2A2A] rounded-full p-5 mb-4">
-            <TextInput
-              className="text-gray-200 font-medium text-[18px]"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              placeholder="New Password"
-              placeholderTextColor="#666"
-              secureTextEntry
-            />
-          </View>
-
-          <View className="mt-4">
-            <ValidationItem
-              label="At least 1 uppercase letter"
-              passed={passwordValidation.hasUppercase}
-            />
-            <ValidationItem
-              label="At least 1 special character"
-              passed={passwordValidation.hasSpecialChar}
-            />
-            <ValidationItem
-              label="Minimum 8 characters"
-              passed={passwordValidation.hasMinLength}
-            />
-          </View>
-        </View>
-
-        {/* Button */}
-        <View className="px-6 pb-8">
-          <TouchableOpacity
-            className={`py-4 rounded-full items-center ${
-              newPassword ? "bg-secondary" : "bg-grayish-100"
-            }`}
-            onPress={handleResetPassword}
-            disabled={!newPassword}
-          >
-            <Text className="text-white text-center font-semibold text-lg">
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "#121212" }}
+      behavior={"padding"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? -20 : -36} // or adjust for your header height
+    >
+      <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
+        <StatusBar barStyle="light-content" />
+        <SafeAreaView className="flex-1">
+          {/* Header */}
+          <View className="flex-row items-center justify-between px-6 pb-4">
+            <TouchableOpacity
+              onPress={() =>
+                router.replace(RouterConstantUtil.profile.settings as any)
+              }
+              className="w-10 h-10 rounded-full items-center justify-center"
+            >
+              <Image source={icons.back} className="w-14 h-14" />
+            </TouchableOpacity>
+            <Text className="text-[#FFFFFF] text-[20px] font-bold">
               Reset Password
             </Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+            <View className="w-10" />
+          </View>
 
-      <OTPModal
-        visible={showOTP}
-        onClose={() => setShowOTP(false)}
-        onConfirm={handleOTPConfirm}
-        onResend={handleResendOTP}
-        title="Confirm code"
-        subtitle="Enter the 6-digit code sent to your email"
-        email="your@email.com"
-      />
-    </View>
+          {/* Inputs */}
+          <View className="flex-1 px-6  pt-8">
+            <View className="bg-[#1C1C1C] rounded-full h-[60px] px-[5%] mb-4">
+              <TextInput
+                className="text-white/50 font-bold h-full text-[15px] font-sfpro-bold "
+                value={currentPassword}
+                onChangeText={setCurrentPassword}
+                placeholder="Old password"
+                placeholderTextColor="#666"
+                secureTextEntry
+                textAlignVertical="center"
+              />
+            </View>
+
+            <View className="bg-[#1C1C1C] rounded-full h-[60px] px-[5%] mb-4">
+              <TextInput
+                className="text-white/50 h-full font-bold text-[15px] font-sfpro-bold "
+                value={newPassword}
+                onChangeText={setNewPassword}
+                placeholder="New Password"
+                placeholderTextColor="#666"
+                secureTextEntry
+              />
+            </View>
+
+            <View className="mt-4 w-full p-2">
+              <ValidationItem
+                label="At least 1 uppercase letter"
+                passed={passwordValidation.hasUppercase}
+              />
+              <ValidationItem
+                label="At least 1 special character"
+                passed={passwordValidation.hasSpecialChar}
+              />
+              <ValidationItem
+                label="Minimum 8 characters"
+                passed={passwordValidation.hasMinLength}
+              />
+            </View>
+          </View>
+
+          {/* Button */}
+          <View className="px-6 ">
+            <TouchableOpacity
+              className={`py-4 rounded-full items-center ${
+                newPassword ? "bg-secondary" : "bg-grayish-100"
+              }`}
+              onPress={handleResetPassword}
+              disabled={!newPassword}
+            >
+              <Text className="text-white text-center font-semibold text-lg">
+                Reset Password
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+
+        <OTPModal
+          visible={showOTP}
+          onClose={() => setShowOTP(false)}
+          onConfirm={handleOTPConfirm}
+          onResend={handleResendOTP}
+          title="Confirm code"
+          subtitle="Enter the 6-digit code sent to your email"
+          email="your@email.com"
+        />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

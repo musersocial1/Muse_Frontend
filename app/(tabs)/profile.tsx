@@ -11,7 +11,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
+} from "react-native"; // or from "expo-status-bar"
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
@@ -59,11 +59,11 @@ const Profile = () => {
       ].map((item, i) => (
         <TouchableOpacity
           key={i}
-          className="flex-row items-center justify-between py-4 px-4 bg-[#1C1C1C] rounded-full"
+          className="flex-row items-center justify-between p-4 bg-[#1C1C1C] rounded-full"
           onPress={() => router.replace(item.route as any)}
         >
           <View className="flex-row items-center">
-            <View className="w-10 h-10 bg-white/10 rounded-full items-center justify-center mr-4">
+            <View className="w-10  h-10 bg-white/10 rounded-full items-center justify-center mr-4">
               <Image
                 source={item.icon}
                 className="w-5 h-5"
@@ -106,9 +106,16 @@ const Profile = () => {
   );
 
   const ProfileScreen = () => (
-    <View className="flex-1 bg-[#121212]">
-      <StatusBar barStyle="light-content" />
-      <SafeAreaView className="flex-1">
+    <View
+      className="flex-1 bg-[#121212]"
+      // style={{ flex: 1, backgroundColor: "#121212" }}
+    >
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="#121212" // <-- add this line!
+        showHideTransition="fade"
+      />
+      <SafeAreaView className="flex-1 ">
         <View
           className="flex-row items-center justify-between py-4"
           style={{ paddingHorizontal: width * 0.05 }}
@@ -117,10 +124,10 @@ const Profile = () => {
             className="items-center justify-center"
             style={{ width: width * 0.12, height: width * 0.12 }}
           >
-            <Image
+            {/* <Image
               source={icons.back}
               style={{ width: width * 0.12, height: width * 0.12 }}
-            />
+            /> */}
           </TouchableOpacity>
           <Text className="text-white text-[20px] font-bold">Profile</Text>
           <TouchableOpacity

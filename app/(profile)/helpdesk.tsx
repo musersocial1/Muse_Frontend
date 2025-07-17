@@ -8,12 +8,12 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
-  StatusBar,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HelpDesk() {
   const [email, setEmail] = useState("");
@@ -30,11 +30,17 @@ export default function HelpDesk() {
     }
   };
 
-  return (
-    <SafeAreaView className="flex-1 bg-[#121212]">
-      <StatusBar barStyle="light-content" backgroundColor="#111827" />
+  const insets = useSafeAreaInsets(); // Handles iPhone home indicator space
 
-      <View className="flex-row items-center justify-between px-6 py-4">
+  return (
+    <SafeAreaView
+      style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 10 }}
+      className="flex-1 bg-[#121212]"
+    >
+      <View
+        style={{ paddingTop: insets.top }}
+        className="flex-row items-center justify-between px-6 "
+      >
         <TouchableOpacity
           onPress={() =>
             router.replace(RouterConstantUtil.profile.settings as any)
@@ -43,12 +49,15 @@ export default function HelpDesk() {
         >
           <Image source={icons.back} className="w-14 h-14" />
         </TouchableOpacity>
-        <Text className="text-[#FFFFFF] text-[20px] font-bold">Help desk</Text>
+        <Text className="text-[#FFFFFF] text-[20px]   font-bold">
+          Help desk
+        </Text>
         <View className="w-10" />
       </View>
 
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === "ios" ? "padding" : "padding"}
+        keyboardVerticalOffset={20} // or adjust for your header height
         className="flex-1"
       >
         <View className="flex-1">
@@ -58,7 +67,7 @@ export default function HelpDesk() {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ flexGrow: 1 }}
           >
-            <Text className="text-white text-[18px] font-medium mt-8 mb-12">
+            <Text className="text-white text-[18px] font-medium mt-8 mb-8">
               Leave us a message
             </Text>
 
@@ -69,6 +78,9 @@ export default function HelpDesk() {
                 placeholder="Enter your email"
                 placeholderTextColor="#6B7280"
                 keyboardType="email-address"
+                autoComplete="email" // <-- NEW (expo 48+, RN 0.71+)
+                textContentType="emailAddress" // <-- iOS hint
+                importantForAutofill="yes" // <-- Android hint
                 autoCapitalize="none"
                 autoCorrect={false}
                 className="bg-grayish-100 text-white px-4 py-4 rounded-full text-[16px]"
@@ -83,14 +95,14 @@ export default function HelpDesk() {
                 placeholderTextColor="#6B7280"
                 multiline
                 textAlignVertical="top"
-                className="bg-grayish-100 text-brandWhite px-4 py-4 rounded-lg text-[16px] flex-1"
+                className="bg-grayish-100 h-[50%] shrink-0 text-brandWhite px-4 py-4 rounded-[20px] text-[16px] w-full"
                 style={{ minHeight: 150 }}
               />
             </View>
           </ScrollView>
 
           {/* Button Container */}
-          <View className="px-6 pb-8 pt-4">
+          <View className="px-6  pt-4">
             <TouchableOpacity
               onPress={handleSend}
               className="bg-secondary py-4 rounded-full items-center justify-center"

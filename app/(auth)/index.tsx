@@ -156,7 +156,7 @@ export default function Index() {
         />
         <AnimatedBlurView
           intensity={blurAnim}
-          tint="dark"
+          tint="light" // <--- as close to white as you can get
           className="absolute inset-0"
         />
         <View className="flex-1 px-6">

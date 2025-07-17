@@ -1,7 +1,9 @@
 import { icons } from "@/constants/icons";
+import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { useEffect, useRef } from "react";
 import { Animated, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function TabIcon({ focused, icon, title, isProfile }: any) {
   const scaleValue = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
@@ -37,7 +39,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
           opacity: opacityValue,
           // ...shadowStyle,
         }}
-        className="w-16 h-16 rounded-full overflow-hidden"
+        className="w-14 h-14 rounded-full overflow-hidden"
       >
         <Image source={icon} className="w-full h-full" resizeMode="cover" />
       </Animated.View>
@@ -52,16 +54,21 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
         opacity: opacityValue,
         // ...shadowStyle,
       }}
-      className={`w-16 h-16 rounded-full justify-center items-center border-2 ${
+      className={`w-14 h-14 rounded-full  justify-center items-center border ${
         focused
           ? "bg-white border-white"
           : "bg-[#808080]/50 border-[#FFFFFF]/50"
       }`}
     >
+      <BlurView
+        intensity={100} // Change for more/less blur
+        tint={focused ? "light" : "dark"}
+        // style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
+      />
       <Image
         source={icon}
         style={{ tintColor: focused ? "#151312" : "#ffffff" }} // <-- Use style prop for tintColor!
-        className="w-6 h-6"
+        className="w-[50%] h-fit"
         resizeMode="contain"
       />
     </Animated.View>
@@ -69,6 +76,8 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 }
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -83,8 +92,9 @@ export default function TabsLayout() {
           backgroundColor: "transparent",
           borderTopWidth: 0,
           borderRadius: 30,
-          marginHorizontal: 10,
-          marginBottom: 36,
+          marginHorizontal: 54,
+          gap: 0,
+          marginBottom: insets.bottom,
           height: 60,
           position: "absolute",
           borderWidth: 0,
