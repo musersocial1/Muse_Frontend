@@ -5,7 +5,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
-import { StatusBar, View } from "react-native";
+import { View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./globals.css";
 
@@ -26,11 +26,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <StatusBar
+          {/* <StatusBar
             hidden={false}
             barStyle="light-content"
+            backgroundColor="#121212" // <-- add this line!
             showHideTransition="fade"
-          />
+          /> */}
           <View style={{ flex: 1, backgroundColor: "#121212" }}>
             <Stack
               screenOptions={{

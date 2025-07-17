@@ -6,6 +6,7 @@ import {
   Dimensions,
   Keyboard,
   Modal,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -72,6 +73,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const otpRefs = useRef<TextInput[]>([]);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [focusedOtpIndex, setFocusedOtpIndex] = useState<number | null>(null);
 
   const totalSteps = 5;
   const stepTitles = [
@@ -305,7 +308,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       isFocused: boolean,
       isValid: boolean
     ) =>
-      `rounded-2xl p-4 text-base text-gray-900 border ${
+      `rounded-[17px] h-[3.9rem] px-[5%] text-base  text-gray-900 border ${
         hasError
           ? "bg-light-red border-border-red"
           : isFocused
@@ -334,7 +337,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 0:
         return (
           <View
-            className="bg-white rounded-t-3xl shadow-2xl"
+            className="bg-white rounded-t-3xl pb-10 shadow-2xl"
             // style={{ minHeight: isKeyboardVisible ? "40%" : "40%" }}
           >
             <View className="px-6 pt-6 pb-6">
@@ -403,10 +406,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 1:
         return (
           <View
-            className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 500 : 300 }}
+            className="bg-white  py-[8%] rounded-t-3xl shadow-2xl"
+            // style={{ minHeight: isKeyboardVisible ? 500 : 300 }}
           >
-            <View className="px-6 pt-6 pb-6">
+            <View className="px-6  ">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
                   onPress={onBack}
@@ -480,8 +483,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 2:
         return (
           <View
-            className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
+            className="bg-white py-[4%] rounded-t-3xl shadow-2xl"
+            // style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
           >
             <View className="px-6 pt-6 pb-6">
               <View className="flex-row justify-between items-center mb-6">
@@ -507,19 +510,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <TextInput
                     value={password}
                     onChangeText={(text) => handleInputChange(text, "password")}
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
                     placeholder="Create password"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError,
-                      isInputFocused,
+                      focusedField === "password",
                       isValidInput
                     )}
                     secureTextEntry={!showPassword}
                     returnKeyType="done"
                     onSubmitEditing={handleContinue}
                   />
+
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-4"
@@ -537,19 +541,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     onChangeText={(text) =>
                       handleInputChange(text, "confirmPassword")
                     }
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
+                    onFocus={() => setFocusedField("confirmPassword")}
+                    onBlur={() => setFocusedField(null)}
                     placeholder="Confirm password"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError,
-                      isInputFocused,
+                      focusedField === "confirmPassword",
                       isValidInput
                     )}
                     secureTextEntry={!showPassword}
                     returnKeyType="done"
                     onSubmitEditing={handleContinue}
                   />
+
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-4"
@@ -596,8 +601,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 3:
         return (
           <View
-            className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 550 : 400 }}
+            className="bg-white py-[3%] rounded-t-3xl shadow-2xl"
+            // style={{ minHeight: isKeyboardVisible ? 550 : 400 }}
           >
             <View className="px-6 pt-6 pb-6">
               <View className="flex-row justify-between items-center mb-6">
@@ -625,13 +630,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     onChangeText={(text) =>
                       handleInputChange(text, "firstName")
                     }
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
+                    onFocus={() => setFocusedField("firstName")}
+                    onBlur={() => setFocusedField(null)}
                     placeholder="First name"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError && !firstName.trim(),
-                      isInputFocused,
+                      focusedField === "firstName",
                       !!firstName.trim()
                     )}
                     returnKeyType="next"
@@ -642,13 +647,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <TextInput
                     value={lastName}
                     onChangeText={(text) => handleInputChange(text, "lastName")}
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
+                    onFocus={() => setFocusedField("lastName")}
+                    onBlur={() => setFocusedField(null)}
                     placeholder="Last name"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError && !lastName.trim(),
-                      isInputFocused,
+                      focusedField === "lastName",
                       !!lastName.trim()
                     )}
                     returnKeyType="next"
@@ -659,13 +664,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <TextInput
                     value={email}
                     onChangeText={(text) => handleInputChange(text, "email")}
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
+                    onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
                     placeholder="Email address"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError && !email.trim(),
-                      isInputFocused,
+                      focusedField === "email",
                       !!email.trim()
                     )}
                     keyboardType="email-address"
@@ -913,7 +918,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           />
 
           {/* Progress indicator */}
-          <View className="flex-row gap-2 w-full  justify-center flex  px-6 mb-4 pt-7">
+          <View
+            style={{
+              paddingTop: Platform.OS === "ios" ? "20%" : "10%",
+            }}
+            className="flex-row gap-2 w-full  justify-center flex  px-6 mb-4 pt-[20%]"
+          >
             {[0, 1, 2, 3, 4].map((step) => (
               <View
                 key={step}
@@ -928,7 +938,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <TouchableOpacity
               className="flex-1"
               activeOpacity={1}
-              onPress={handleModalClose}
+              // onPress={handleModalClose}
             />
             <Animated.View
               style={{

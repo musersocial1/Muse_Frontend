@@ -8,8 +8,10 @@ const ProfileLayout = () => {
       <StatusBar
         hidden={false}
         barStyle="light-content"
+        backgroundColor="#121212" // <-- add this line!
         showHideTransition="fade"
       />
+
       <Stack
         screenOptions={{
           headerShown: false,
