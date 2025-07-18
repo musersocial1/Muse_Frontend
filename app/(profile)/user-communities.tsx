@@ -11,38 +11,58 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const CommunityItem = ({
+const communities = [
+  { name: "Beatrix", members: "$36" },
+  { name: "Valorant", members: "$59" },
+  { name: "Guardians", members: "$84" },
+];
+
+const AnimatedCommunityItem = ({
   name,
   members,
+  index,
 }: {
   name: string;
   members: number | string;
+  index: number;
 }) => (
-  <Link
-    style={{ fontFamily: "SFProDisplay-Bold" }}
-    href={RouterConstantUtil.profile.subscriptioninfo as any}
+  <Animatable.View
+    animation="fadeInUp"
+    duration={220}
+    delay={index * 50}
+    useNativeDriver
   >
-    <View className="flex-row items-center p-3  bg-[#1C1C1C] rounded-full  ">
-      <View className="w-12 h-12 rounded-full  items-center justify-center mr-4 overflow-hidden">
-        <Image source={icons.dp} className="w-full h-full" resizeMode="cover" />
-      </View>
+    <Link
+      style={{ fontFamily: "SFProDisplay-Bold" }}
+      href={RouterConstantUtil.profile.subscriptioninfo as any}
+    >
+      <View className="flex-row items-center p-3  bg-[#1C1C1C] rounded-full">
+        <View className="w-12 h-12 rounded-full  items-center justify-center mr-4 overflow-hidden">
+          <Image
+            source={icons.dp}
+            className="w-full h-full"
+            resizeMode="cover"
+          />
+        </View>
 
-      <View className="flex-1">
-        <Text className="text-white/50 font-bold text-[16px]">{name}</Text>
+        <View className="flex-1">
+          <Text className="text-white/50 font-bold text-[16px]">{name}</Text>
+        </View>
+        <View className="flex-row items-center max-w-[50%]">
+          <Text
+            numberOfLines={1}
+            className="text-white text-[16px] font-bold mr-2"
+          >
+            {members}
+          </Text>
+          <ChevronRight color={"gray"} opacity={30} size={20} />
+        </View>
       </View>
-      <View className="flex-row items-center max-w-[50%]">
-        <Text
-          numberOfLines={1}
-          className="text-white text-[16px] font-bold mr-2"
-        >
-          {members}
-        </Text>
-        <ChevronRight color={"gray"} opacity={30} size={20} />
-      </View>
-    </View>
-  </Link>
+    </Link>
+  </Animatable.View>
 );
 
 const UserCommunities = () => {
@@ -50,7 +70,7 @@ const UserCommunities = () => {
   return (
     <View className="flex-1 bg-[#121212]">
       <SafeAreaView className="flex-1 gap-7">
-        <View className="flex-row items-center justify-between px-6 pt-8 ">
+        <View className="flex-row items-center justify-between px-6 pt-8">
           <TouchableOpacity
             onPress={() =>
               router.replace(RouterConstantUtil.tabs.profile as any)
@@ -65,10 +85,10 @@ const UserCommunities = () => {
           <View className="w-10" />
         </View>
 
-        <View className="flex-row items-center justify-between px-3  ">
+        <View className="flex-row items-center justify-between px-3">
           <Text
             style={{ fontFamily: "SFProDisplay-Medium" }}
-            className="text-white text-lg px-6 "
+            className="text-white text-lg px-6"
           >
             Showing all communities
           </Text>
@@ -77,18 +97,23 @@ const UserCommunities = () => {
               style={{ fontFamily: "SFProDisplay-Regular" }}
               className="text-white/40 text-lg font-bold"
             >
-              3
+              {communities.length}
             </Text>
           </View>
         </View>
 
-        <View className="w-full border-b border-b-[#565656]/10  mb-2"></View>
+        <View className="w-full border-b border-b-[#565656]/10 mb-2"></View>
 
         <ScrollView className="px-4">
           <View className="space-y-4 gap-4">
-            <CommunityItem name="Beatrix" members="$36" />
-            <CommunityItem name="Valorant" members="$59" />
-            <CommunityItem name="Guardians" members="$84" />
+            {communities.map((item, idx) => (
+              <AnimatedCommunityItem
+                key={item.name}
+                name={item.name}
+                members={item.members}
+                index={idx}
+              />
+            ))}
           </View>
         </ScrollView>
       </SafeAreaView>
