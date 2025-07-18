@@ -23,6 +23,7 @@
 			@"BlurView": NSClassFromString(@"BlurView"), // @react-native-community/blur
 			@"VibrancyView": NSClassFromString(@"VibrancyView"), // @react-native-community/blur
 			@"RNDateTimePicker": NSClassFromString(@"RNDateTimePickerComponentView"), // @react-native-community/datetimepicker
+			@"RNDatePicker": NSClassFromString(@"RNDatePicker"), // react-native-date-picker
 			@"RNGestureHandlerButton": NSClassFromString(@"RNGestureHandlerButtonComponentView"), // react-native-gesture-handler
 			@"RNCSafeAreaProvider": NSClassFromString(@"RNCSafeAreaProviderComponentView"), // react-native-safe-area-context
 			@"RNCSafeAreaView": NSClassFromString(@"RNCSafeAreaViewComponentView"), // react-native-safe-area-context
@@ -37,7 +38,6 @@
 			@"RNSScreenStackHeaderSubview": NSClassFromString(@"RNSScreenStackHeaderSubview"), // react-native-screens
 			@"RNSScreenStack": NSClassFromString(@"RNSScreenStackView"), // react-native-screens
 			@"RNSSearchBar": NSClassFromString(@"RNSSearchBar"), // react-native-screens
-			@"RNCWebView": NSClassFromString(@"RNCWebView"), // react-native-webview
 			@"RNSVGCircle": NSClassFromString(@"RNSVGCircle"), // react-native-svg
 			@"RNSVGClipPath": NSClassFromString(@"RNSVGClipPath"), // react-native-svg
 			@"RNSVGDefs": NSClassFromString(@"RNSVGDefs"), // react-native-svg
@@ -67,6 +67,7 @@
 			@"RNSVGText": NSClassFromString(@"RNSVGText"), // react-native-svg
 			@"RNSVGTextPath": NSClassFromString(@"RNSVGTextPath"), // react-native-svg
 			@"RNSVGUse": NSClassFromString(@"RNSVGUse"), // react-native-svg
+			@"RNCWebView": NSClassFromString(@"RNCWebView"), // react-native-webview
     };
   });
 
