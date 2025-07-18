@@ -6,7 +6,7 @@ import { Animated, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 function TabIcon({ focused, icon, title, isProfile }: any) {
-  const scaleValue = useRef(new Animated.Value(focused ? 1.1 : 1)).current;
+  const scaleValue = useRef(new Animated.Value(focused ? 1.05 : 1)).current;
   const opacityValue = useRef(new Animated.Value(focused ? 1 : 0.7)).current;
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
         opacity: opacityValue,
         // ...shadowStyle,
       }}
-      className={`w-14 h-14 rounded-full  justify-center items-center border ${
+      className={`w-16 h-16 rounded-full  justify-center items-center border ${
         focused
           ? "bg-white border-white"
           : "bg-[#808080]/50 border-[#FFFFFF]/50"
@@ -92,7 +92,7 @@ export default function TabsLayout() {
           backgroundColor: "transparent",
           borderTopWidth: 0,
           borderRadius: 30,
-          marginHorizontal: 54,
+          marginHorizontal: 34,
           gap: 0,
           marginBottom: insets.bottom,
           height: 60,
