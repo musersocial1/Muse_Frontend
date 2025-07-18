@@ -1,0 +1,6 @@
+module Pods_muse {
+  umbrella header "Pods-muse-umbrella.h"
+
+  export *
+  module * { export * }
+}
