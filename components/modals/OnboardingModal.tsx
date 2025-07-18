@@ -85,7 +85,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     "Enter verification code",
     "Set password",
     "Enter your details",
-    "Enter user name",
+    "Enter username",
   ];
 
   React.useEffect(() => {
@@ -515,11 +515,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
       case 2:
         return (
-          <View
-            className="bg-white py-[4%] rounded-t-3xl shadow-2xl"
-            // style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
-          >
-            <View className="px-6 pt-6 pb-6">
+          <View className="bg-white rounded-t-3xl shadow-2xl">
+            <View className="px-6 py-8">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
                   onPress={onBack}
@@ -538,6 +535,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </TouchableOpacity>
               </View>
 
+              {/* Add gap-3 here to space out each child */}
               <View className="mb-4 gap-3">
                 <View className="relative">
                   <TextInput
@@ -556,7 +554,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     returnKeyType="done"
                     onSubmitEditing={handleContinue}
                   />
-
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-4"
@@ -587,7 +584,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     returnKeyType="done"
                     onSubmitEditing={handleContinue}
                   />
-
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-4"
@@ -606,7 +602,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 ) : null}
               </View>
 
-              <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
+              <Text className="text-gray-500 text-sm text-center mb-4 leading-5">
                 Password must be at least 8 characters with{"\n"}uppercase,
                 lowercase, and numbers
               </Text>
@@ -634,7 +630,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case 3:
         return (
           <View
-            className="bg-white py-[3%] rounded-t-3xl shadow-2xl"
+            className="bg-white  rounded-t-3xl shadow-2xl"
             // style={{ minHeight: isKeyboardVisible ? 550 : 400 }}
           >
             <View className="px-6 pt-6 pb-6">
@@ -719,7 +715,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 ) : null}
               </View>
 
-              <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
+              <Text className="text-gray-500 text-sm text-center mb-4 leading-5">
                 This information will be used to{"\n"}personalize your
                 experience
               </Text>
@@ -744,121 +740,121 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </View>
         );
 
-      case 3:
-        return (
-          <View
-            className="bg-white rounded-t-3xl shadow-2xl"
-            style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
-          >
-            <View className="px-6 pt-6 pb-6">
-              <View className="flex-row justify-between items-center mb-6">
-                <TouchableOpacity
-                  onPress={onBack}
-                  className="p-2 bg-gray-100 rounded-full"
-                >
-                  <Feather name="arrow-left" size={20} color="#666" />
-                </TouchableOpacity>
-                <Text className="text-xl font-semibold text-gray-900">
-                  {stepTitles[currentStep]}
-                </Text>
-                <TouchableOpacity
-                  onPress={handleModalClose}
-                  className="p-2 bg-gray-100 rounded-full"
-                >
-                  <Feather name="x" size={20} color="#666" />
-                </TouchableOpacity>
-              </View>
+      // case 3:
+      //   return (
+      //     <View
+      //       className="bg-white rounded-t-3xl shadow-2xl"
+      //       style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
+      //     >
+      //       <View className="px-6 pt-6  pb-6">
+      //         <View className="flex-row justify-between items-center mb-6">
+      //           <TouchableOpacity
+      //             onPress={onBack}
+      //             className="p-2 bg-gray-100 rounded-full"
+      //           >
+      //             <Feather name="arrow-left" size={20} color="#666" />
+      //           </TouchableOpacity>
+      //           <Text className="text-xl font-semibold text-gray-900">
+      //             {stepTitles[currentStep]}
+      //           </Text>
+      //           <TouchableOpacity
+      //             onPress={handleModalClose}
+      //             className="p-2 bg-gray-100 rounded-full"
+      //           >
+      //             <Feather name="x" size={20} color="#666" />
+      //           </TouchableOpacity>
+      //         </View>
 
-              <View className="mb-4 gap-3">
-                <View className="relative">
-                  <TextInput
-                    value={password}
-                    onChangeText={(text) => handleInputChange(text, "password")}
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
-                    placeholder="Create password"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!inputError,
-                      isInputFocused,
-                      isValidInput
-                    )}
-                    secureTextEntry={!showPassword}
-                    returnKeyType="done"
-                    onSubmitEditing={handleContinue}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4"
-                  >
-                    {showPassword ? (
-                      <Feather name="eye-off" size={20} color="#666" />
-                    ) : (
-                      <Feather name="eye" size={20} color="#666" />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                <View className="relative">
-                  <TextInput
-                    value={confirmPassword}
-                    onChangeText={(text) =>
-                      handleInputChange(text, "confirmPassword")
-                    }
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
-                    placeholder="Confirm password"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!inputError,
-                      isInputFocused,
-                      isValidInput
-                    )}
-                    secureTextEntry={!showPassword}
-                    returnKeyType="done"
-                    onSubmitEditing={handleContinue}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4"
-                  >
-                    {showPassword ? (
-                      <Feather name="eye-off" size={20} color="#666" />
-                    ) : (
-                      <Feather name="eye" size={20} color="#666" />
-                    )}
-                  </TouchableOpacity>
-                </View>
-                {inputError ? (
-                  <Text className="text-red-500 text-sm mt-2 px-2">
-                    {inputError}
-                  </Text>
-                ) : null}
-              </View>
+      //         <View className="mb-4 gap-3">
+      //           <View className="relative">
+      //             <TextInput
+      //               value={password}
+      //               onChangeText={(text) => handleInputChange(text, "password")}
+      //               onFocus={() => setIsInputFocused(true)}
+      //               onBlur={() => setIsInputFocused(false)}
+      //               placeholder="Create password"
+      //               placeholderTextColor="#9CA3AF"
+      //               className={baseInputStyle(
+      //                 !!inputError,
+      //                 isInputFocused,
+      //                 isValidInput
+      //               )}
+      //               secureTextEntry={!showPassword}
+      //               returnKeyType="done"
+      //               onSubmitEditing={handleContinue}
+      //             />
+      //             <TouchableOpacity
+      //               onPress={() => setShowPassword(!showPassword)}
+      //               className="absolute right-4 top-4"
+      //             >
+      //               {showPassword ? (
+      //                 <Feather name="eye-off" size={20} color="#666" />
+      //               ) : (
+      //                 <Feather name="eye" size={20} color="#666" />
+      //               )}
+      //             </TouchableOpacity>
+      //           </View>
+      //           <View className="relative">
+      //             <TextInput
+      //               value={confirmPassword}
+      //               onChangeText={(text) =>
+      //                 handleInputChange(text, "confirmPassword")
+      //               }
+      //               onFocus={() => setIsInputFocused(true)}
+      //               onBlur={() => setIsInputFocused(false)}
+      //               placeholder="Confirm password"
+      //               placeholderTextColor="#9CA3AF"
+      //               className={baseInputStyle(
+      //                 !!inputError,
+      //                 isInputFocused,
+      //                 isValidInput
+      //               )}
+      //               secureTextEntry={!showPassword}
+      //               returnKeyType="done"
+      //               onSubmitEditing={handleContinue}
+      //             />
+      //             <TouchableOpacity
+      //               onPress={() => setShowPassword(!showPassword)}
+      //               className="absolute right-4 top-4"
+      //             >
+      //               {showPassword ? (
+      //                 <Feather name="eye-off" size={20} color="#666" />
+      //               ) : (
+      //                 <Feather name="eye" size={20} color="#666" />
+      //               )}
+      //             </TouchableOpacity>
+      //           </View>
+      //           {inputError ? (
+      //             <Text className="text-red-500 text-sm mt-2 px-2">
+      //               {inputError}
+      //             </Text>
+      //           ) : null}
+      //         </View>
 
-              <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
-                Password must be at least 8 characters with{"\n"}uppercase,
-                lowercase, and numbers
-              </Text>
+      //         <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
+      //           Password must be at least 8 characters with{"\n"}uppercase,
+      //           lowercase, and numbersddjd
+      //         </Text>
 
-              <TouchableOpacity
-                onPress={handleContinue}
-                disabled={!isValidInput}
-                className={`rounded-full p-4 ${
-                  isValidInput ? "bg-secondary" : "bg-disabled"
-                }`}
-                activeOpacity={0.8}
-              >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
-                  }`}
-                >
-                  Complete Setup
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
+      //         <TouchableOpacity
+      //           onPress={handleContinue}
+      //           disabled={!isValidInput}
+      //           className={`rounded-full p-4 ${
+      //             isValidInput ? "bg-secondary" : "bg-disabled"
+      //           }`}
+      //           activeOpacity={0.8}
+      //         >
+      //           <Text
+      //             className={`text-center font-semibold text-base ${
+      //               isValidInput ? "text-white" : "text-gray-400"
+      //             }`}
+      //           >
+      //             Complete Setup
+      //           </Text>
+      //         </TouchableOpacity>
+      //       </View>
+      //     </View>
+      //   );
 
       case 4:
         return (
@@ -888,16 +884,16 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <View className="space-y-4 gap-3 mb-6">
                 <View>
                   <TextInput
-                    value={firstName}
+                    value={username}
                     onChangeText={(text) => handleInputChange(text, "username")}
                     onFocus={() => setIsInputFocused(true)}
                     onBlur={() => setIsInputFocused(false)}
                     placeholder="Enter username"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
-                      !!inputError && !firstName.trim(),
+                      !!inputError && !username.trim(),
                       isInputFocused,
-                      !!firstName.trim()
+                      !!username.trim()
                     )}
                     returnKeyType="next"
                   />
@@ -940,7 +936,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       transparent
       animationType="fade"
       onRequestClose={handleModalClose}
-      className="bg-white/30 backdrop-blur-md"
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.View style={{ opacity: fadeAnim }} className="flex-1">
@@ -950,37 +945,25 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             className="absolute inset-0"
           />
 
-          {/* Progress indicator */}
-          <View
-            style={{
-              paddingTop: Platform.OS === "ios" ? "20%" : "10%",
-            }}
-            className="flex-row gap-2 w-full  justify-center flex  px-6 mb-4 pt-[20%]"
-          >
-            {[0, 1, 2, 3, 4].map((step) => (
-              <View
-                key={step}
-                className={` w-[12%] h-[2px]  mx-1 rounded ${
-                  step <= currentStep ? "bg-[#FFFFFF]" : "bg-[#FFFFFF]/30"
-                }`}
-              />
-            ))}
-          </View>
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0} // adjust as needed for your modal header
-            style={{ flex: 1, justifyContent: "flex-end" }}
-          >
-            <TouchableOpacity className="flex-1" activeOpacity={1} />
-            <Animated.View
-              style={{
-                transform: [{ translateY: slideAnim }],
-                paddingBottom: isKeyboardVisible ? keyboardHeight * 0 : 0,
-              }}
+          <View className="flex-1 justify-end">
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+              style={{ flex: 1, justifyContent: "flex-end" }}
             >
-              {renderModalContent()}
-            </Animated.View>
-          </KeyboardAvoidingView>
+              {/* Animated Card */}
+              <Animated.View
+                style={{
+                  transform: [{ translateY: slideAnim }],
+                  alignSelf: "center", // centers the card horizontally
+                  // marginBottom: !isKeyboardVisible ? width * 0.1 : width * 0.06, // 10vw or 6vw
+                }}
+                className="w-[90vw] max-w-[400px] bg-white rounded-3xl overflow-hidden  mb-[8vw] "
+              >
+                {renderModalContent()}
+              </Animated.View>
+            </KeyboardAvoidingView>
+          </View>
         </Animated.View>
       </TouchableWithoutFeedback>
     </Modal>

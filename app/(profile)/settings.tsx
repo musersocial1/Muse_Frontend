@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Animatable from "react-native-animatable";
 import {
   SafeAreaView,
   useSafeAreaInsets,
@@ -97,11 +96,11 @@ const SettingsItem = ({
   const animationType = type === "logout" ? "bounceInRight" : "fadeInRight";
 
   return (
-    <Animatable.View
-      animation={animationType}
-      duration={180} // <<< FASTER!
-      delay={20 + index * 30}
-      useNativeDriver
+    <View
+    // animation={animationType}
+    // duration={180} // <<< FASTER!
+    // delay={20 + index * 30}
+    // useNativeDriver
     >
       <TouchableOpacity
         onPress={handlePress}
@@ -137,7 +136,7 @@ const SettingsItem = ({
           size={20}
         />
       </TouchableOpacity>
-    </Animatable.View>
+    </View>
   );
 };
 
@@ -152,7 +151,7 @@ const Settings = () => {
     >
       <StatusBar barStyle="light-content" />
       <SafeAreaView className="flex-1">
-        <Animatable.View animation="fadeInDown" duration={350} delay={30}>
+        <View>
           <View className="flex-row items-center justify-between px-6 pb-4">
             <TouchableOpacity
               onPress={() =>
@@ -165,7 +164,7 @@ const Settings = () => {
             <Text className="text-white text-[20px] font-bold">Settings</Text>
             <View className="w-10" />
           </View>
-        </Animatable.View>
+        </View>
         <ScrollView className="px-4 mt-4">
           <View className="space-y-4 gap-3">
             {SETTINGS_ITEMS.map((item, idx) => (
