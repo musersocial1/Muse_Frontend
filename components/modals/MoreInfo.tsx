@@ -1,24 +1,38 @@
 import { images } from "@/constants/images";
-import { BlurView as ExpoBlurView } from "expo-blur";
-import { Sparkles, User } from "lucide-react-native";
-import React, { useState } from "react";
+import { Feather } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { BlurView } from "expo-blur";
+
+import React, { useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   Image,
   Modal,
+  Platform,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
 interface MoreInfoModalProps {
   visible: boolean;
   onClose: () => void;
-  onComplete: (data: any) => void;
+  onComplete: (data: {
+    birthMonth: number;
+    birthDay: number;
+    birthYear: number;
+    accountType: string;
+    gender: string;
+    interests: string[];
+  }) => void;
 }
 
 export default function MoreInfoModal({
@@ -28,17 +42,56 @@ export default function MoreInfoModal({
 }: MoreInfoModalProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
-    birthMonth: "September",
-    birthDay: "17",
-    birthYear: "2021",
+    birthMonth: 0,
+    birthDay: 0,
+    birthYear: 0,
     accountType: "",
     gender: "",
     interests: [] as string[],
   });
 
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  // Handle date change from DateTimePicker
+  const handleDateChange = (event: any, date?: Date) => {
+    if (date) {
+      setSelectedDate(date);
+      setFormData((prev) => ({
+        ...prev,
+        birthMonth: date.getMonth() + 1,
+        birthDay: date.getDate(),
+        birthYear: date.getFullYear(),
+      }));
+    }
+  };
+
+  // Validation
+  const isStepValid = (step: number): boolean => {
+    switch (step) {
+      case 0: // Date step
+        return (
+          formData.birthYear > 0 &&
+          formData.birthMonth > 0 &&
+          formData.birthDay > 0
+        );
+      case 1: // Account type step
+        return formData.accountType !== "";
+      case 2: // Gender step
+        return formData.gender !== "";
+      case 3: // Interests step
+        return formData.interests.length > 0;
+      default:
+        return false;
+    }
+  };
+
   const handleContinue = () => {
+    if (!isStepValid(currentStep)) {
+      return;
+    }
+
     if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
+      goToStep(currentStep + 1);
     } else {
       onComplete(formData);
     }
@@ -57,71 +110,87 @@ export default function MoreInfoModal({
     }));
   };
 
-  // Date picker data
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
+  const slideAnim = useRef(new Animated.Value(width)).current;
+  React.useEffect(() => {
+    if (visible) {
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: width,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [visible]);
 
-  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
-  const years = Array.from({ length: 50 }, (_, i) => (2024 - i).toString());
+  const [prevStep, setPrevStep] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
 
-  const DatePicker = ({
-    data,
-    selectedValue,
-    onValueChange,
-  }: {
-    data: string[];
-    selectedValue: string;
-    onValueChange: (value: string) => void;
-  }) => {
-    const selectedIndex = data.findIndex((item) => item === selectedValue);
+  const enterAnim = useRef(new Animated.Value(width)).current;
+  const exitAnim = useRef(new Animated.Value(0)).current;
 
-    return (
-      <View className="flex-1 mx-1">
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingVertical: 60,
-            alignItems: "center",
-          }}
-          snapToInterval={40}
-          decelerationRate="fast"
-        >
-          {data.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => onValueChange(item)}
-              className="h-10 justify-center items-center"
-            >
-              <Text
-                className={`text-lg ${
-                  item === selectedValue
-                    ? "text-black font-semibold"
-                    : "text-gray-400"
-                }`}
-              >
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-    );
+  const goToStep = (next: number) => {
+    if (next === currentStep) return;
+    setPrevStep(currentStep);
+    setCurrentStep(next);
+    setIsAnimating(true);
+
+    enterAnim.setValue(width);
+    exitAnim.setValue(0);
+
+    Animated.parallel([
+      Animated.timing(exitAnim, {
+        toValue: -width,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(enterAnim, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setPrevStep(null);
+      setIsAnimating(false);
+    });
   };
 
+  const insets = useSafeAreaInsets();
+
+  const Header = () => (
+    <View className="flex-row items-start justify-between px-6 pb-2">
+      <View className="flex-1 items-start">
+        <Image
+          source={images.logo}
+          className="w-36 h-20"
+          resizeMode="contain"
+        />
+      </View>
+    </View>
+  );
+
+  const ButtonFooter = () => (
+    <View className="px-6 w-full pt-2">
+      <TouchableOpacity
+        onPress={handleContinue}
+        disabled={!isStepValid(currentStep)}
+        className={`py-4 rounded-full ${
+          isStepValid(currentStep) ? "bg-secondary" : "bg-gray-400"
+        }`}
+      >
+        <Text className="text-white text-center font-semibold text-lg">
+          {currentStep === 3 ? "Complete" : "Continue"}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   const renderDateStep = () => (
-    <View className="flex-1">
+    <View className="flex-1 h-full">
       <View className="px-6 mt-4 mb-8">
         <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
           {`We'd love to know your \nbirthday — just the date!`}
@@ -130,47 +199,52 @@ export default function MoreInfoModal({
           Fill in your birthday details below
         </Text>
       </View>
-
-      {/* Date Picker */}
-      <View className="flex-1 justify-center px-6">
-        <View className="bg-white rounded-2xl mx-4 h-48 overflow-hidden">
-          <View className="flex-row justify-between items-center p-4 border-b border-gray-100">
-            <Text className="text-gray-500 text-sm flex-1 text-center">
-              Month
-            </Text>
-            <Text className="text-gray-500 text-sm flex-1 text-center">
-              Day
-            </Text>
-            <Text className="text-gray-500 text-sm flex-1 text-center">
-              Year
-            </Text>
-          </View>
-
-          <View className="flex-row flex-1">
-            <DatePicker
-              data={months}
-              selectedValue={formData.birthMonth}
-              onValueChange={(value) => updateFormData("birthMonth", value)}
+      <View
+        style={{ transform: [{ translateY: -30 }] }}
+        className="flex-1 items-center justify-center"
+      >
+        <BlurView
+          intensity={100}
+          style={{
+            borderRadius: 24,
+            width: width * 0.9,
+            backgroundColor: "transparent",
+            padding: 6,
+            margin: 0,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.13,
+            shadowRadius: 12,
+            elevation: 4,
+            alignSelf: "center",
+          }}
+          tint="light"
+          className="bg-black/20 overflow-hidden py-2.5 relative"
+        >
+          <Animated.View className="bg-white p-2 rounded-[24px]">
+            <DateTimePicker
+              testID="dateTimePicker"
+              value={selectedDate}
+              mode="date"
+              display={Platform.OS === "ios" ? "spinner" : "default"}
+              maximumDate={new Date()}
+              style={{
+                backgroundColor: "white",
+                width: "100%",
+                borderRadius: 24,
+              }}
+              textColor="black"
+              onChange={handleDateChange}
             />
-            <DatePicker
-              data={days}
-              selectedValue={formData.birthDay}
-              onValueChange={(value) => updateFormData("birthDay", value)}
-            />
-            <DatePicker
-              data={years}
-              selectedValue={formData.birthYear}
-              onValueChange={(value) => updateFormData("birthYear", value)}
-            />
-          </View>
-        </View>
+          </Animated.View>
+        </BlurView>
       </View>
     </View>
   );
 
   const renderAccountTypeStep = () => (
-    <View className="flex-1">
-      {/* Title Section */}
+    <View className="flex-1 justify-between">
       <View className="px-6 mt-4 mb-8">
         <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
           {`Select your \naccount type`}
@@ -180,55 +254,60 @@ export default function MoreInfoModal({
         </Text>
       </View>
 
-      {/* Account Options */}
       <View className="flex-1 justify-center px-6">
         <View className="space-y-4 gap-3">
-          <View className="bg-white rounded-2xl p-4 flex-row items-center border-[5px] border-[#FFFFFF1A]/70">
+          <TouchableOpacity
+            onPress={() => updateFormData("accountType", "join")}
+            className={`bg-white rounded-2xl p-4 flex-row items-center ${
+              formData.accountType === "join"
+                ? "border-4 border-secondary"
+                : "border-[5px] border-[#FFFFFF1A]/70"
+            }`}
+          >
             <View className="w-16 h-16 bg-[#F3F3F3] rounded-full mr-4 items-center justify-center">
-              <Text className="text-lg">
-                <User />
-              </Text>
+              <Feather name="user" size={32} color="#888" />
             </View>
             <Text className="flex-1 text-[#000000] font-bold text-[16px]">
               Join a community
             </Text>
-            <TouchableOpacity
-              onPress={() => updateFormData("accountType", "join")}
-              className={`px-8 py-3 rounded-full ${
-                formData.accountType === "join" ? "bg-blue-500" : "bg-secondary"
+            <View
+              className={`w-6 h-6 rounded-full border-2 ${
+                formData.accountType === "join"
+                  ? "bg-secondary border-secondary"
+                  : "border-gray-400"
               }`}
-            >
-              <Text className="text-white font-medium">Select</Text>
-            </TouchableOpacity>
-          </View>
+            />
+          </TouchableOpacity>
 
-          <View className="bg-white rounded-2xl p-4 flex-row items-center">
-            <View className="w-16 h-16 bg-disabled rounded-full mr-4 items-center justify-center">
-              <Text className="text-lg">
-                <Sparkles />
-              </Text>
+          <TouchableOpacity
+            onPress={() => updateFormData("accountType", "create")}
+            className={`bg-white rounded-2xl p-4 flex-row items-center ${
+              formData.accountType === "create"
+                ? "border-4 border-secondary"
+                : "border-[5px] border-[#FFFFFF1A]/70"
+            }`}
+          >
+            <View className="w-16 h-16 bg-[#F3F3F3] rounded-full mr-4 items-center justify-center">
+              <Feather name="star" size={32} color="#888" />
             </View>
             <Text className="flex-1 text-black font-bold text-[16px]">
               Create a community
             </Text>
-            <TouchableOpacity
-              onPress={() => updateFormData("accountType", "create")}
-              className={`px-8 py-3 rounded-full ${
+            <View
+              className={`w-6 h-6 rounded-full border-2 ${
                 formData.accountType === "create"
-                  ? "bg-blue-500"
-                  : "bg-secondary"
+                  ? "bg-secondary border-secondary"
+                  : "border-gray-400"
               }`}
-            >
-              <Text className="text-white font-medium">Select</Text>
-            </TouchableOpacity>
-          </View>
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 
   const renderGenderStep = () => (
-    <View className="flex-1">
+    <View className="flex-1 justify-between">
       <View className="px-6 mt-4 mb-8">
         <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
           {`What's your\nGender`}
@@ -258,7 +337,9 @@ export default function MoreInfoModal({
                 key={gender}
                 onPress={() => updateFormData("gender", gender)}
                 className={`flex-1 rounded-3xl overflow-hidden relative h-[280px] ${
-                  selected ? "" : ""
+                  selected
+                    ? "border-2 border-transparent"
+                    : "border-2 border-transparent"
                 }`}
               >
                 <Image
@@ -266,6 +347,11 @@ export default function MoreInfoModal({
                   className="w-full h-full"
                   resizeMode="cover"
                 />
+                {selected && (
+                  <View className="absolute top-4 right-4 w-8 h-8 bg-secondary rounded-full items-center justify-center">
+                    <Feather name="check" size={16} color="white" />
+                  </View>
+                )}
               </TouchableOpacity>
             );
           })}
@@ -281,7 +367,7 @@ export default function MoreInfoModal({
             Prefer not to say
           </Text>
           <View
-            className={`w-6 h-6 rounded-full border-2 border-white/50 mr-4 ${
+            className={`w-6 h-6 rounded-full border-2 border-white/50 ${
               formData.gender === "other" ? "bg-secondary" : ""
             }`}
           />
@@ -324,53 +410,58 @@ export default function MoreInfoModal({
     ];
 
     return (
-      <ScrollView className="flex-1">
-        <View className="px-6 mt-4 mb-6">
-          <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
-            {`What are your\ninterests`}
-          </Text>
-        </View>
+      <View className="flex-1 justify-between">
+        <ScrollView className="flex-1">
+          <View className="px-6 mt-4 mb-6">
+            <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
+              {`What are your\ninterests`}
+            </Text>
+            <Text className="text-white/70 text-start text-[16px]">
+              Select at least one interest to continue
+            </Text>
+          </View>
 
-        <View className="flex-1 px-6">
-          <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
-            {interestCategories.map((category, index) => (
-              <View key={index} className="mb-6">
-                <Text className="text-[#FFFFFF] font-extrabold text-[18px] mb-3">
-                  {category.title}
-                </Text>
-                <View className="flex-row flex-wrap">
-                  {category.items.map((item, itemIndex) => (
-                    <TouchableOpacity
-                      key={itemIndex}
-                      onPress={() => toggleInterest(item)}
-                      className={`mr-2 mb-2 px-4 py-3 rounded-full ${
-                        formData.interests.includes(item)
-                          ? "bg-secondary"
-                          : "bg-[#FFFFFF14]/20"
-                      }`}
-                    >
-                      <Text
-                        className={`text-[15px] ${
+          <View className="flex-1 px-6">
+            <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+              {interestCategories.map((category, index) => (
+                <View key={index} className="mb-6">
+                  <Text className="text-[#FFFFFF] font-extrabold text-[18px] mb-3">
+                    {category.title}
+                  </Text>
+                  <View className="flex-row flex-wrap">
+                    {category.items.map((item, itemIndex) => (
+                      <TouchableOpacity
+                        key={itemIndex}
+                        onPress={() => toggleInterest(item)}
+                        className={`mr-2 mb-2 px-4 py-3 rounded-full ${
                           formData.interests.includes(item)
-                            ? "text-white"
-                            : "text-white/70"
+                            ? "bg-secondary"
+                            : "bg-[#FFFFFF14]/20"
                         }`}
                       >
-                        {item}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <Text
+                          className={`text-[15px] ${
+                            formData.interests.includes(item)
+                              ? "text-white font-medium"
+                              : "text-white/70"
+                          }`}
+                        >
+                          {item}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-      </ScrollView>
+              ))}
+            </ScrollView>
+          </View>
+        </ScrollView>
+      </View>
     );
   };
 
-  const renderCurrentStep = () => {
-    switch (currentStep) {
+  function renderStep(step: any) {
+    switch (step) {
       case 0:
         return renderDateStep();
       case 1:
@@ -382,50 +473,72 @@ export default function MoreInfoModal({
       default:
         return renderDateStep();
     }
-  };
+  }
+
+  // Reset form when modal closes
+  React.useEffect(() => {
+    if (!visible) {
+      setCurrentStep(0);
+      setFormData({
+        birthMonth: 0,
+        birthDay: 0,
+        birthYear: 0,
+        accountType: "",
+        gender: "",
+        interests: [],
+      });
+      setSelectedDate(new Date());
+    }
+  }, [visible]);
 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="fade"
       transparent={true}
       onRequestClose={onClose}
+      className="flex-1"
     >
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
-
-      <View className="flex-1">
-        <ExpoBlurView intensity={50} tint="dark" className="absolute inset-0" />
-
-        <View className="flex-1 bg-white/60 backdrop-blur-sm">
-          {/* Header */}
-          <View className="flex-row items-start justify-between px-6 pt-14 pb-2">
-            <View className="flex-1 items-start">
-              <Image
-                source={images.logo}
-                className="w-36 h-20"
-                resizeMode="contain"
-              />
-            </View>
-          </View>
-
-          {renderCurrentStep()}
-
-          <View className="px-6 pb-8 mb-6">
-            <TouchableOpacity
-              onPress={handleContinue}
-              className="bg-secondary py-4 rounded-full"
+      <SafeAreaView
+        className="flex-1 relative"
+        style={{ paddingBottom: insets.bottom, paddingTop: insets.top }}
+      >
+        <Header />
+        <Animated.View className="flex-1 relative">
+          {/* Outgoing step animation */}
+          {isAnimating && prevStep !== null && (
+            <Animated.View
+              style={{
+                position: "absolute",
+                width,
+                height: "100%",
+                top: 0,
+                left: 0,
+                transform: [{ translateX: exitAnim }],
+                zIndex: 1,
+              }}
             >
-              <Text className="text-white text-center font-semibold text-lg">
-                {currentStep === 3 ? "Continue" : "Continue"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+              {renderStep(prevStep)}
+            </Animated.View>
+          )}
+
+          {/* Current step */}
+          <Animated.View
+            style={{
+              width,
+              height: "100%",
+              transform: [{ translateX: isAnimating ? enterAnim : 0 }],
+              position: isAnimating ? "absolute" : "relative",
+              top: 0,
+              left: 0,
+              zIndex: 2,
+            }}
+          >
+            {renderStep(currentStep)}
+          </Animated.View>
+        </Animated.View>
+        <ButtonFooter />
+      </SafeAreaView>
     </Modal>
   );
 }

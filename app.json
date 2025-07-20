@@ -7,10 +7,10 @@
     "icon": "./assets/images/muse-logo.png",
     "scheme": "muse",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
-      "bundleIdentifier": "com.moseleydev.muse",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.moseleydev.muse"
     },
     "android": {
       "bundleIdentifier": "com.moseleydev.muse",

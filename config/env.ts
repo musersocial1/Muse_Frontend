@@ -100,12 +100,12 @@ const IS_PROD = APP_ENV === "production";
 
 export const env: EnvConfig = {
   // App Info
-  APP_NAME: Constants.expoConfig?.name || "My Expo App",
+  APP_NAME: Constants.expoConfig?.name || "Muse",
   APP_VERSION: Constants.expoConfig?.version || "1.0.0",
   APP_ENV,
-  APP_SCHEME: Constants.expoConfig?.scheme || "muse",
+  APP_SCHEME: "muse",
   BUNDLE_ID:
-    Constants.expoConfig?.ios?.bundleIdentifier || "com.company.myexpoapp",
+    Constants.expoConfig?.ios?.bundleIdentifier || "com.moseleydev.muse",
 
   // API Configuration
   API_URL: getEnvVar(

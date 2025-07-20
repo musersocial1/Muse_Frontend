@@ -2,15 +2,13 @@ import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import SwitchToggle from "react-native-switch-toggle";
+
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import {
-  Image,
-  ScrollView,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 interface NotificationSettings {
   communityOwnerPosts: boolean;
@@ -64,11 +62,31 @@ const NotificationsSettings = () => {
     <View>
       <View className="flex-row items-center justify-between py-4 px-4">
         <Text className="text-white/60 text-[16px] font-medium">{label}</Text>
-        <Switch
+        {/* <Switch
           value={enabled}
           onValueChange={onToggle}
           trackColor={{ false: "#4B5563", true: "#0368FF" }}
           thumbColor={"#fff"}
+        /> */}
+        <SwitchToggle
+          switchOn={enabled}
+          onPress={onToggle}
+          circleColorOff="#fff"
+          circleColorOn="#fff"
+          backgroundColorOn="#0368FF"
+          backgroundColorOff="#4B5563"
+          containerStyle={{
+            width: 48,
+            height: 28,
+            borderRadius: 25,
+            padding: 3,
+            paddingLeft: 0,
+          }}
+          circleStyle={{
+            width: 22,
+            height: 22,
+            borderRadius: 11,
+          }}
         />
       </View>
       {showViewider && <View className="" />}
@@ -81,82 +99,85 @@ const NotificationsSettings = () => {
     </View>
   );
 
+  const insets = useSafeAreaInsets(); // Handles iPhone home indicator space
+
   return (
-    <View className="flex-1 bg-[#121212]">
-      <SafeAreaView className="flex-1">
-        {/* Header */}
-        <View className="flex-row items-center justify-between px-6 py-4">
-          <TouchableOpacity
-            onPress={() =>
-              router.replace(RouterConstantUtil.profile.settings as any)
-            }
-            className="w-10 h-10 rounded-full items-center justify-center"
-          >
-            <Image source={icons.back} className="w-14 h-14" />
-          </TouchableOpacity>
-          <Text className="text-white text-[20px] font-bold">Notification</Text>
-          <View className="w-10" />
+    <SafeAreaView
+      style={{ paddingTop: insets.top }}
+      className="flex-1 bg-[#121212]"
+    >
+      {/* Header */}
+      <View className="flex-row items-center justify-between px-6 pb-4">
+        <TouchableOpacity
+          onPress={() =>
+            router.replace(RouterConstantUtil.profile.settings as any)
+          }
+          className="w-10 h-10 rounded-full items-center justify-center"
+        >
+          <Image source={icons.back} className="w-14 h-14" />
+        </TouchableOpacity>
+        <Text className="text-white text-[20px] font-bold">Notification</Text>
+        <View className="w-10" />
+      </View>
+
+      {/* Content */}
+      <ScrollView className="flex-1 pb-0 ">
+        <View className="mt-6">
+          <SectionHeader title="Communities" />
+          <View className=" mx-6  overflow-hidden">
+            <SettingItem
+              label="Community owner posts"
+              enabled={settings.communityOwnerPosts}
+              onToggle={() => toggleSetting("communityOwnerPosts")}
+            />
+            <SettingItem
+              label="Community member posts"
+              enabled={settings.communityMemberPosts}
+              onToggle={() => toggleSetting("communityMemberPosts")}
+            />
+            <SettingItem
+              label="Likes on your posts"
+              enabled={settings.likesOnPosts}
+              onToggle={() => toggleSetting("likesOnPosts")}
+            />
+            <SettingItem
+              label="Comments on your posts"
+              enabled={settings.commentsOnPosts}
+              onToggle={() => toggleSetting("commentsOnPosts")}
+            />
+            <SettingItem
+              label="Community owner comment"
+              enabled={settings.communityOwnerComment}
+              onToggle={() => toggleSetting("communityOwnerComment")}
+              showViewider={false}
+            />
+          </View>
         </View>
 
-        {/* Content */}
-        <ScrollView className="flex-1 pb-8">
-          <View className="mt-6">
-            <SectionHeader title="Communities" />
-            <View className=" mx-6  overflow-hidden">
-              <SettingItem
-                label="Community owner posts"
-                enabled={settings.communityOwnerPosts}
-                onToggle={() => toggleSetting("communityOwnerPosts")}
-              />
-              <SettingItem
-                label="Community member posts"
-                enabled={settings.communityMemberPosts}
-                onToggle={() => toggleSetting("communityMemberPosts")}
-              />
-              <SettingItem
-                label="Likes on your posts"
-                enabled={settings.likesOnPosts}
-                onToggle={() => toggleSetting("likesOnPosts")}
-              />
-              <SettingItem
-                label="Comments on your posts"
-                enabled={settings.commentsOnPosts}
-                onToggle={() => toggleSetting("commentsOnPosts")}
-              />
-              <SettingItem
-                label="Community owner comment"
-                enabled={settings.communityOwnerComment}
-                onToggle={() => toggleSetting("communityOwnerComment")}
-                showViewider={false}
-              />
-            </View>
+        {/* Groups Section */}
+        <View className="mt-8">
+          <SectionHeader title="Groups" />
+          <View className=" mx-6  overflow-hidden">
+            <SettingItem
+              label="Tags"
+              enabled={settings.tags}
+              onToggle={() => toggleSetting("tags")}
+            />
+            <SettingItem
+              label="Chat reply"
+              enabled={settings.chatReply}
+              onToggle={() => toggleSetting("chatReply")}
+            />
+            <SettingItem
+              label="New message"
+              enabled={settings.newMessage}
+              onToggle={() => toggleSetting("newMessage")}
+              showViewider={false}
+            />
           </View>
-
-          {/* Groups Section */}
-          <View className="mt-8">
-            <SectionHeader title="Groups" />
-            <View className=" mx-6  overflow-hidden">
-              <SettingItem
-                label="Tags"
-                enabled={settings.tags}
-                onToggle={() => toggleSetting("tags")}
-              />
-              <SettingItem
-                label="Chat reply"
-                enabled={settings.chatReply}
-                onToggle={() => toggleSetting("chatReply")}
-              />
-              <SettingItem
-                label="New message"
-                enabled={settings.newMessage}
-                onToggle={() => toggleSetting("newMessage")}
-                showViewider={false}
-              />
-            </View>
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
