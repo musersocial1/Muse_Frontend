@@ -13,6 +13,7 @@
       "bundleIdentifier": "com.moseleydev.muse"
     },
     "android": {
+      "bundleIdentifier": "com.moseleydev.muse",
       "package": "com.moseley.muse",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/muse-logo.png",

@@ -6,8 +6,11 @@ import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 
+import LoginModal from "@/components/modals/LoginModal";
+import { useAuthState } from "@/hooks/useAuthState";
+import { showError, showSuccess } from "@/lib/toast";
+import { STEPS, StepType } from "@/utils/constants";
 import {
-  Alert,
   Animated,
   Image,
   StatusBar,
@@ -16,11 +19,26 @@ import {
   View,
 } from "react-native";
 
+const stepOrder: StepType[] = [
+  STEPS.PHONE,
+  STEPS.VERIFY_OTP,
+  STEPS.PASSWORD,
+  STEPS.PERSONAL_INFO,
+  STEPS.USERNAME,
+];
+
 export default function Index() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.PHONE);
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [otpValues, setOtpValues] = useState<string[]>(["", "", "", "", ""]);
+  const [otpValues, setOtpValues] = useState<string[]>([
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ]);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -28,6 +46,8 @@ export default function Index() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState("");
   const [moreInfoVisible, setMoreInfoVisible] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const { register, login, isLoading, error, clearError } = useAuthState();
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -37,7 +57,6 @@ export default function Index() {
   const bgAnim = useRef(new Animated.Value(0)).current; // 0 (transparent) → 1 (full opacity)
 
   const router = useRouter();
-  // On first mount, animate the entry of the main card (fade in + slide up)
   React.useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -46,7 +65,7 @@ export default function Index() {
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
-        toValue: 0, // Slide to default position (from below)
+        toValue: 0,
         duration: 800,
         useNativeDriver: true,
       }),
@@ -95,17 +114,15 @@ export default function Index() {
     }
   }, [anyModalVisible]);
 
-  // Blur background intensity animation based on modal state
   React.useEffect(() => {
     const listener = blurAnim.addListener(({ value }) => {
-      setBlurIntensity(value); // Sync local state with animation value
+      setBlurIntensity(value);
     });
 
-    // Animate blur: show when a modal is open, hide otherwise
     Animated.timing(blurAnim, {
       toValue: anyModalVisible ? 100 : 0, // Max blur = 100, none = 0
       duration: 600,
-      useNativeDriver: false, // BlurView requires nativeDriver: false
+      useNativeDriver: false,
     }).start();
 
     return () => blurAnim.removeListener(listener);
@@ -119,12 +136,10 @@ export default function Index() {
     ],
   });
 
-  // Handlers for showing/hiding the onboarding modal and triggering blur animation
   const handleGetStarted = () => {
     setModalVisible(true);
-    setCurrentStep(0);
+    setCurrentStep(STEPS.PHONE);
     setPhoneNumber("");
-    // Animate blur in when onboarding starts
     Animated.timing(blurAnim, {
       toValue: 100,
       duration: 600,
@@ -135,7 +150,6 @@ export default function Index() {
   const handleModalClose = () => {
     setModalVisible(false);
     resetForm();
-    // Animate blur out when modal closes
     Animated.timing(blurAnim, {
       toValue: 0,
       duration: 600,
@@ -143,22 +157,23 @@ export default function Index() {
     }).start();
   };
 
-  // Onboarding navigation: go to next/previous step in the modal
   const handleContinue = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
+    const currentIndex = stepOrder.indexOf(currentStep);
+    if (currentIndex < stepOrder.length - 1) {
+      setCurrentStep(stepOrder[currentIndex + 1]);
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    const currentIndex = stepOrder.indexOf(currentStep);
+    if (currentIndex > 0) {
+      setCurrentStep(stepOrder[currentIndex - 1]);
     }
   };
 
   // Reset all onboarding form fields
   const resetForm = () => {
-    setCurrentStep(0);
+    setCurrentStep(STEPS.PHONE);
     setPhoneNumber("");
     setOtpValues(["", "", "", "", ""]);
     setFirstName("");
@@ -169,36 +184,44 @@ export default function Index() {
 
   // Onboarding complete handler
   const handleComplete = (formData: any) => {
-    console.log("=== ONBOARDING COMPLETE ===");
+    console.log("=== ONBOARDING 1 COMPLETE ===");
     console.log("Final form data:", JSON.stringify(formData, null, 2));
-
-    Alert.alert("Success!", "Account created successfully!", [
-      {
-        text: "OK",
-        onPress: () => {
-          setMoreInfoVisible(true); // Open more info modal after success
-          setModalVisible(false);
-          resetForm();
-        },
-      },
-    ]);
+    setModalVisible(false);
+    setMoreInfoVisible(true);
   };
 
   // More info modal complete handler
-  const handleMoreInfoComplete = (moreInfoData: any) => {
-    console.log("=== MORE INFO COMPLETE ===");
-    console.log("More info data:", JSON.stringify(moreInfoData, null, 2));
+  const handleMoreInfoComplete = async (moreInfoData: any) => {
+    try {
+      const dateOfBirth = `${moreInfoData.birthYear}-${String(
+        moreInfoData.birthMonth
+      ).padStart(2, "0")}-${String(moreInfoData.birthDay).padStart(2, "0")}`;
 
-    Alert.alert("Success!", "Profile setup completed successfully!", [
-      {
-        text: "OK",
-        onPress: () => {
-          // resetForm();
-          // setMoreInfoVisible(false); // Close more info modal and go home
-          router.replace(RouterConstantUtil.tabs.home as any); // <--- then go home!
-        },
-      },
-    ]);
+      const payload = {
+        email,
+        password,
+        phoneNumber,
+        username,
+        firstName,
+        lastName,
+        confirmPassword,
+        dateOfBirth,
+        accountType: moreInfoData.accountType,
+        gender: moreInfoData.gender,
+        interests: moreInfoData.interests,
+      };
+
+      await register(payload);
+      showSuccess("Account created successfully!");
+      setMoreInfoVisible(false);
+      router.replace(RouterConstantUtil.tabs.home as any);
+    } catch (e) {
+      console.error("Registration error:", e);
+      showError(
+        "Registration Failed",
+        "Please check your details and try again."
+      );
+    }
   };
 
   // Close more info modal handler
@@ -212,11 +235,7 @@ export default function Index() {
         backgroundColor="transparent"
         translucent
       />
-      <View
-        // source={images.splash}
-        // resizeMode="cover"
-        className="flex-1 relative"
-      >
+      <View className="flex-1 relative">
         <Image
           source={images.splash}
           style={{
@@ -268,7 +287,7 @@ export default function Index() {
                   <TouchableOpacity
                     className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                     activeOpacity={0.8}
-                    onPress={() => router.replace("/home")} // Or "/(tabs)/home" if needed
+                    onPress={() => setShowLogin(true)}
                   >
                     <Text className="text-white text-center font-sfpro-bold text-lg">
                       Already have an account
@@ -315,13 +334,12 @@ export default function Index() {
         setUsername={setUsername}
         onComplete={handleComplete}
       />
-      {moreInfoVisible && (
-        <MoreInfoModal
-          visible={moreInfoVisible}
-          onClose={handleMoreInfoClose}
-          onComplete={handleMoreInfoComplete}
-        />
-      )}
+      <MoreInfoModal
+        visible={moreInfoVisible}
+        onClose={handleMoreInfoClose}
+        onComplete={handleMoreInfoComplete}
+      />
+      <LoginModal visible={showLogin} onClose={() => setShowLogin(false)} />
     </View>
   );
 }

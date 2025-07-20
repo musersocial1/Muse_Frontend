@@ -1,9 +1,10 @@
-import { BlurView as ExpoBlurView } from "expo-blur";
-// import { ArrowLeft, Eye, EyeOff, X } from "lucide-react-native";
+import { authAPI } from "@/lib/api/auth";
+import { STEPS, StepType } from "@/utils/constants";
 import { Feather } from "@expo/vector-icons";
-
+import { BlurView as ExpoBlurView } from "expo-blur";
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Keyboard,
@@ -22,7 +23,7 @@ const { width, height } = Dimensions.get("window");
 interface OnboardingModalProps {
   visible: boolean;
   onClose: () => void;
-  currentStep: number;
+  currentStep: string;
   onContinue: () => void;
   onBack: () => void;
   phoneNumber: string;
@@ -77,16 +78,19 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const otpRefs = useRef<TextInput[]>([]);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-  const [focusedOtpIndex, setFocusedOtpIndex] = useState<number | null>(null);
 
-  const totalSteps = 5;
-  const stepTitles = [
-    "Create account",
-    "Enter verification code",
-    "Set password",
-    "Enter your details",
-    "Enter username",
-  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPhoneVerified, setIsPhoneVerified] = useState(false);
+  const [canResendCode, setCanResendCode] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
+  const stepTitles: Record<StepType, string> = {
+    [STEPS.PHONE]: "Enter Phone Number",
+    [STEPS.VERIFY_OTP]: "Verify Code",
+    [STEPS.PASSWORD]: "Create Password",
+    [STEPS.PERSONAL_INFO]: "Personal Information",
+    [STEPS.USERNAME]: "Choose Username",
+  };
 
   React.useEffect(() => {
     if (visible) {
@@ -141,31 +145,55 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     };
   }, []);
 
+  React.useEffect(() => {
+    let interval: any;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResendCode(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
   const phoneInputRef = useRef<TextInput>(null);
   React.useEffect(() => {
     if (!visible) return;
-    // Auto-focus logic based on step
-    if (currentStep === 0 && phoneInputRef.current) {
+    if (currentStep === STEPS.PHONE && phoneInputRef.current) {
       setTimeout(() => phoneInputRef.current?.focus(), 200); // Delay for modal open
     }
-    if (currentStep === 1 && otpRefs.current[0]) {
+    if (currentStep === STEPS.VERIFY_OTP && otpRefs.current[0]) {
       setTimeout(() => otpRefs.current[0]?.focus(), 200); // Focus first OTP input
     }
-    // Add similar blocks for other steps if needed
   }, [visible, currentStep]);
 
-  const validatePhoneNumber = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, "");
-    if (cleaned.length === 0) return "Phone number is required";
-    if (cleaned.length < 10) return "Phone number must be at least 10 digits";
-    if (cleaned.length > 15) return "Phone number is too long";
+  const validatePhoneNumber = (phone: string): string => {
+    if (!phone || phone.trim().length === 0) {
+      return "Phone number is required";
+    }
+
+    const formatted = formatPhoneNumber(phone);
+
+    if (!isValidInternationalPhone(formatted)) {
+      return "Please enter a valid phone number with country code (e.g., +1234567890)";
+    }
+
     return "";
   };
 
-  const validateOTP = () => {
+  const validateOTP = (): string => {
     const otpString = otpValues.join("");
-    if (otpString.length === 0) return "Verification code is required";
-    if (otpString.length !== 5) return "Please enter all 5 digits";
+    if (otpString.length !== 6) {
+      return "Please enter the complete 5-digit code";
+    }
+    if (!/^\d{6}$/.test(otpString)) {
+      return "Code should contain only numbers";
+    }
     return "";
   };
 
@@ -192,53 +220,156 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const formatPhoneNumber = (phone: string) => {
-    const cleaned = phone.replace(/\D/g, "");
-    if (cleaned.length >= 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
-        6,
-        10
-      )}`;
-    } else if (cleaned.length >= 6) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
-        6
-      )}`;
-    } else if (cleaned.length >= 3) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3)}`;
+    let cleaned = phone.trim();
+
+    if (cleaned.startsWith("+")) {
+      cleaned = "+" + cleaned.slice(1).replace(/\D/g, "");
+    } else {
+      cleaned = cleaned.replace(/\D/g, "");
+      // don't worry validation would catch this
     }
     return cleaned;
   };
 
+  const isValidInternationalPhone = (phone: string): boolean => {
+    return /^\+[1-9]\d{9,16}$/.test(phone);
+  };
+
+  const sendVerificationCode = async (phone: string) => {
+    try {
+      setIsLoading(true);
+      setInputError("");
+
+      const cleanedPhone = formatPhoneNumber(phone);
+
+      // Validate before sending
+      if (!isValidInternationalPhone(cleanedPhone)) {
+        setInputError("Please enter a valid phone number with country code ");
+        throw new Error(
+          "Please enter a valid phone number with country code (e.g., +1234567890)"
+        );
+      }
+
+      const response = await authAPI.sendPhoneVerificationCode({
+        phoneNumber: cleanedPhone,
+      });
+
+      // Starting resend timer on here
+      setCanResendCode(false);
+      setResendTimer(60);
+
+      return { success: true, data: response };
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send verification code";
+      setInputError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendVerificationCode = async () => {
+    if (!canResendCode || isLoading) return;
+
+    try {
+      setIsLoading(true);
+      setInputError("");
+
+      const cleanedPhone = formatPhoneNumber(phoneNumber);
+
+      if (!isValidInternationalPhone(cleanedPhone)) {
+        setInputError("Please enter a valid phone number with country code");
+        throw new Error("Please enter a valid phone number with country code");
+      }
+
+      await authAPI.resendPhoneVerificationCode({ phoneNumber: cleanedPhone });
+
+      // Resetting the timer on here
+      setCanResendCode(false);
+      setResendTimer(60);
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to resend code";
+      setInputError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyCode = async (code: string) => {
+    try {
+      setIsLoading(true);
+      setInputError("");
+
+      const cleanedPhone = formatPhoneNumber(phoneNumber);
+
+      if (!isValidInternationalPhone(cleanedPhone)) {
+        setInputError("Invalid phone number format");
+        throw new Error("Invalid phone number format");
+      }
+
+      const response = await authAPI.verifyPhoneVerificationCode({
+        phoneNumber: cleanedPhone,
+        code: code,
+      });
+
+      setIsPhoneVerified(true);
+      return { success: true, data: response };
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Invalid verification code";
+      setInputError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleOTPChange = (text: string, index: number) => {
-    text = text.replace(/\D/g, "");
+    const cleaned = text.replace(/\D/g, "");
 
-    // PASTE (multi-char, e.g., "12345")
-    if (text.length > 1) {
-      const chars = text.slice(0, 5).split("");
-      setOtpValues(chars.concat(Array(5 - chars.length).fill("")));
+    // Handle paste (multiple characters at once)
+    if (cleaned.length > 1) {
+      const chars = cleaned.slice(0, 6).split("");
+      const newOtpValues = Array(6).fill("");
+      chars.forEach((char, i) => {
+        newOtpValues[i] = char;
+      });
+      setOtpValues(newOtpValues);
 
-      // Blur the last box if all are filled
-      if (chars.length >= 5) {
-        setTimeout(() => otpRefs.current[4]?.blur(), 10);
+      // Focus next or blur last
+      if (chars.length === 6) {
+        setTimeout(() => otpRefs.current[5]?.blur(), 10);
       } else {
         setTimeout(() => otpRefs.current[chars.length]?.focus(), 10);
       }
+
       if (inputError) setInputError("");
       return;
     }
 
-    // SINGLE ENTRY
+    // Handle single digit entry
     const newOtpValues = [...otpValues];
-    newOtpValues[index] = text[0] || "";
+    newOtpValues[index] = cleaned[0] || "";
     setOtpValues(newOtpValues);
 
-    // Move focus to next input only if not last
-    if (text && index < 4) {
+    // Focus next if not last input
+    if (cleaned && index < 5) {
       otpRefs.current[index + 1]?.focus();
     }
-    // If we're on the last box, BLUR (and do NOT focus anything else)
-    if (index === 4 && text) {
-      setTimeout(() => otpRefs.current[4]?.blur(), 10);
+
+    // If on last input, blur it
+    if (index === 5 && cleaned) {
+      setTimeout(() => otpRefs.current[5]?.blur(), 10);
     }
+
     if (inputError) setInputError("");
   };
 
@@ -250,48 +381,87 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   const getCurrentValidation = () => {
     switch (currentStep) {
-      case 0:
+      case STEPS.PHONE:
         return validatePhoneNumber(phoneNumber);
-      case 1:
+      case STEPS.VERIFY_OTP:
         return validateOTP();
-      case 2:
-        return validatePassword(password);
-      case 3:
+      case STEPS.PASSWORD:
+        return (
+          validatePassword(password) ||
+          (password !== confirmPassword ? "Passwords don't match" : "")
+        );
+      case STEPS.PERSONAL_INFO:
         return (
           validateName(firstName) ||
           validateName(lastName) ||
           validateEmail(email)
         );
-      case 4:
+      case STEPS.USERNAME:
         return validateName(username);
       default:
         return "";
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    if (isLoading) return;
+
     const error = getCurrentValidation();
     if (error) {
       setInputError(error);
       return;
     }
 
-    if (currentStep === 4) {
-      // Final step - submit the form
-      const formData = {
-        phoneNumber,
-        verificationCode: otpValues.join(""),
-        firstName,
-        lastName,
-        email,
-        password,
-        submittedAt: new Date().toISOString(),
-      };
+    switch (currentStep) {
+      case STEPS.PHONE:
+        // Send verification code
+        const result = await sendVerificationCode(phoneNumber);
+        if (result.success) {
+          onContinue();
+        }
+        break;
 
-      console.log("Form submission data:", formData);
-      onComplete(formData);
-    } else {
-      onContinue();
+      case STEPS.VERIFY_OTP:
+        // Verify code
+        if (!isPhoneVerified) {
+          const otpString = otpValues.join("");
+          const result = await verifyCode(otpString);
+          if (result.success) {
+            onContinue();
+          }
+        } else {
+          onContinue();
+        }
+        break;
+
+      case STEPS.PASSWORD:
+        console.log("Password step completed, moving to personal info");
+        onContinue();
+        break;
+
+      case STEPS.PERSONAL_INFO:
+        console.log("Personal info step completed, moving to username");
+        onContinue();
+        break;
+
+      case STEPS.USERNAME:
+        const formData = {
+          phoneNumber: formatPhoneNumber(phoneNumber),
+          verificationCode: otpValues.join(""),
+          firstName,
+          lastName,
+          email,
+          password,
+          username,
+        };
+
+        console.log("Form submission data:", formData);
+        onComplete(formData);
+        break;
+
+      default:
+        console.warn("Unknown step:", currentStep);
+        break;
     }
   };
 
@@ -314,8 +484,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         break;
       case "confirmPassword":
         setConfirmPassword(value);
+        break;
       case "username":
         setUsername(value);
+        break;
     }
 
     if (inputError) {
@@ -327,6 +499,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     Keyboard.dismiss();
     setInputError("");
     setIsInputFocused(false);
+    setIsPhoneVerified(false);
+    setCanResendCode(false);
+    setResendTimer(0);
     onClose();
   };
 
@@ -368,12 +543,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       }`;
 
     switch (currentStep) {
-      case 0:
+      case STEPS.PHONE:
         return (
-          <View
-            className="bg-white rounded-t-3xl py-[8%] shadow-2xl"
-            // style={{ minHeight: isKeyboardVisible ? "40%" : "40%" }}
-          >
+          <View className="bg-white rounded-t-3xl py-[8%] shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-semibold text-gray-900">
@@ -394,17 +566,18 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onChangeText={(text) => handleInputChange(text, "phone")}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setIsInputFocused(false)}
-                  placeholder="Enter phone number"
+                  placeholder="Enter phone number (+1234567890)"
                   placeholderTextColor="#9CA3AF"
                   className={baseInputStyle(
                     !!inputError,
                     isInputFocused,
-                    isValidInput
+                    isValidInput && !isLoading
                   )}
                   keyboardType="phone-pad"
                   returnKeyType="done"
                   onSubmitEditing={handleContinue}
                   maxLength={14}
+                  editable={!isLoading}
                 />
                 {inputError ? (
                   <Text className="text-red-500 text-sm mt-2 px-2">
@@ -420,35 +593,39 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
               <TouchableOpacity
                 onPress={handleContinue}
-                disabled={!isValidInput}
+                disabled={!isValidInput || isLoading}
                 className={`rounded-full p-4 mb-3 ${
-                  isValidInput ? "bg-secondary" : "bg-disabled"
+                  isValidInput && !isLoading ? "bg-secondary" : "bg-disabled"
                 }`}
                 activeOpacity={0.8}
               >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
-                  }`}
-                >
-                  Continue
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      isValidInput && !isLoading
+                        ? "text-white"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    Send Code
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
         );
 
-      case 1:
+      case STEPS.VERIFY_OTP:
         return (
-          <View
-            className="bg-white  py-[8%] rounded-t-3xl shadow-2xl"
-            // style={{ minHeight: isKeyboardVisible ? 500 : 300 }}
-          >
+          <View className="bg-white  py-[8%] rounded-t-3xl shadow-2xl">
             <View className="px-6  ">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
+                  disabled={isLoading}
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
@@ -464,7 +641,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </View>
 
               <View className="mb-4">
-                <View className="flex-row justify-center space-x-3 gap-4 mb-4">
+                <View className="flex-row justify-center space-x-3 gap-2 mb-4">
                   {otpValues.map((value, index) => (
                     <TextInput
                       key={index}
@@ -476,8 +653,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       }
                       className={otpInputStyle(!!inputError, false, !!value)}
                       keyboardType="number-pad"
-                      // maxLength={1}
                       selectTextOnFocus
+                      editable={!isLoading}
                     />
                   ))}
                 </View>
@@ -488,32 +665,55 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 ) : null}
               </View>
 
-              <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
+              <TouchableOpacity
+                onPress={resendVerificationCode}
+                disabled={!canResendCode || isLoading}
+                className="mb-4"
+              >
+                <Text
+                  className={`text-center text-sm ${
+                    canResendCode && !isLoading
+                      ? "text-blue-600"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {resendTimer > 0
+                    ? `Resend code in ${resendTimer}s`
+                    : "Didn't receive the code? Resend"}
+                </Text>
+              </TouchableOpacity>
+              <Text className="text-gray-500 text-sm text-center mb-4 leading-5">
                 Enter the 5-digit code sent to{"\n"}
                 {phoneNumber}
               </Text>
 
               <TouchableOpacity
                 onPress={handleContinue}
-                disabled={!isValidInput}
+                disabled={!isValidInput || isLoading}
                 className={`rounded-full p-4 mb-3 ${
-                  isValidInput ? "bg-secondary" : "bg-disabled"
+                  isValidInput && !isLoading ? "bg-secondary" : "bg-disabled"
                 }`}
                 activeOpacity={0.8}
               >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
-                  }`}
-                >
-                  Verify code
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      isValidInput && !isLoading
+                        ? "text-white"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    Verify Code
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
         );
 
-      case 2:
+      case STEPS.PASSWORD:
         return (
           <View className="bg-white rounded-t-3xl shadow-2xl">
             <View className="px-6 py-8">
@@ -620,20 +820,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     isValidInput ? "text-white" : "text-gray-400"
                   }`}
                 >
-                  Complete Setup
+                  Continue
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         );
 
-      case 3:
+      case STEPS.PERSONAL_INFO:
         return (
           <View
             className="bg-white  rounded-t-3xl shadow-2xl"
             // style={{ minHeight: isKeyboardVisible ? 550 : 400 }}
           >
-            <View className="px-6 pt-6 pb-6">
+            <View className="px-6 pt-6 pb-6 flex-1">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
                   onPress={onBack}
@@ -740,123 +940,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </View>
         );
 
-      // case 3:
-      //   return (
-      //     <View
-      //       className="bg-white rounded-t-3xl shadow-2xl"
-      //       style={{ minHeight: isKeyboardVisible ? 500 : 380 }}
-      //     >
-      //       <View className="px-6 pt-6  pb-6">
-      //         <View className="flex-row justify-between items-center mb-6">
-      //           <TouchableOpacity
-      //             onPress={onBack}
-      //             className="p-2 bg-gray-100 rounded-full"
-      //           >
-      //             <Feather name="arrow-left" size={20} color="#666" />
-      //           </TouchableOpacity>
-      //           <Text className="text-xl font-semibold text-gray-900">
-      //             {stepTitles[currentStep]}
-      //           </Text>
-      //           <TouchableOpacity
-      //             onPress={handleModalClose}
-      //             className="p-2 bg-gray-100 rounded-full"
-      //           >
-      //             <Feather name="x" size={20} color="#666" />
-      //           </TouchableOpacity>
-      //         </View>
-
-      //         <View className="mb-4 gap-3">
-      //           <View className="relative">
-      //             <TextInput
-      //               value={password}
-      //               onChangeText={(text) => handleInputChange(text, "password")}
-      //               onFocus={() => setIsInputFocused(true)}
-      //               onBlur={() => setIsInputFocused(false)}
-      //               placeholder="Create password"
-      //               placeholderTextColor="#9CA3AF"
-      //               className={baseInputStyle(
-      //                 !!inputError,
-      //                 isInputFocused,
-      //                 isValidInput
-      //               )}
-      //               secureTextEntry={!showPassword}
-      //               returnKeyType="done"
-      //               onSubmitEditing={handleContinue}
-      //             />
-      //             <TouchableOpacity
-      //               onPress={() => setShowPassword(!showPassword)}
-      //               className="absolute right-4 top-4"
-      //             >
-      //               {showPassword ? (
-      //                 <Feather name="eye-off" size={20} color="#666" />
-      //               ) : (
-      //                 <Feather name="eye" size={20} color="#666" />
-      //               )}
-      //             </TouchableOpacity>
-      //           </View>
-      //           <View className="relative">
-      //             <TextInput
-      //               value={confirmPassword}
-      //               onChangeText={(text) =>
-      //                 handleInputChange(text, "confirmPassword")
-      //               }
-      //               onFocus={() => setIsInputFocused(true)}
-      //               onBlur={() => setIsInputFocused(false)}
-      //               placeholder="Confirm password"
-      //               placeholderTextColor="#9CA3AF"
-      //               className={baseInputStyle(
-      //                 !!inputError,
-      //                 isInputFocused,
-      //                 isValidInput
-      //               )}
-      //               secureTextEntry={!showPassword}
-      //               returnKeyType="done"
-      //               onSubmitEditing={handleContinue}
-      //             />
-      //             <TouchableOpacity
-      //               onPress={() => setShowPassword(!showPassword)}
-      //               className="absolute right-4 top-4"
-      //             >
-      //               {showPassword ? (
-      //                 <Feather name="eye-off" size={20} color="#666" />
-      //               ) : (
-      //                 <Feather name="eye" size={20} color="#666" />
-      //               )}
-      //             </TouchableOpacity>
-      //           </View>
-      //           {inputError ? (
-      //             <Text className="text-red-500 text-sm mt-2 px-2">
-      //               {inputError}
-      //             </Text>
-      //           ) : null}
-      //         </View>
-
-      //         <Text className="text-gray-500 text-sm text-center mb-8 leading-5">
-      //           Password must be at least 8 characters with{"\n"}uppercase,
-      //           lowercase, and numbersddjd
-      //         </Text>
-
-      //         <TouchableOpacity
-      //           onPress={handleContinue}
-      //           disabled={!isValidInput}
-      //           className={`rounded-full p-4 ${
-      //             isValidInput ? "bg-secondary" : "bg-disabled"
-      //           }`}
-      //           activeOpacity={0.8}
-      //         >
-      //           <Text
-      //             className={`text-center font-semibold text-base ${
-      //               isValidInput ? "text-white" : "text-gray-400"
-      //             }`}
-      //           >
-      //             Complete Setup
-      //           </Text>
-      //         </TouchableOpacity>
-      //       </View>
-      //     </View>
-      //   );
-
-      case 4:
+      case STEPS.USERNAME:
         return (
           <View
             className="bg-white rounded-t-3xl shadow-2xl"
@@ -905,6 +989,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   </Text>
                 ) : null}
               </View>
+
+              <View className="flex-1" />
 
               <TouchableOpacity
                 onPress={handleContinue}
