@@ -162,7 +162,7 @@ export default function MoreInfoModal({
   const insets = useSafeAreaInsets();
 
   const Header = () => (
-    <View className="flex-row items-start justify-between px-6 pb-2">
+    <View className="flex-row items-start justify-between px-6 ">
       <View className="flex-1 items-start">
         <Image
           source={images.logo}
@@ -245,70 +245,116 @@ export default function MoreInfoModal({
 
   const renderAccountTypeStep = () => (
     <View className="flex-1 justify-between">
-      <View className="px-6 mt-4 mb-8">
-        <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
+      <View className="px-4 mt-4 mb-8">
+        <Text className="text-[#FFFFFF] font-sfpro-medium text-[32px] font-medium text-start mb-2">
           {`Select your \naccount type`}
         </Text>
-        <Text className="text-white/70 text-start text-[16px]">
+        <Text className="text-white/70  text-start text-[16px]">
           You can switch this later in your profile setting
         </Text>
       </View>
 
-      <View className="flex-1 justify-center px-6">
-        <View className="space-y-4 gap-3">
-          <TouchableOpacity
-            onPress={() => updateFormData("accountType", "join")}
-            className={`bg-white rounded-2xl p-4 flex-row items-center ${
-              formData.accountType === "join"
-                ? "border-4 border-secondary"
-                : "border-[5px] border-[#FFFFFF1A]/70"
-            }`}
-          >
-            <View className="w-16 h-16 bg-[#F3F3F3] rounded-full mr-4 items-center justify-center">
-              <Feather name="user" size={32} color="#888" />
-            </View>
-            <Text className="flex-1 text-[#000000] font-bold text-[16px]">
-              Join a community
-            </Text>
-            <View
-              className={`w-6 h-6 rounded-full border-2 ${
-                formData.accountType === "join"
-                  ? "bg-secondary border-secondary"
-                  : "border-gray-400"
-              }`}
-            />
-          </TouchableOpacity>
+      <View className="flex-1 justify-center px-4">
+        <View className="space-y-5 gap-3">
+          <View className="overflow-hidden rounded-[30px]">
+            <BlurView
+              intensity={100}
+              tint="light"
+              className=" p-1.5 overflow-hidden "
+            >
+              <TouchableOpacity
+                onPress={() => updateFormData("accountType", "join")}
+                className={`bg-white rounded-[30px] p-2.5 flex-row items-center `}
+              >
+                <View className="w-14 h-14 bg-[#F3F3F3] rounded-full mr-4 items-center justify-center">
+                  <Image
+                    source={images.createCommunity}
+                    className=" w-14 h-14"
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text className="flex-1 text-[#000000] font-sfpro-bold text-[16px]">
+                  Join a community
+                </Text>
 
-          <TouchableOpacity
-            onPress={() => updateFormData("accountType", "create")}
-            className={`bg-white rounded-2xl p-4 flex-row items-center ${
-              formData.accountType === "create"
-                ? "border-4 border-secondary"
-                : "border-[5px] border-[#FFFFFF1A]/70"
-            }`}
-          >
-            <View className="w-16 h-16 bg-[#F3F3F3] rounded-full mr-4 items-center justify-center">
-              <Feather name="star" size={32} color="#888" />
-            </View>
-            <Text className="flex-1 text-black font-bold text-[16px]">
-              Create a community
-            </Text>
-            <View
-              className={`w-6 h-6 rounded-full border-2 ${
-                formData.accountType === "create"
-                  ? "bg-secondary border-secondary"
-                  : "border-gray-400"
-              }`}
-            />
-          </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={formData.accountType === "join"}
+                  onPress={() => updateFormData("accountType", "join")}
+                  className={`px-4  py-3 rounded-full ml-2 ${
+                    formData.accountType !== "join"
+                      ? "bg-[#0368FF] text-white"
+                      : "text-white bg-gray-400"
+                  }`}
+                  activeOpacity={formData.accountType === "join" ? 1 : 0}
+                >
+                  <Text
+                    className={` font-neutral-bold  ${
+                      formData.accountType !== "join"
+                        ? "text-white"
+                        : "text-black"
+                    }`}
+                  >
+                    {formData.accountType === "join" ? "Selected" : "Select"}
+                  </Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </BlurView>
+          </View>
+
+          <View className="overflow-hidden rounded-[30px]">
+            <BlurView
+              intensity={100}
+              tint="light"
+              className=" p-1.5 overflow-hidden "
+            >
+              <TouchableOpacity
+                onPress={() => updateFormData("accountType", "create")}
+                className={`bg-white  rounded-[30px] p-2.5  flex-row items-center `}
+              >
+                <View className="w-14 h-14 bg-[#F3F3F3] rounded-full mr-3 items-center justify-center">
+                  <Image
+                    source={images.joinCommunity}
+                    className=" w-14 h-14"
+                    resizeMode="contain"
+                  />
+                </View>
+                <Text className="flex-1 text-black font-bold text-[16px]">
+                  Create a community
+                </Text>
+
+                <TouchableOpacity
+                  disabled={formData.accountType === "create"}
+                  onPress={() => updateFormData("accountType", "create")}
+                  className={`px-4  py-3 rounded-full ml-2 ${
+                    formData.accountType !== "create"
+                      ? "bg-[#0368FF] text-white"
+                      : "text-white bg-gray-400"
+                  }`}
+                  activeOpacity={formData.accountType === "create" ? 1 : 0}
+                >
+                  <Text
+                    className={` font-neutral-bold  ${
+                      formData.accountType !== "create"
+                        ? "text-white"
+                        : "text-black"
+                    }`}
+                  >
+                    {formData.accountType === "create" ? "Selected" : "Select"}
+                  </Text>
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </BlurView>
+          </View>
         </View>
       </View>
     </View>
   );
+  const tr = [{ translateY: -20 }]; // Moves 50 units DOWN
+  // or use a negative value to move up: [{ translateY: -30 }]
 
   const renderGenderStep = () => (
     <View className="flex-1 justify-between">
-      <View className="px-6 mt-4 mb-8">
+      <View className="px-6  mb-8">
         <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
           {`What's your\nGender`}
         </Text>
@@ -317,8 +363,8 @@ export default function MoreInfoModal({
         </Text>
       </View>
 
-      <View className="flex-1 justify-center px-6">
-        <View className="flex-row space-x-4 gap-2 mb-6">
+      <View style={{ transform: tr }} className="flex-1  justify-center px-4">
+        <View className="flex-row space-x-4 gap-3 mb-3">
           {[
             {
               gender: "female",
@@ -336,7 +382,7 @@ export default function MoreInfoModal({
               <TouchableOpacity
                 key={gender}
                 onPress={() => updateFormData("gender", gender)}
-                className={`flex-1 rounded-3xl overflow-hidden relative h-[280px] ${
+                className={`w-[40vw] h-fit aspect-[1/1.5] flex-1 border2 bg-white rounded-[20px] overflow-hidden relative  ${
                   selected
                     ? "border-2 border-transparent"
                     : "border-2 border-transparent"
@@ -344,9 +390,12 @@ export default function MoreInfoModal({
               >
                 <Image
                   source={image}
-                  className="w-full h-full"
+                  className="w-full scale-150 h-full"
                   resizeMode="cover"
                 />
+                <Text className="absolute bottom-[5%] text-white font-neutral-medium text-3xl capitalize left-[4%]">
+                  {gender}
+                </Text>
                 {selected && (
                   <View className="absolute top-4 right-4 w-8 h-8 bg-secondary rounded-full items-center justify-center">
                     <Feather name="check" size={16} color="white" />
@@ -359,18 +408,22 @@ export default function MoreInfoModal({
 
         <TouchableOpacity
           onPress={() => updateFormData("gender", "other")}
-          className={`bg-black/45 p-5 rounded-3xl flex-row items-center justify-between ${
-            formData.gender === "other" ? "border-4 border-white/50" : ""
-          }`}
+          className={`  overflow-hidden rounded-3xl flex-row items-center justify-between `}
         >
-          <Text className="text-white text-[18px] font-medium">
-            Prefer not to say
-          </Text>
-          <View
-            className={`w-6 h-6 rounded-full border-2 border-white/50 ${
-              formData.gender === "other" ? "bg-secondary" : ""
-            }`}
-          />
+          <BlurView
+            intensity={70}
+            tint="dark"
+            className="flex items-center w-full flex-row justify-between h-full p-7"
+          >
+            <Text className="text-white font-neutral-medium leading-[20px]  text-[20px] font-medium">
+              Prefer not to say
+            </Text>
+            <View
+              className={`w-6 h-6 rounded-full border-2 border-white/50 ${
+                formData.gender === "other" ? "bg-secondary" : ""
+              }`}
+            />
+          </BlurView>
         </TouchableOpacity>
       </View>
     </View>
@@ -443,7 +496,7 @@ export default function MoreInfoModal({
                           className={`text-[15px] ${
                             formData.interests.includes(item)
                               ? "text-white font-medium"
-                              : "text-white/70"
+                              : "text-white"
                           }`}
                         >
                           {item}
@@ -497,11 +550,14 @@ export default function MoreInfoModal({
       animationType="fade"
       transparent={true}
       onRequestClose={onClose}
-      className="flex-1"
+      className="flex "
     >
       <SafeAreaView
-        className="flex-1 relative"
-        style={{ paddingBottom: insets.bottom, paddingTop: insets.top }}
+        className="flex-1 justify-between relative"
+        style={{
+          paddingBottom: 70,
+          top: insets.top,
+        }}
       >
         <Header />
         <Animated.View className="flex-1 relative">
