@@ -19,41 +19,6 @@ export const APP_CONFIG = {
   bundleId: env.BUNDLE_ID,
 } as const;
 
-// Navigation Configuration
-export const NAVIGATION_CONFIG = {
-  initialRouteName: "index",
-  defaultScreenOptions: {
-    headerShown: false,
-    gestureEnabled: true,
-    animation: "slide_from_right",
-  },
-  tabBarOptions: {
-    showLabel: true,
-    activeTintColor: "#3B82F6",
-    inactiveTintColor: "#64748B",
-    style: {
-      backgroundColor: "#FFFFFF",
-      borderTopWidth: 1,
-      borderTopColor: "#E2E8F0",
-    },
-  },
-} as const;
-
-// API Configuration
-export const API_CONFIG = {
-  baseURL: env.API_URL,
-  version: env.API_VERSION,
-  timeout: env.API_TIMEOUT,
-  retryAttempts: env.MAX_RETRY_ATTEMPTS,
-  retryDelay: 1000,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-    "X-App-Version": env.APP_VERSION,
-    "X-Platform": Platform.OS,
-  },
-} as const;
-
 // Storage Configuration
 export const STORAGE_CONFIG = {
   prefix: env.STORAGE_PREFIX,
@@ -82,7 +47,6 @@ export const STORAGE_CONFIG = {
 
 // Feature Flags
 export const FEATURE_FLAGS = {
-  ENABLE_ANALYTICS: env.ENABLE_ANALYTICS,
   ENABLE_CRASH_REPORTING: env.ENABLE_CRASH_REPORTING,
   ENABLE_PUSH_NOTIFICATIONS: true,
   ENABLE_BIOMETRIC_AUTH: Platform.select({
@@ -110,25 +74,6 @@ export const VALIDATION_RULES = {
   },
 } as const;
 
-// Animation Configuration
-export const ANIMATION_CONFIG = {
-  timing: {
-    short: 150,
-    medium: 300,
-    long: 500,
-  },
-  easing: {
-    easeInOut: "ease-in-out",
-    easeIn: "ease-in",
-    easeOut: "ease-out",
-    linear: "linear",
-  },
-  spring: {
-    tension: 100,
-    friction: 8,
-  },
-} as const;
-
 // Debug Configuration
 export const DEBUG_CONFIG = {
   enableLogging: env.ENABLE_DEBUG_MODE,
@@ -152,5 +97,4 @@ export const getStorageKey = (
 };
 
 // Type exports
-export type ApiConfig = typeof API_CONFIG;
 export type StorageConfig = typeof STORAGE_CONFIG;

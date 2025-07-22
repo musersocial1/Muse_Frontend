@@ -47,7 +47,7 @@ export default function Index() {
   const [username, setUsername] = useState("");
   const [moreInfoVisible, setMoreInfoVisible] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const { register, login, isLoading, error, clearError } = useAuthState();
+  const { register, isLoading, error, clearError } = useAuthState();
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -217,10 +217,7 @@ export default function Index() {
       router.replace(RouterConstantUtil.tabs.home as any);
     } catch (e) {
       console.error("Registration error:", e);
-      showError(
-        "Registration Failed",
-        "Please check your details and try again."
-      );
+      showError("Registration Failed", `${error}`);
     }
   };
 
@@ -287,7 +284,10 @@ export default function Index() {
                   <TouchableOpacity
                     className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                     activeOpacity={0.8}
-                    onPress={() => setShowLogin(true)}
+                    // onPress={() => setShowLogin(true)}
+                    onPress={() =>
+                      router.replace(RouterConstantUtil.tabs.home as any)
+                    }
                   >
                     <Text className="text-white text-center font-sfpro-bold text-lg">
                       Already have an account

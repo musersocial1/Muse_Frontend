@@ -28,12 +28,6 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          {/* <StatusBar
-            hidden={false}
-            barStyle="light-content"
-            backgroundColor="#121212" // <-- add this line!
-            showHideTransition="fade"
-          /> */}
           <View style={{ flex: 1, backgroundColor: "#121212" }}>
             <Stack
               screenOptions={{

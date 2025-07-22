@@ -1,5 +1,5 @@
 import { STORAGE_CONFIG } from "@/config/app";
-import { ApiClient, tokenManager } from "@/lib/api/apiClient";
+import { ServiceApiClient, tokenManager } from "@/lib/api/apiClient";
 import { authAPI } from "@/lib/api/auth";
 import { AuthState, RegisterRequest } from "@/types/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -54,7 +54,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     // Registering the auth error handler with ApiClient on here
-    ApiClient.setAuthErrorHandler(handleAuthError);
+    ServiceApiClient.setAuthErrorHandler(handleAuthError);
 
     initializeAuth();
   }, [handleAuthError]);

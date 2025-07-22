@@ -54,7 +54,7 @@ export interface SendPhoneVerificationRequest {
   phoneNumber: string;
 }
 
-export interface PhoneVerificationResponse {
+export interface NormalResponse {
   success: boolean;
   message: string;
 }
@@ -70,7 +70,7 @@ export interface PasswordChangeRequest {
 }
 
 export interface UsernameChangeRequest {
-  username: string;
+  newUsername: string;
 }
 
 export interface AuthState {

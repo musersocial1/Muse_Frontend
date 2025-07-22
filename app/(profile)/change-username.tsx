@@ -1,10 +1,12 @@
-import OTPModal from "@/components/modals/OTPModal";
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useAuthState } from "@/hooks/useAuthState";
+import { authAPI } from "@/lib/api/auth";
+import { showError, showInfo, showSuccess } from "@/lib/toast";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Alert,
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -21,70 +23,133 @@ import {
 import Svg, { Circle } from "react-native-svg";
 
 const ChangeUsername = () => {
-  const [showOTP, setShowOTP] = useState(false);
-  const [username, setUsername] = useState("Dreyajames");
-  const [changesMade, setChangesMade] = useState(1);
-
-  const maxChanges = 3;
-  const remaining = maxChanges - changesMade;
-  const progress = (remaining / maxChanges) * 100;
-  const radius = 18;
-  const stroke = 4;
-  const normalizedRadius = radius - stroke / 2;
-  const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (progress / 100) * circumference;
+  const [newUsername, setNewUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-
-  const handleChangeUsername = () => {
-    if (remaining <= 0) {
-      Alert.alert("Limit reached", "You can’t change your username anymore.");
-      return;
-    }
-
-    if (!username || username.length < 3) {
-      Alert.alert("Invalid Username", "Username must be at least 3 characters");
-      return;
-    }
-
-    setShowOTP(true);
-  };
-
-  const handleOTPConfirm = (otp: string) => {
-    Alert.alert("Success", "Username changed successfully", [
-      {
-        text: "OK",
-        onPress: () => {
-          setShowOTP(false);
-          // Increment changes made for this example
-          setChangesMade((prev) => Math.min(maxChanges, prev + 1));
-          router.replace(RouterConstantUtil.tabs.profile as any);
-        },
-      },
-    ]);
-  };
-
-  const handleResendOTP = () => {
-    Alert.alert("Code Resent", "A new verification code has been sent.");
-  };
-
   const insets = useSafeAreaInsets();
+
+  const { user } = useAuthState();
+
+  const currentUsername = user?.username || "";
+  const usernameChangeCount = user?.usernameChangeCount || 0;
+
+  const maxChanges = 3;
+  const remaining = maxChanges - usernameChangeCount;
+  const progress = (usernameChangeCount / maxChanges) * 100;
+
+  useEffect(() => {
+    if (currentUsername && !newUsername) {
+      setNewUsername(currentUsername);
+    }
+  }, [currentUsername]);
+
+  const validateUsername = (username: string): boolean => {
+    if (!username || username.trim().length < 3) {
+      showInfo("Invalid Username", "Username must be at least 3 characters");
+      return false;
+    }
+
+    if (username.length > 20) {
+      showInfo("Invalid Username", "Username must be less than 20 characters");
+      return false;
+    }
+
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(username)) {
+      showInfo(
+        "Invalid Username",
+        "Username can only contain letters, numbers, and underscores"
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleChangeUsername = async () => {
+    if (remaining <= 0) {
+      showInfo(
+        "Limit Reached",
+        "You have reached the maximum number of username changes allowed."
+      );
+      return;
+    }
+
+    if (newUsername.trim() === currentUsername) {
+      showInfo("No Changes", "Please enter a different username.");
+      return;
+    }
+
+    if (!validateUsername(newUsername.trim())) {
+      return;
+    }
+
+    const usernameChangeData = {
+      newUsername: newUsername.trim(),
+    };
+
+    try {
+      await authAPI.changeUsername(usernameChangeData);
+      showSuccess("Username changed successfully!");
+    } catch (error: any) {
+      console.error("Username change error:", error);
+      showError(
+        "Error",
+        error.message || "Failed to change username. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // const handleOTPConfirm = async (otp: string) => {
+  //   setIsLoading(true);
+
+  //   try {
+  //     const response = await authAPI.verifyPhoneVerificationCode({
+  //       phoneNumber: 4,
+  //       code: otp,
+  //     });
+
+  //     if (response.success) {
+  //       showSuccess(response.message || "Username changed successfully");
+  //       router.replace(RouterConstantUtil.tabs.profile as any);
+  //     } else {
+  //       throw new Error(response.message || "Failed to change username");
+  //     }
+  //   } catch (error: any) {
+  //     console.error("Username change error:", error);
+  //     showError(
+  //       "Error",
+  //       error.message || "Failed to change username. Please try again."
+  //     );
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const hasChanges =
+    newUsername.trim() !== currentUsername && newUsername.trim().length > 0;
+  const isButtonDisabled = !hasChanges || isLoading || remaining <= 0;
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#121212" }}
       behavior={"padding"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55} // or adjust for your header height
+      keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55}
     >
       <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
         <StatusBar barStyle="light-content" />
         <SafeAreaView className="flex-1">
+          {/* Header */}
           <View className="flex-row items-center justify-between px-6 pb-4">
             <TouchableOpacity
               onPress={() =>
                 router.replace(RouterConstantUtil.tabs.profile as any)
               }
               className="w-10 h-10 rounded-full items-center justify-center"
+              disabled={isLoading}
             >
               <Image source={icons.back} className="w-14 h-14" />
             </TouchableOpacity>
@@ -94,31 +159,39 @@ const ChangeUsername = () => {
             <View className="w-10" />
           </View>
 
+          {/* Content */}
           <View className="flex-1 px-6 pt-8">
+            {/* Username Input */}
             <View className="bg-[#2A2A2A] rounded-full h-[60px] px-[5%] mb-6">
               <TextInput
-                className="text-white/50 font-bold h-full text-[15px] font-sfpro-bold "
-                value={username}
-                onChangeText={setUsername}
+                className="text-white font-bold h-full text-[15px] font-sfpro-bold"
+                value={newUsername}
+                onChangeText={setNewUsername}
                 placeholder="Enter new username"
                 placeholderTextColor="#666"
                 autoCapitalize="none"
                 autoCorrect={false}
+                editable={!isLoading && remaining > 0}
+                maxLength={20}
               />
             </View>
+
+            {/* Usage Limit Info */}
             <View className="flex-row items-center justify-between mb-3 px-1">
               <Text className="text-gray-400 text-sm font-medium">
-                You can only change usernames 3 times
+                You can change usernames {maxChanges} times
               </Text>
               <View className="flex-row items-center">
-                {/* 1/3 Text */}
-                <Text className="text-white text-[15px] font-bold mr-2">
-                  {changesMade}/{maxChanges}
+                <Text
+                  className={`text-[15px] font-bold mr-2 ${
+                    remaining > 0 ? "text-white" : "text-red-400"
+                  }`}
+                >
+                  {usernameChangeCount}/{maxChanges}
                 </Text>
                 {/* Progress Ring */}
                 <View style={{ width: 28, height: 28 }}>
                   <Svg height={28} width={28}>
-                    {/* Background circle */}
                     <Circle
                       stroke="#333"
                       fill="none"
@@ -127,9 +200,8 @@ const ChangeUsername = () => {
                       r={12}
                       strokeWidth={4}
                     />
-                    {/* Progress circle */}
                     <Circle
-                      stroke="#22C55E"
+                      stroke={remaining > 0 ? "#22C55E" : "#EF4444"}
                       fill="none"
                       cx={14}
                       cy={14}
@@ -137,7 +209,10 @@ const ChangeUsername = () => {
                       strokeWidth={4}
                       strokeDasharray={2 * Math.PI * 12}
                       strokeDashoffset={
-                        2 * Math.PI * 12 * (1 - changesMade / maxChanges)
+                        2 *
+                        Math.PI *
+                        12 *
+                        (1 - usernameChangeCount / maxChanges)
                       }
                       strokeLinecap="round"
                       rotation={-90}
@@ -147,32 +222,40 @@ const ChangeUsername = () => {
                 </View>
               </View>
             </View>
+
+            <View className="px-1 mb-4">
+              <Text
+                className={`text-sm ${
+                  remaining > 0 ? "text-gray-400" : "text-red-400"
+                }`}
+              >
+                {remaining > 0
+                  ? `${remaining} change${remaining !== 1 ? "s" : ""} remaining`
+                  : "No changes remaining"}
+              </Text>
+            </View>
           </View>
 
+          {/* Change Button */}
           <View className="px-6 pb-8">
             <TouchableOpacity
-              className={`py-4 rounded-full items-center ${
-                username ? "bg-secondary" : "bg-gray-600"
+              className={`py-4 rounded-full items-center justify-center ${
+                isButtonDisabled ? "bg-gray-600" : "bg-secondary"
               }`}
               onPress={handleChangeUsername}
-              disabled={!username}
+              disabled={isButtonDisabled}
+              style={{ minHeight: 56 }}
             >
-              <Text className="text-white text-center font-semibold text-lg">
-                Change
-              </Text>
+              {isLoading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text className="text-white text-center font-semibold text-lg">
+                  Change Username
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         </SafeAreaView>
-
-        <OTPModal
-          visible={showOTP}
-          onClose={() => setShowOTP(false)}
-          onConfirm={handleOTPConfirm}
-          onResend={handleResendOTP}
-          title="Confirm code"
-          subtitle="Enter the 6-digit code sent to your email"
-          email={username}
-        />
       </View>
     </KeyboardAvoidingView>
   );
