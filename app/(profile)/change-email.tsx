@@ -1,8 +1,11 @@
 import OTPModal from "@/components/modals/OTPModal";
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useAuth } from "@/hooks/useAuth";
+import { authAPI } from "@/lib/api/auth";
+import { showError, showSuccess } from "@/lib/toast";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -21,10 +24,19 @@ import {
 
 const ChangeEmail = () => {
   const [showOTP, setShowOTP] = useState(false);
-  const [email, setEmail] = useState("Dreyajames@gmail.com");
+  const [email, setEmail] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
 
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,32 +48,74 @@ const ChangeEmail = () => {
     setIsEmailValid(validateEmail(text));
   };
 
-  const handleChangeEmail = () => {
+  const handleChangeEmail = async () => {
     if (!validateEmail(email)) {
       setIsEmailValid(false);
       Alert.alert("Invalid Email", "Please enter a valid email address");
       return;
     }
-    setShowOTP(true);
+
+    setIsLoading(true);
+
+    try {
+      const response = await authAPI.requestEmailChange({
+        newEmail: email,
+      });
+
+      if (response) {
+        showSuccess(
+          "Verification Code Sent",
+          "Please check your new email for the verification code"
+        );
+        setShowOTP(true);
+      }
+    } catch (error: any) {
+      showError(
+        "Error",
+        `${error.message} || "Failed to send verification code"`
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleOTPConfirm = (otp: string) => {
-    Alert.alert("Success", "Email changed successfully", [
-      {
-        text: "OK",
-        onPress: () => {
-          setShowOTP(false);
-          router.replace(RouterConstantUtil.tabs.profile as any);
-        },
-      },
-    ]);
+  const handleOTPConfirm = async (otp: string) => {
+    setOtpLoading(true);
+
+    try {
+      const response = await authAPI.confirmEmailChange({
+        newEmail: email,
+        code: otp,
+      });
+
+      if (response) {
+        showSuccess("Success", "Email changed successfully");
+        setShowOTP(false);
+        router.replace(RouterConstantUtil.tabs.profile as any);
+      }
+    } catch (error: any) {
+      showError("Error", error.message || "Failed to verify code");
+    } finally {
+      setOtpLoading(false);
+    }
   };
 
-  const handleResendOTP = () => {
-    Alert.alert(
-      "Code Resent",
-      "A new verification code has been sent to your email"
-    );
+  const handleResendOTP = async () => {
+    try {
+      const response = await authAPI.resendEmailVerificationCode({
+        email,
+      });
+
+      if (response) {
+        showSuccess(
+          "Code Resent",
+          "A new verification code has been sent to your email"
+        );
+      }
+    } catch (error: any) {
+      console.log(error);
+      showError("Error", error.message || "Failed to resend code");
+    }
   };
 
   const insets = useSafeAreaInsets();
@@ -70,7 +124,7 @@ const ChangeEmail = () => {
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#121212" }}
       behavior={"padding"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55} // or adjust for your header height
+      keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55}
     >
       <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
         <StatusBar barStyle="light-content" />
@@ -118,13 +172,15 @@ const ChangeEmail = () => {
           <View className="px-6 pb-8">
             <TouchableOpacity
               className={`py-4 rounded-full items-center ${
-                validateEmail(email) ? "bg-secondary" : "bg-gray-600"
+                validateEmail(email) && !isLoading
+                  ? "bg-secondary"
+                  : "bg-gray-600"
               }`}
               onPress={handleChangeEmail}
-              disabled={!validateEmail(email)}
+              disabled={!validateEmail(email) || isLoading}
             >
               <Text className="text-white text-center font-semibold text-lg">
-                Change
+                {isLoading ? "Sending..." : "Change"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -138,6 +194,7 @@ const ChangeEmail = () => {
           title="Confirm code"
           subtitle="Enter the 6-digits code we sent to your mail"
           email={email}
+          // isLoading={otpLoading}
         />
       </View>
     </KeyboardAvoidingView>

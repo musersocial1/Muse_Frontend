@@ -1,6 +1,5 @@
 import {
   AuthResponse,
-  EmailChangeRequest,
   LoginRequest,
   NormalResponse,
   PasswordChangeRequest,
@@ -87,24 +86,29 @@ export const authAPI = {
   // User profile endpoints
   getUserProfile: async (): Promise<User> => {
     const response = await userApiClient.get<User>("/user/me");
+    console.log("proeilll", response.data);
     return response.data;
   },
 
   // Account management endpoints
-  requestEmailChange: async (
-    data: EmailChangeRequest
-  ): Promise<NormalResponse> => {
+  requestEmailChange: async (data: {
+    newEmail: string;
+  }): Promise<NormalResponse> => {
     const response = await userApiClient.post<NormalResponse>(
       "/user/change-email",
       data
     );
+
     return response.data;
   },
 
-  confirmEmailChange: async (code: string): Promise<NormalResponse> => {
+  confirmEmailChange: async (data: {
+    newEmail: string;
+    code: string;
+  }): Promise<NormalResponse> => {
     const response = await userApiClient.post<NormalResponse>(
       "/user/confirm-email",
-      { code }
+      data
     );
     return response.data;
   },
@@ -116,6 +120,7 @@ export const authAPI = {
       "/user/change-password",
       data
     );
+    console.log(response.data, "theee ");
     return response.data;
   },
 
@@ -130,7 +135,7 @@ export const authAPI = {
   changeUsername: async (
     data: UsernameChangeRequest
   ): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+    const response = await userApiClient.patch<NormalResponse>(
       "/user/username",
       data
     );

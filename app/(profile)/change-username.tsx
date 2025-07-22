@@ -1,6 +1,7 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useProfileActions } from "@/hooks/useProfile";
 import { authAPI } from "@/lib/api/auth";
 import { showError, showInfo, showSuccess } from "@/lib/toast";
 import { useRouter } from "expo-router";
@@ -30,6 +31,7 @@ const ChangeUsername = () => {
   const insets = useSafeAreaInsets();
 
   const { user } = useAuthState();
+  const { refetchProfile } = useProfileActions();
 
   const currentUsername = user?.username || "";
   const usernameChangeCount = user?.usernameChangeCount || 0;
@@ -89,45 +91,27 @@ const ChangeUsername = () => {
       newUsername: newUsername.trim(),
     };
 
+    setIsLoading(true);
+
     try {
       await authAPI.changeUsername(usernameChangeData);
-      showSuccess("Username changed successfully!");
+      await refetchProfile();
+      showSuccess("Success!", "Username changed successfully");
+
+      setTimeout(() => {
+        router.replace(RouterConstantUtil.tabs.profile as any);
+      }, 1500);
     } catch (error: any) {
       console.error("Username change error:", error);
-      showError(
-        "Error",
-        error.message || "Failed to change username. Please try again."
-      );
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to change username. Please try again.";
+      showError("Error", errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
-  // const handleOTPConfirm = async (otp: string) => {
-  //   setIsLoading(true);
-
-  //   try {
-  //     const response = await authAPI.verifyPhoneVerificationCode({
-  //       phoneNumber: 4,
-  //       code: otp,
-  //     });
-
-  //     if (response.success) {
-  //       showSuccess(response.message || "Username changed successfully");
-  //       router.replace(RouterConstantUtil.tabs.profile as any);
-  //     } else {
-  //       throw new Error(response.message || "Failed to change username");
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Username change error:", error);
-  //     showError(
-  //       "Error",
-  //       error.message || "Failed to change username. Please try again."
-  //     );
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const hasChanges =
     newUsername.trim() !== currentUsername && newUsername.trim().length > 0;
@@ -136,7 +120,7 @@ const ChangeUsername = () => {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#121212" }}
-      behavior={"padding"}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55}
     >
       <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
@@ -161,7 +145,6 @@ const ChangeUsername = () => {
 
           {/* Content */}
           <View className="flex-1 px-6 pt-8">
-            {/* Username Input */}
             <View className="bg-[#2A2A2A] rounded-full h-[60px] px-[5%] mb-6">
               <TextInput
                 className="text-white font-bold h-full text-[15px] font-sfpro-bold"
@@ -176,7 +159,6 @@ const ChangeUsername = () => {
               />
             </View>
 
-            {/* Usage Limit Info */}
             <View className="flex-row items-center justify-between mb-3 px-1">
               <Text className="text-gray-400 text-sm font-medium">
                 You can change usernames {maxChanges} times
@@ -189,7 +171,6 @@ const ChangeUsername = () => {
                 >
                   {usernameChangeCount}/{maxChanges}
                 </Text>
-                {/* Progress Ring */}
                 <View style={{ width: 28, height: 28 }}>
                   <Svg height={28} width={28}>
                     <Circle
@@ -247,7 +228,12 @@ const ChangeUsername = () => {
               style={{ minHeight: 56 }}
             >
               {isLoading ? (
-                <ActivityIndicator color="white" />
+                <View className="flex-row items-center">
+                  <ActivityIndicator color="white" size="small" />
+                  <Text className="text-white ml-2 font-semibold text-lg">
+                    Changing...
+                  </Text>
+                </View>
               ) : (
                 <Text className="text-white text-center font-semibold text-lg">
                   Change Username

@@ -3,7 +3,11 @@ import { ServiceApiClient, tokenManager } from "@/lib/api/apiClient";
 import { authAPI } from "@/lib/api/auth";
 import { AuthState, RegisterRequest } from "@/types/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { createContext, useCallback, useEffect, useState } from "react";
+
+// Query key for user profile
+export const USER_PROFILE_QUERY_KEY = ["user", "profile"];
 
 interface AuthContextType extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -15,6 +19,9 @@ interface AuthContextType extends AuthState {
   handleAuthError: () => Promise<void>;
   needsVerification: boolean;
   verificationEmail: string | null;
+  refetchProfile: () => Promise<any>;
+  invalidateProfile: () => Promise<void>;
+  isProfileLoading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -26,6 +33,8 @@ interface AuthProviderProps {
 }
 
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const queryClient = useQueryClient();
+
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -39,8 +48,64 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     null
   );
 
+  // React Query for user profile
+  const {
+    data: profileData,
+    isLoading: isProfileLoading,
+    refetch: refetchProfile,
+    error: profileError,
+  } = useQuery({
+    queryKey: USER_PROFILE_QUERY_KEY,
+    queryFn: async () => {
+      if (!authState.isAuthenticated) {
+        throw new Error("Not authenticated");
+      }
+      const profile = await authAPI.getUserProfile();
+      return profile;
+    },
+    enabled: authState.isAuthenticated && !authState.user,
+    retry: (failureCount, error: any) => {
+      // Don't retry on auth errors
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  useEffect(() => {
+    if (profileData && authState.isAuthenticated) {
+      setAuthState((prev) => ({
+        ...prev,
+        user: profileData,
+      }));
+
+      AsyncStorage.setItem(
+        STORAGE_CONFIG.keys.USER_DATA,
+        JSON.stringify(profileData)
+      );
+    }
+  }, [profileData, authState.isAuthenticated]);
+
+  // Handle profile errors
+  useEffect(() => {
+    if (profileError && authState.isAuthenticated) {
+      const error = profileError as any;
+      // Let ApiClient handle 401/403 errors automatically
+      if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+        setAuthState((prev) => ({
+          ...prev,
+          error: error?.response?.data?.message || "Failed to load profile",
+        }));
+      }
+    }
+  }, [profileError, authState.isAuthenticated]);
+
   const handleAuthError = useCallback(async () => {
     await clearAuthData();
+    queryClient.clear();
     setAuthState({
       user: null,
       isAuthenticated: false,
@@ -50,12 +115,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
     setNeedsVerification(false);
     setVerificationEmail(null);
-  }, []);
+  }, [queryClient]);
 
   useEffect(() => {
-    // Registering the auth error handler with ApiClient on here
     ServiceApiClient.setAuthErrorHandler(handleAuthError);
-
     initializeAuth();
   }, [handleAuthError]);
 
@@ -86,14 +149,15 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           isAuthenticated: true,
           isLoading: false,
           error: null,
+          token,
         });
       } else {
-        await clearAuthData();
         setAuthState({
           user: null,
-          isAuthenticated: false,
+          isAuthenticated: true,
           isLoading: false,
           error: null,
+          token,
         });
       }
     } catch (error) {
@@ -103,6 +167,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: false,
         isLoading: false,
         error: null,
+        token: null,
       });
     }
   };
@@ -139,16 +204,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setAuthState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-      // This returns the actual tokens and user data
       const response = await authAPI.verifyLogin({ email, code });
 
-      // Store the token and user data
-      await tokenManager.setToken(response.token);
-
-      // If there's a refresh token in the response, store it
-      if ("refreshToken" in response && response.refreshToken) {
-        await tokenManager.setRefreshToken(response.token);
-      }
+      await tokenManager.setToken(response.jwtToken);
+      await tokenManager.setRefreshToken(response.jwtToken);
 
       await AsyncStorage.setItem(
         STORAGE_CONFIG.keys.USER_DATA,
@@ -160,9 +219,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: true,
         isLoading: false,
         error: null,
+        token: response.jwtToken,
       });
 
-      // Clear verification state
+      // Set the profile data in React Query cache
+      queryClient.setQueryData(USER_PROFILE_QUERY_KEY, response.user);
+
       setNeedsVerification(false);
       setVerificationEmail(null);
     } catch (error: any) {
@@ -181,9 +243,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const response = await authAPI.register(payload);
 
-      // Assuming register still works the same way with tokens
-      await tokenManager.setToken(response.token);
-      await tokenManager.setRefreshToken(response.token);
+      await tokenManager.setToken(response.jwtToken);
+      await tokenManager.setRefreshToken(response.jwtToken);
 
       await AsyncStorage.setItem(
         STORAGE_CONFIG.keys.USER_DATA,
@@ -195,7 +256,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: true,
         isLoading: false,
         error: null,
+        token: response.jwtToken,
       });
+
+      // Set the profile data in React Query cache
+      queryClient.setQueryData(USER_PROFILE_QUERY_KEY, response.user);
     } catch (error: any) {
       setAuthState((prev) => ({
         ...prev,
@@ -214,11 +279,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout API error:", error);
     } finally {
       await clearAuthData();
+      // Clear all queries on logout
+      queryClient.clear();
       setAuthState({
         user: null,
         isAuthenticated: false,
         isLoading: false,
         error: null,
+        token: null,
       });
       setNeedsVerification(false);
       setVerificationEmail(null);
@@ -240,8 +308,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         user: userData,
         error: null,
       }));
+
+      // Update React Query cache
+      queryClient.setQueryData(USER_PROFILE_QUERY_KEY, userData);
     } catch (error: any) {
-      // Allowing ApiClient handle 401/403 errors automatically
       if (error.response?.status !== 401 && error.response?.status !== 403) {
         setAuthState((prev) => ({
           ...prev,
@@ -249,6 +319,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }));
       }
     }
+  };
+
+  const invalidateProfile = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: USER_PROFILE_QUERY_KEY,
+    });
   };
 
   const clearError = () => {
@@ -273,6 +349,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     handleAuthError,
     needsVerification,
     verificationEmail,
+    refetchProfile,
+    invalidateProfile,
+    isProfileLoading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

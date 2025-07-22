@@ -1,10 +1,11 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
+import { useProfileActions } from "@/hooks/useProfile";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dimensions,
   Image,
@@ -190,6 +191,19 @@ const Profile = () => {
   const { user, isLoading, error, clearError } = useAuthState();
 
   const { username, lastName, firstName, email } = user || {};
+  const { refetchProfile } = useProfileActions();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        await refetchProfile();
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <View className="flex-1 bg-[#121212]">

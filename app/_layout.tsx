@@ -45,8 +45,65 @@ export default function RootLayout() {
               success: (props) => (
                 <BaseToast
                   {...props}
-                  style={{ borderLeftColor: "#4CAF50" }}
-                  text1Style={{ fontWeight: "bold" }}
+                  style={{
+                    borderLeftColor: "#18FF037D",
+                    backgroundColor: "#F3FFF6",
+                  }}
+                  text1Style={{
+                    fontWeight: "bold",
+                    color: "#121212",
+                  }}
+                  text2Style={{
+                    color: "#363636",
+                  }}
+                />
+              ),
+              error: (props) => (
+                <BaseToast
+                  {...props}
+                  style={{
+                    borderLeftColor: "#FF03037D",
+                    backgroundColor: "#FFF3F3",
+                  }}
+                  text1Style={{
+                    fontWeight: "bold",
+                    color: "#121212",
+                  }}
+                  text2Style={{
+                    color: "#363636",
+                  }}
+                />
+              ),
+              warning: (props) => (
+                <BaseToast
+                  {...props}
+                  style={{
+                    borderLeftColor: "#FFA500",
+                    backgroundColor: "#FFF8E1",
+                  }}
+                  text1Style={{
+                    fontWeight: "bold",
+                    color: "#121212",
+                  }}
+                  text2Style={{
+                    color: "#363636",
+                  }}
+                />
+              ),
+              info: (props) => (
+                <BaseToast
+                  {...props}
+                  style={{
+                    borderLeftColor: "#0368FF",
+                    backgroundColor: "#F3F7FF",
+                  }}
+                  text1Style={{
+                    fontWeight: "bold",
+                    color: "#121212",
+                  }}
+                  text2Style={{
+                    color: "#363636",
+                  }}
                 />
               ),
             }}

@@ -1,5 +1,6 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { tokenManager } from "@/lib/api/apiClient";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -83,9 +84,10 @@ const SettingsItem = ({
 }) => {
   const router = useRouter();
 
-  const handlePress = () => {
+  const handlePress = async () => {
     if (type === "logout") {
-      router.dismissAll();
+      await tokenManager.removeTokens();
+      // router.dismissAll();
       router.replace("/(auth)" as any);
     } else {
       router.push(route as any);

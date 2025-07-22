@@ -16,12 +16,12 @@ export interface User {
 
 export interface AuthResponse {
   message: string;
-  token: string;
+  jwtToken: string;
   user: User | null;
 }
 
 export interface AuthTokens {
-  token: string;
+  jwtToken: string;
   refreshToken: string;
   expiresIn: number;
 }
@@ -59,13 +59,8 @@ export interface NormalResponse {
   message: string;
 }
 
-export interface EmailChangeRequest {
-  newEmail: string;
-  password: string;
-}
-
 export interface PasswordChangeRequest {
-  currentPassword: string;
+  oldPassword: string;
   newPassword: string;
 }
 

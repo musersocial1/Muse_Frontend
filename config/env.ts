@@ -78,7 +78,7 @@ const IS_STAGING = APP_ENV === "staging";
 const IS_PROD = APP_ENV === "production";
 
 const createServicesConfig = (): ServicesConfig => {
-  const defaultTimeout = getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 15000);
+  const defaultTimeout = getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 20000);
 
   return {
     user: {
@@ -102,7 +102,7 @@ export const env: EnvConfig = {
 
   // API Configuration
   API_VERSION: process.env.EXPO_PUBLIC_API_VERSION || "v1",
-  API_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 15000),
+  API_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 20000),
 
   // Services Configuration
   SERVICES: createServicesConfig(),

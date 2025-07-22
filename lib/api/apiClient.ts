@@ -57,8 +57,6 @@ export const tokenManager = {
 // API Client class
 export class ServiceApiClient {
   private instance: AxiosInstance;
-  private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
   private serviceName: string;
   static authErrorHandler: (() => Promise<void>) | null = null;
 
@@ -87,6 +85,7 @@ export class ServiceApiClient {
     this.instance.interceptors.request.use(
       async (config) => {
         const token = await tokenManager.getToken();
+        // console.log(token, "the token");
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -98,73 +97,21 @@ export class ServiceApiClient {
       (error) => Promise.reject(error)
     );
 
+    // Response interceptor to handle auth errors
     this.instance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          if (this.isRefreshing) {
-            return new Promise((resolve) => {
-              this.refreshSubscribers.push((token: string) => {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                resolve(this.instance(originalRequest));
-              });
-            });
-          }
-
-          originalRequest._retry = true;
-          this.isRefreshing = true;
-
-          try {
-            const refreshToken = await tokenManager.getRefreshToken();
-            if (refreshToken) {
-              // Use user service for token refresh
-              const response = await this.refreshTokenRequest(refreshToken);
-              const newToken = response.data.token;
-
-              await tokenManager.setToken(newToken);
-              if (response.data.refreshToken) {
-                await tokenManager.setRefreshToken(response.data.refreshToken);
-              }
-
-              originalRequest.headers.Authorization = `Bearer ${newToken}`;
-              this.refreshSubscribers.forEach((cb) => cb(newToken));
-              this.refreshSubscribers = [];
-
-              return this.instance(originalRequest);
-            }
-          } catch (refreshError) {
-            await tokenManager.removeTokens();
-
-            if (ServiceApiClient.authErrorHandler) {
-              await ServiceApiClient.authErrorHandler();
-            }
-
-            return Promise.reject(refreshError);
-          } finally {
-            this.isRefreshing = false;
-          }
-        }
-
+        // Handle 401/403 errors by calling the auth error handler
         if (
           (error.response?.status === 401 || error.response?.status === 403) &&
-          !originalRequest._retry
+          ServiceApiClient.authErrorHandler
         ) {
-          if (ServiceApiClient.authErrorHandler) {
-            await ServiceApiClient.authErrorHandler();
-          }
+          await ServiceApiClient.authErrorHandler();
         }
 
         return Promise.reject(error);
       }
     );
-  }
-
-  private async refreshTokenRequest(refreshToken: string) {
-    return axios.post(`${SERVICES_CONFIG.user.baseURL}/user/profile`, {
-      refreshToken,
-    });
   }
 
   // Generic request methods
