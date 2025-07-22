@@ -55,6 +55,7 @@ export default function Index() {
   const blurAnim = useRef(new Animated.Value(0)).current;
   const [blurIntensity, setBlurIntensity] = useState(0);
   const bgAnim = useRef(new Animated.Value(0)).current; // 0 (transparent) → 1 (full opacity)
+  const [direction, setDirection] = useState(1);
 
   const router = useRouter();
   React.useEffect(() => {
@@ -158,8 +159,11 @@ export default function Index() {
   };
 
   const handleContinue = () => {
-    const currentIndex = stepOrder.indexOf(currentStep);
+    const currentIndex: any = stepOrder.indexOf(currentStep);
+    // console.log(stepOrder[currentIndex + 1]);
+
     if (currentIndex < stepOrder.length - 1) {
+      setDirection(1);
       setCurrentStep(stepOrder[currentIndex + 1]);
     }
   };
@@ -167,6 +171,7 @@ export default function Index() {
   const handleBack = () => {
     const currentIndex = stepOrder.indexOf(currentStep);
     if (currentIndex > 0) {
+      setDirection(-1);
       setCurrentStep(stepOrder[currentIndex - 1]);
     }
   };
@@ -175,7 +180,7 @@ export default function Index() {
   const resetForm = () => {
     setCurrentStep(STEPS.PHONE);
     setPhoneNumber("");
-    setOtpValues(["", "", "", "", ""]);
+    setOtpValues(["", "", "", "", "", ""]);
     setFirstName("");
     setLastName("");
     setEmail("");
@@ -333,6 +338,7 @@ export default function Index() {
         username={username}
         setUsername={setUsername}
         onComplete={handleComplete}
+        direction={direction} // new
       />
       <MoreInfoModal
         visible={moreInfoVisible}
