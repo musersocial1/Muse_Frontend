@@ -10,7 +10,6 @@ import {
   Dimensions,
   Image,
   ScrollView,
-  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -206,49 +205,48 @@ const Profile = () => {
   }, []);
 
   return (
-    <View className="flex-1 bg-[#121212]">
-      <StatusBar
+    <SafeAreaView className="flex-1 bg-[#121212]">
+      {/* <StatusBar
         barStyle="light-content"
         backgroundColor="#121212"
         showHideTransition="fade"
-      />
-      <SafeAreaView className="flex-1 ">
-        {/* Header */}
-        <View
-          className="flex-row items-center justify-between py-4"
-          style={{ paddingHorizontal: width * 0.05 }}
-        >
-          <TouchableOpacity
-            className="items-center justify-center"
-            style={{ width: width * 0.12, height: width * 0.12 }}
-            disabled
-          />
-          <Text className="text-white text-[20px] font-bold">Profile</Text>
-          <TouchableOpacity
-            className="items-center justify-center"
-            style={{ width: width * 0.12, height: width * 0.12 }}
-            onPress={() =>
-              router.replace(RouterConstantUtil.profile.settings as any)
-            }
-          >
-            <Image
-              source={icons.settings}
-              style={{ width: width * 0.12, height: width * 0.12 }}
-            />
-          </TouchableOpacity>
-        </View>
+      /> */}
 
-        <ScrollView className="flex-1">
-          <ProfileHeader
-            firstName={firstName}
-            lastName={lastName}
-            username={username}
+      {/* Header */}
+      <View
+        className="flex-row items-center justify-between pb-4"
+        style={{ paddingHorizontal: width * 0.05 }}
+      >
+        <TouchableOpacity
+          className="items-center justify-center"
+          style={{ width: width * 0.12, height: width * 0.12 }}
+          disabled
+        />
+        <Text className="text-white text-[20px] font-bold">Profile</Text>
+        <TouchableOpacity
+          className="items-center justify-center"
+          style={{ width: width * 0.12, height: width * 0.12 }}
+          onPress={() =>
+            router.replace(RouterConstantUtil.profile.settings as any)
+          }
+        >
+          <Image
+            source={icons.settings}
+            style={{ width: width * 0.12, height: width * 0.12 }}
           />
-          <ProfileStats router={router} email={email} username={username} />
-          <SavedPostsSection />
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView className="flex-1">
+        <ProfileHeader
+          firstName={firstName}
+          lastName={lastName}
+          username={username}
+        />
+        <ProfileStats router={router} email={email} username={username} />
+        <SavedPostsSection />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

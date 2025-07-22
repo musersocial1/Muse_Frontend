@@ -996,6 +996,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       focusedField === "email",
                       !!email.trim()
                     )}
+                    autoCapitalize="none"
                     keyboardType="email-address"
                     returnKeyType="done"
                     onSubmitEditing={handleContinue}

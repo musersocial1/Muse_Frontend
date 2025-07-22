@@ -18,6 +18,7 @@ export const authAPI = {
       "/user/signin",
       data
     );
+    console.log(response.data);
     return response.data;
   },
 
@@ -124,10 +125,13 @@ export const authAPI = {
     return response.data;
   },
 
-  confirmPasswordChange: async (code: string): Promise<NormalResponse> => {
+  confirmPasswordChange: async (
+    code: string,
+    newPassword: string
+  ): Promise<NormalResponse> => {
     const response = await userApiClient.post<NormalResponse>(
-      "/user/confirm-change-password",
-      { code }
+      "/user/confirm-password",
+      { code, newPassword }
     );
     return response.data;
   },

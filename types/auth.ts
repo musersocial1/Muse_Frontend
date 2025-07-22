@@ -18,6 +18,8 @@ export interface AuthResponse {
   message: string;
   jwtToken: string;
   user: User | null;
+  error: any | null;
+  code: string; // <--- add this!
 }
 
 export interface AuthTokens {
