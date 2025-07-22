@@ -1,8 +1,8 @@
-import { API_CONFIG, STORAGE_CONFIG } from "@/config/app";
+import { STORAGE_CONFIG } from "@/config/app";
+import { SERVICES_CONFIG } from "@/config/env";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import * as SecureStore from "expo-secure-store";
 
-// Storage utility to handle  SecureStore
 const storage = {
   async getItem(key: string): Promise<string | null> {
     try {
@@ -12,7 +12,6 @@ const storage = {
       return null;
     }
   },
-
   async setItem(key: string, value: string): Promise<void> {
     try {
       await SecureStore.setItemAsync(key, value);
@@ -20,7 +19,6 @@ const storage = {
       console.error("SecureStore set error:", error);
     }
   },
-
   async removeItem(key: string): Promise<void> {
     try {
       await SecureStore.deleteItemAsync(key);
@@ -57,21 +55,26 @@ export const tokenManager = {
 };
 
 // API Client class
-export class ApiClient {
+export class ServiceApiClient {
   private instance: AxiosInstance;
-  private isRefreshing = false;
-  private refreshSubscribers: ((token: string) => void)[] = [];
+  private serviceName: string;
   static authErrorHandler: (() => Promise<void>) | null = null;
 
   static setAuthErrorHandler(handler: () => Promise<void>) {
-    ApiClient.authErrorHandler = handler;
+    ServiceApiClient.authErrorHandler = handler;
   }
 
-  constructor() {
+  constructor(serviceName: keyof typeof SERVICES_CONFIG) {
+    this.serviceName = serviceName;
+    const serviceConfig = SERVICES_CONFIG[serviceName];
+
     this.instance = axios.create({
-      baseURL: API_CONFIG.baseURL,
-      timeout: API_CONFIG.timeout,
-      headers: API_CONFIG.headers,
+      baseURL: serviceConfig.baseURL,
+      timeout: serviceConfig.timeout,
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
     });
 
     this.setupInterceptors();
@@ -82,81 +85,33 @@ export class ApiClient {
     this.instance.interceptors.request.use(
       async (config) => {
         const token = await tokenManager.getToken();
+        // console.log(token, "the token");
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+
+        config.headers["X-Service"] = this.serviceName;
+
         return config;
       },
       (error) => Promise.reject(error)
     );
 
-    // Response interceptor to handle token refresh
+    // Response interceptor to handle auth errors
     this.instance.interceptors.response.use(
       (response) => response,
       async (error) => {
-        const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          if (this.isRefreshing) {
-            return new Promise((resolve) => {
-              this.refreshSubscribers.push((token: string) => {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                resolve(this.instance(originalRequest));
-              });
-            });
-          }
-
-          originalRequest._retry = true;
-          this.isRefreshing = true;
-
-          try {
-            const refreshToken = await tokenManager.getRefreshToken();
-            if (refreshToken) {
-              const response = await this.refreshTokenRequest(refreshToken);
-              const newToken = response.data.token;
-
-              await tokenManager.setToken(newToken);
-              if (response.data.refreshToken) {
-                await tokenManager.setRefreshToken(response.data.refreshToken);
-              }
-
-              originalRequest.headers.Authorization = `Bearer ${newToken}`;
-              this.refreshSubscribers.forEach((cb) => cb(newToken));
-              this.refreshSubscribers = [];
-
-              return this.instance(originalRequest);
-            }
-          } catch (refreshError) {
-            await tokenManager.removeTokens();
-
-            if (ApiClient.authErrorHandler) {
-              await ApiClient.authErrorHandler();
-            }
-
-            return Promise.reject(refreshError);
-          } finally {
-            this.isRefreshing = false;
-          }
-        }
-
+        // Handle 401/403 errors by calling the auth error handler
         if (
           (error.response?.status === 401 || error.response?.status === 403) &&
-          !originalRequest._retry
+          ServiceApiClient.authErrorHandler
         ) {
-          if (ApiClient.authErrorHandler) {
-            await ApiClient.authErrorHandler();
-          }
+          await ServiceApiClient.authErrorHandler();
         }
 
         return Promise.reject(error);
       }
     );
-  }
-
-  private async refreshTokenRequest(refreshToken: string) {
-    return axios.post(`${API_CONFIG.baseURL}/auth/refresh`, {
-      refreshToken,
-    });
   }
 
   // Generic request methods
@@ -203,5 +158,5 @@ export class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient();
-export default apiClient;
+export const userApiClient = new ServiceApiClient("user");
+export const postsApiClient = new ServiceApiClient("posts");

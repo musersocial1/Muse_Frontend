@@ -53,11 +53,7 @@ export function Button({
       )}
     >
       {loading && (
-        <ActivityIndicator
-          size="small"
-          color={variant === "outline" ? "#3b82f6" : "#ffffff"}
-          className="mr-2"
-        />
+        <ActivityIndicator size="small" color="blue" className="mr-2" />
       )}
       <Text className={cn(textVariants[variant])}>{title}</Text>
     </TouchableOpacity>

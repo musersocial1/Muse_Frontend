@@ -4,10 +4,11 @@ import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import LoginModal from "@/components/modals/LoginModal";
 import { useAuthState } from "@/hooks/useAuthState";
+import { tokenManager } from "@/lib/api/apiClient";
 import { showError, showSuccess } from "@/lib/toast";
 import { STEPS, StepType } from "@/utils/constants";
 import {
@@ -47,7 +48,7 @@ export default function Index() {
   const [username, setUsername] = useState("");
   const [moreInfoVisible, setMoreInfoVisible] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const { register, login, isLoading, error, clearError } = useAuthState();
+  const { register, isLoading, error, clearError } = useAuthState();
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -216,16 +217,20 @@ export default function Index() {
         interests: moreInfoData.interests,
       };
 
+      console.log(payload, "yeeee");
+
       await register(payload);
       showSuccess("Account created successfully!");
       setMoreInfoVisible(false);
       router.replace(RouterConstantUtil.tabs.home as any);
-    } catch (e) {
+    } catch (e: any) {
       console.error("Registration error:", e);
-      showError(
-        "Registration Failed",
-        "Please check your details and try again."
-      );
+      const message =
+        e?.response?.data?.message ||
+        e?.message ||
+        "An unexpected error occurred.";
+
+      showError("Registration Failed", message);
     }
   };
 
@@ -233,6 +238,17 @@ export default function Index() {
   const handleMoreInfoClose = () => {
     setMoreInfoVisible(false);
   };
+
+  useEffect(() => {
+    (async () => {
+      const token = await tokenManager.getToken();
+
+      if (token) {
+        router.replace(RouterConstantUtil.tabs.home as any);
+      }
+    })();
+  }, []);
+
   return (
     <View className="flex-1">
       <StatusBar
@@ -293,6 +309,9 @@ export default function Index() {
                     className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                     activeOpacity={0.8}
                     onPress={() => setShowLogin(true)}
+                    // onPress={() =>
+                    //   router.replace(RouterConstantUtil.tabs.home as any)
+                    // }
                   >
                     <Text className="text-white text-center font-sfpro-bold text-lg">
                       Already have an account

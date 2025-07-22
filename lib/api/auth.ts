@@ -1,38 +1,40 @@
 import {
   AuthResponse,
-  EmailChangeRequest,
   LoginRequest,
+  NormalResponse,
   PasswordChangeRequest,
   PhoneVerificationRequest,
-  PhoneVerificationResponse,
   RegisterRequest,
   SendPhoneVerificationRequest,
   User,
   UsernameChangeRequest,
 } from "@/types/auth";
-import { apiClient } from "./apiClient";
+import { userApiClient } from "./apiClient";
 
 export const authAPI = {
   // Authentication endpoints
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>("/user/signin", data);
+    const response = await userApiClient.post<AuthResponse>(
+      "/user/signin",
+      data
+    );
     return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<any> => {
-    const response = await apiClient.post<any>("/user/signup", data);
+    const response = await userApiClient.post<any>("/user/signup", data);
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post("/user/logout");
+    await userApiClient.post("/user/logout");
   },
 
   // Phone verification endpoints
   sendPhoneVerificationCode: async (
     data: SendPhoneVerificationRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  ): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/send-code",
       data
     );
@@ -41,8 +43,8 @@ export const authAPI = {
 
   resendPhoneVerificationCode: async (
     data: SendPhoneVerificationRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  ): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/resend-code",
       data
     );
@@ -51,8 +53,8 @@ export const authAPI = {
 
   verifyPhoneVerificationCode: async (
     data: PhoneVerificationRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  ): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/verify-code",
       data
     );
@@ -64,7 +66,7 @@ export const authAPI = {
     email: string;
     code: string;
   }): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>(
+    const response = await userApiClient.post<AuthResponse>(
       "/user/verify-login",
       data
     );
@@ -73,8 +75,8 @@ export const authAPI = {
 
   resendEmailVerificationCode: async (data: {
     email: string;
-  }): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  }): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/resend",
       data
     );
@@ -83,45 +85,47 @@ export const authAPI = {
 
   // User profile endpoints
   getUserProfile: async (): Promise<User> => {
-    const response = await apiClient.get<User>("/user/me");
+    const response = await userApiClient.get<User>("/user/me");
+    console.log("proeilll", response.data);
     return response.data;
   },
 
   // Account management endpoints
-  requestEmailChange: async (
-    data: EmailChangeRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  requestEmailChange: async (data: {
+    newEmail: string;
+  }): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/change-email",
       data
     );
+
     return response.data;
   },
 
-  confirmEmailChange: async (
-    code: string
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  confirmEmailChange: async (data: {
+    newEmail: string;
+    code: string;
+  }): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/confirm-email",
-      { code }
+      data
     );
     return response.data;
   },
 
   requestPasswordChange: async (
     data: PasswordChangeRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  ): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/change-password",
       data
     );
+    console.log(response.data, "theee ");
     return response.data;
   },
 
-  confirmPasswordChange: async (
-    code: string
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  confirmPasswordChange: async (code: string): Promise<NormalResponse> => {
+    const response = await userApiClient.post<NormalResponse>(
       "/user/confirm-change-password",
       { code }
     );
@@ -130,8 +134,8 @@ export const authAPI = {
 
   changeUsername: async (
     data: UsernameChangeRequest
-  ): Promise<PhoneVerificationResponse> => {
-    const response = await apiClient.post<PhoneVerificationResponse>(
+  ): Promise<NormalResponse> => {
+    const response = await userApiClient.patch<NormalResponse>(
       "/user/username",
       data
     );

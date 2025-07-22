@@ -1,9 +1,11 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useAuthState } from "@/hooks/useAuthState";
+import { useProfileActions } from "@/hooks/useProfile";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dimensions,
   Image,
@@ -18,115 +20,143 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
-const ProfileHeader = () => (
-  <Animatable.View
-    animation="fadeInUp"
-    duration={350}
-    delay={60}
-    className="items-center pt-6 pb-8"
-    useNativeDriver
-  >
-    <View className="relative">
-      <Image
-        source={icons.user}
-        style={{ width: width * 0.3, height: width * 0.3, borderRadius: 100 }}
-      />
-    </View>
-    <Animatable.Text
-      animation="fadeIn"
-      delay={110}
-      duration={250}
-      className="text-white text-[20px] font-bold mt-4"
-    >
-      Dreya James
-    </Animatable.Text>
-    <Animatable.Text
-      animation="fadeIn"
-      delay={180}
-      duration={250}
-      className="text-gray-400 text-[15px] font-medium"
-    >
-      Dreyajames
-    </Animatable.Text>
-  </Animatable.View>
-);
+interface ProfileHeaderProps {
+  firstName?: string;
+  lastName?: string;
+  username?: string;
+}
 
-const statItems = [
-  {
-    label: "Communities",
-    icon: icons.users,
-    route: RouterConstantUtil.profile.communities,
-    rightText: "3",
-  },
-  {
-    label: "Your email",
-    icon: icons.email,
-    route: RouterConstantUtil.profile.email,
-    rightText: "Dreyajames@gmail.com",
-  },
-  {
-    label: "Username",
-    icon: icons.user_icon,
-    route: RouterConstantUtil.profile.username,
-    rightText: "Dreyajames",
-  },
-];
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({
+  firstName,
+  lastName,
+  username,
+}) => {
+  const fullName =
+    firstName && lastName
+      ? `${firstName} ${lastName}`
+      : firstName || lastName || "User";
 
-const ProfileStats = ({ router }: any) => (
-  <Animatable.View
-    animation="fadeInUp"
-    duration={350}
-    delay={90}
-    style={{ marginHorizontal: width * 0.05 }}
-    className="space-y-4 gap-3"
-    useNativeDriver
-  >
-    {statItems.map((item, i) => (
-      <Animatable.View
-        key={i}
-        animation="fadeInUp"
+  return (
+    <Animatable.View
+      animation="fadeInUp"
+      duration={350}
+      delay={60}
+      className="items-center pt-6 pb-8"
+      useNativeDriver
+    >
+      <View className="relative">
+        <Image
+          source={icons.user}
+          style={{ width: width * 0.3, height: width * 0.3, borderRadius: 100 }}
+        />
+      </View>
+      <Animatable.Text
+        animation="fadeIn"
+        delay={110}
         duration={250}
-        delay={150 + i * 40}
-        useNativeDriver
+        className="text-white text-[20px] font-bold mt-4"
       >
-        <TouchableOpacity
-          className="flex-row items-center justify-between p-4 bg-[#1C1C1C] rounded-full"
-          onPress={() => router.replace(item.route as any)}
-          activeOpacity={0.8}
+        {fullName}
+      </Animatable.Text>
+      <Animatable.Text
+        animation="fadeIn"
+        delay={180}
+        duration={250}
+        className="text-gray-400 text-[15px] font-medium"
+      >
+        {username || "Username"}
+      </Animatable.Text>
+    </Animatable.View>
+  );
+};
+
+interface ProfileStatsProps {
+  router: any;
+  email?: string;
+  username?: string;
+}
+
+const ProfileStats: React.FC<ProfileStatsProps> = ({
+  router,
+  email,
+  username,
+}) => {
+  const statItems = [
+    {
+      label: "Communities",
+      icon: icons.users,
+      route: RouterConstantUtil.profile.communities,
+      rightText: "3",
+    },
+    {
+      label: "Your email",
+      icon: icons.email,
+      route: RouterConstantUtil.profile.email,
+      rightText: email || "No email provided",
+    },
+    {
+      label: "Username",
+      icon: icons.user_icon,
+      route: RouterConstantUtil.profile.username,
+      rightText: username || "No username",
+    },
+  ];
+
+  return (
+    <Animatable.View
+      animation="fadeInUp"
+      duration={350}
+      delay={90}
+      style={{ marginHorizontal: width * 0.05 }}
+      className="space-y-4 gap-3"
+      useNativeDriver
+    >
+      {statItems.map((item, i) => (
+        <Animatable.View
+          key={i}
+          animation="fadeInUp"
+          duration={250}
+          delay={150 + i * 40}
+          useNativeDriver
         >
-          <View className="flex-row items-center">
-            <View className="w-10 h-10 bg-white/10 rounded-full items-center justify-center mr-4">
-              <Image
-                source={item.icon}
-                className="w-5 h-5"
-                tintColor="#9CA3AF"
-              />
+          <TouchableOpacity
+            className="flex-row items-center justify-between p-4 bg-[#1C1C1C] rounded-full"
+            onPress={() => router.replace(item.route as any)}
+            activeOpacity={0.8}
+          >
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-white/10 rounded-full items-center justify-center mr-4">
+                <Image
+                  source={item.icon}
+                  className="w-5 h-5"
+                  tintColor="#9CA3AF"
+                />
+              </View>
+              <Text className="text-gray-400 text-base">{item.label}</Text>
             </View>
-            <Text className="text-gray-400 text-base">{item.label}</Text>
-          </View>
-          <View className="flex-row items-center max-w-[50%]">
-            <View className="flex-row items-center flex-shrink">
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                className="text-white text-base font-medium mr-2 flex-shrink"
-              >
-                {item.rightText}
-              </Text>
-              <Feather
-                name="chevron-right"
-                size={20}
-                color="white"
-                style={{ opacity: 0.7 }}
-              />
-              {/* <ChevronRight color={"white"} opacity={30} size={20} /> */}
+            <View className="flex-row items-center max-w-[50%]">
+              <View className="flex-row items-center flex-shrink">
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  className="text-white text-base font-medium mr-2 flex-shrink"
+                >
+                  {item.rightText}
+                </Text>
+                <Feather
+                  name="chevron-right"
+                  size={20}
+                  color="white"
+                  style={{ opacity: 0.7 }}
+                />
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
-      </Animatable.View>
-    ))}
-  </Animatable.View>
-);
+          </TouchableOpacity>
+        </Animatable.View>
+      ))}
+    </Animatable.View>
+  );
+};
 
 const SavedPostsSection = () => (
   <Animatable.View
@@ -158,6 +188,22 @@ const SavedPostsSection = () => (
 
 const Profile = () => {
   const router = useRouter();
+  const { user, isLoading, error, clearError } = useAuthState();
+
+  const { username, lastName, firstName, email } = user || {};
+  const { refetchProfile } = useProfileActions();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        await refetchProfile();
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   return (
     <View className="flex-1 bg-[#121212]">
@@ -192,10 +238,13 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Animated Scroll Content */}
         <ScrollView className="flex-1">
-          <ProfileHeader />
-          <ProfileStats router={router} />
+          <ProfileHeader
+            firstName={firstName}
+            lastName={lastName}
+            username={username}
+          />
+          <ProfileStats router={router} email={email} username={username} />
           <SavedPostsSection />
         </ScrollView>
       </SafeAreaView>

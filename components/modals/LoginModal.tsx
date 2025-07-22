@@ -4,6 +4,7 @@ import { BlurView as ExpoBlurView } from "expo-blur";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
 import { authAPI } from "@/lib/api/auth";
+import { ValidationItem } from "@/lib/validation/ValidateItem";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -139,12 +140,38 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   };
 
   const validatePassword = (password: string) => {
-    if (!password.trim()) return "Password is required";
-    if (password.length < 8) return "Password must be at least 8 characters";
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return "Password must contain uppercase, lowercase, and number";
+    const hasMinLength = password.length >= 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    // const hasLowercase = /[a-z]/.test(password);
+    // const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    let error = "";
+    if (!password.trim()) {
+      error = "Password is required";
+    } else if (!hasMinLength) {
+      error = "Password must be at least 8 characters";
+    } else if (!hasUppercase) {
+      error = "Password must contain at least one uppercase letter";
     }
-    return "";
+    // else if (!hasLowercase) {
+    //   error = "Password must contain at least one lowercase letter";
+    // }
+    // else if (!hasNumber) {
+    //   error = "Password must contain at least one number";
+    // }
+    else if (!hasSpecialChar) {
+      error = "Password must contain at least one special character";
+    }
+
+    return {
+      hasMinLength,
+      hasUppercase,
+      // hasLowercase,
+      // hasNumber,
+      hasSpecialChar,
+      error, // empty string if all valid
+    };
   };
 
   const validateOTP = (): string => {
@@ -157,6 +184,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     }
     return "";
   };
+
+  const passwordValidation = validatePassword(password);
 
   // API functions
   const handleLogin = async (email: string) => {
@@ -274,9 +303,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const getCurrentValidation = () => {
     switch (currentStep) {
       case 0:
-        const emailError = validateEmail(email);
-        const passwordError = validatePassword(password);
-        return emailError || passwordError;
+        const passwordResult = validatePassword(password);
+        if (passwordResult.error) return passwordResult.error;
+        return "";
       case 1:
         return validateOTP();
       default:
@@ -415,7 +444,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                     onChangeText={(text) => handleInputChange(text, "password")}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="Create password"
+                    placeholder="Enter password"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
                       !!inputError,
@@ -439,6 +468,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 </View>
               </View>
 
+              <View className=" mb-2  w-full p-2">
+                <ValidationItem
+                  label="At least 1 uppercase letter"
+                  passed={passwordValidation.hasUppercase}
+                />
+                <ValidationItem
+                  label="At least 1 special character"
+                  passed={passwordValidation.hasSpecialChar}
+                />
+                <ValidationItem
+                  label="Minimum 8 characters"
+                  passed={passwordValidation.hasMinLength}
+                />
+              </View>
+
               {inputError ? (
                 <Text className="text-red-500 text-sm mt-2 px-2">
                   {inputError}
@@ -459,7 +503,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 activeOpacity={0.8}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color="blue" />
                 ) : (
                   <Text
                     className={`text-center font-semibold text-base ${
@@ -557,7 +601,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 activeOpacity={0.8}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color="blue" />
                 ) : (
                   <Text
                     className={`text-center font-semibold text-base ${

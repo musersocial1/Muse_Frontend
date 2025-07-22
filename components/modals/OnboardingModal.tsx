@@ -1,7 +1,7 @@
 import { authAPI } from "@/lib/api/auth";
+import { ValidationItem } from "@/lib/validation/ValidateItem";
 import { STEPS, StepType } from "@/utils/constants";
 import { Feather } from "@expo/vector-icons";
-import { CheckCircle, XCircle } from "lucide-react-native";
 import React, { useRef, useState } from "react";
 
 import {
@@ -666,7 +666,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 activeOpacity={0.8}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color="blue" />
                 ) : (
                   <Text
                     className={`text-center font-semibold text-base ${
@@ -770,7 +770,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 activeOpacity={0.8}
               >
                 {isLoading ? (
-                  <ActivityIndicator size="small" color="white" />
+                  <ActivityIndicator size="small" color="blue" />
                 ) : (
                   <Text
                     className={`text-center font-semibold text-base ${
@@ -1184,22 +1184,3 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 };
 
 export default OnboardingModal;
-
-export const ValidationItem = ({
-  label,
-  passed,
-}: {
-  label: string;
-  passed: boolean;
-}) => (
-  <View className="flex-row mt-2 items-center ">
-    {passed ? (
-      <CheckCircle size={18} color="green" className="mr-2" />
-    ) : (
-      <XCircle size={18} color="red" className="mr-2" />
-    )}
-    <Text className="text-black/50 text-[20px] font-sfpro-regular capitalize text-sm ml-2">
-      {label}
-    </Text>
-  </View>
-);

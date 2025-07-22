@@ -278,23 +278,29 @@ export default function MoreInfoModal({
                 </Text>
 
                 <TouchableOpacity
-                  disabled={formData.accountType === "join"}
-                  onPress={() => updateFormData("accountType", "join")}
+                  disabled={formData.accountType === "join_community"}
+                  onPress={() =>
+                    updateFormData("accountType", "join_community")
+                  }
                   className={`px-4  py-3 rounded-full ml-2 ${
-                    formData.accountType !== "join"
+                    formData.accountType !== "join_community"
                       ? "bg-[#0368FF] text-white"
                       : "text-white bg-gray-400"
                   }`}
-                  activeOpacity={formData.accountType === "join" ? 1 : 0}
+                  activeOpacity={
+                    formData.accountType === "join_community" ? 1 : 0
+                  }
                 >
                   <Text
                     className={` font-neutral-bold  ${
-                      formData.accountType !== "join"
+                      formData.accountType !== "join_community"
                         ? "text-white"
                         : "text-black"
                     }`}
                   >
-                    {formData.accountType === "join" ? "Selected" : "Select"}
+                    {formData.accountType === "join_community"
+                      ? "Selected"
+                      : "Select"}
                   </Text>
                 </TouchableOpacity>
               </TouchableOpacity>
@@ -308,7 +314,9 @@ export default function MoreInfoModal({
               className=" p-1.5 overflow-hidden "
             >
               <TouchableOpacity
-                onPress={() => updateFormData("accountType", "create")}
+                onPress={() =>
+                  updateFormData("accountType", "create_community")
+                }
                 className={`bg-white  rounded-[30px] p-2.5  flex-row items-center `}
               >
                 <View className="w-14 h-14 bg-[#F3F3F3] rounded-full mr-3 items-center justify-center">
@@ -323,14 +331,18 @@ export default function MoreInfoModal({
                 </Text>
 
                 <TouchableOpacity
-                  disabled={formData.accountType === "create"}
-                  onPress={() => updateFormData("accountType", "create")}
+                  disabled={formData.accountType === "create_community"}
+                  onPress={() =>
+                    updateFormData("accountType", "create_community")
+                  }
                   className={`px-4  py-3 rounded-full ml-2 ${
-                    formData.accountType !== "create"
+                    formData.accountType !== "create_community"
                       ? "bg-[#0368FF] text-white"
                       : "text-white bg-gray-400"
                   }`}
-                  activeOpacity={formData.accountType === "create" ? 1 : 0}
+                  activeOpacity={
+                    formData.accountType === "create_community" ? 1 : 0
+                  }
                 >
                   <Text
                     className={` font-neutral-bold  ${
@@ -339,7 +351,9 @@ export default function MoreInfoModal({
                         : "text-black"
                     }`}
                   >
-                    {formData.accountType === "create" ? "Selected" : "Select"}
+                    {formData.accountType === "create_community"
+                      ? "Selected"
+                      : "Select"}
                   </Text>
                 </TouchableOpacity>
               </TouchableOpacity>
