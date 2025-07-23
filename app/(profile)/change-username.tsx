@@ -104,9 +104,10 @@ const ChangeUsername = () => {
     } catch (error: any) {
       console.error("Username change error:", error);
       const errorMessage =
+        error?.response?.data?.error ||
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to change username. Please try again.";
+        "Failed to send verification code";
       showError("Error", errorMessage);
     } finally {
       setIsLoading(false);

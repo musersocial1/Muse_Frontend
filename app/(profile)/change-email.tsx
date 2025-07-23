@@ -70,10 +70,12 @@ const ChangeEmail = () => {
         setShowOTP(true);
       }
     } catch (error: any) {
-      showError(
-        "Error",
-        `${error.message} || "Failed to send verification code"`
-      );
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send verification code";
+      showError("Error", errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +96,12 @@ const ChangeEmail = () => {
         router.replace(RouterConstantUtil.tabs.profile as any);
       }
     } catch (error: any) {
-      showError("Error", error.message || "Failed to verify code");
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send verification code";
+      showError("Error", errorMessage);
     } finally {
       setOtpLoading(false);
     }
@@ -114,7 +121,12 @@ const ChangeEmail = () => {
       }
     } catch (error: any) {
       console.log(error);
-      showError("Error", error.message || "Failed to resend code");
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to send verification code";
+      showError("Error", errorMessage);
     }
   };
 

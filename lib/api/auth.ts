@@ -126,9 +126,8 @@ export const authAPI = {
   },
 
   // User profile endpoints
-  getUserProfile: async (): Promise<User> => {
+  getUserProfile: async (): Promise<any> => {
     const response = await userApiClient.get<User>("/user/me");
-    console.log("proeilll", response.data);
     return response.data;
   },
 

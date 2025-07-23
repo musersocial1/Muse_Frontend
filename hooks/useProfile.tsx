@@ -24,7 +24,8 @@ export const useProfile = () => {
     if (!isAuthenticated) {
       throw new Error("Not authenticated");
     }
-    return await refetchProfile();
+    const result = await refetchProfile();
+    return result;
   };
 
   const invalidateUserProfile = async () => {
@@ -55,18 +56,24 @@ export const useProfile = () => {
 };
 
 export const useProfileActions = () => {
+  const authContext = useContext(AuthContext);
   const queryClient = useQueryClient();
 
-  const refetchProfile = () => {
-    return queryClient.refetchQueries({
-      queryKey: USER_PROFILE_QUERY_KEY,
-    });
+  if (!authContext) {
+    throw new Error("useProfileActions must be used within an AuthProvider");
+  }
+
+  const refetchProfile = async () => {
+    if (!authContext.isAuthenticated) {
+      throw new Error("Not authenticated");
+    }
+
+    const result = await authContext.refetchProfile();
+    return result;
   };
 
-  const invalidateProfile = () => {
-    return queryClient.invalidateQueries({
-      queryKey: USER_PROFILE_QUERY_KEY,
-    });
+  const invalidateProfile = async () => {
+    await authContext.invalidateProfile();
   };
 
   const setProfileData = (userData: any) => {
@@ -78,4 +85,19 @@ export const useProfileActions = () => {
     invalidateProfile,
     setProfileData,
   };
+};
+
+export const useProfileUpdate = () => {
+  const { refetchProfile, setProfileData } = useProfileActions();
+
+  const updateProfile = async (newProfileData?: any) => {
+    if (newProfileData) {
+      console.log(" Instant profile update with new data");
+      setProfileData(newProfileData);
+    }
+
+    await refetchProfile();
+  };
+
+  return { updateProfile };
 };

@@ -6,7 +6,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { createContext, useCallback, useEffect, useState } from "react";
 
-// Query key for user profile
 export const USER_PROFILE_QUERY_KEY = ["user", "profile"];
 
 interface AuthContextType extends AuthState {
@@ -48,7 +47,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     null
   );
 
-  // React Query for user profile
   const {
     data: profileData,
     isLoading: isProfileLoading,
@@ -60,11 +58,14 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (!authState.isAuthenticated) {
         throw new Error("Not authenticated");
       }
-      const profile = await authAPI.getUserProfile();
+      const response = await authAPI.getUserProfile();
+
+      const profile = response.user || response;
       return profile;
     },
-    enabled: authState.isAuthenticated && !authState.user,
+    enabled: authState.isAuthenticated,
     retry: (failureCount, error: any) => {
+      console.log(`⚠️ Profile fetch retry ${failureCount}:`, error?.message);
       // Don't retry on auth errors
       if (error?.response?.status === 401 || error?.response?.status === 403) {
         return false;
@@ -73,6 +74,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnMount: !authState.user,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
@@ -89,10 +92,10 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [profileData, authState.isAuthenticated]);
 
-  // Handle profile errors
   useEffect(() => {
     if (profileError && authState.isAuthenticated) {
       const error = profileError as any;
+      console.error(" Profile query error:", error);
       // Let ApiClient handle 401/403 errors automatically
       if (error?.response?.status !== 401 && error?.response?.status !== 403) {
         setAuthState((prev) => ({
@@ -104,6 +107,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [profileError, authState.isAuthenticated]);
 
   const handleAuthError = useCallback(async () => {
+    console.log("🚨 Auth error - logging out user");
     await clearAuthData();
     queryClient.clear();
     setAuthState({
@@ -151,6 +155,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error: null,
           token,
         });
+        // Set cached data in React Query
+        queryClient.setQueryData(USER_PROFILE_QUERY_KEY, user);
       } else {
         setAuthState({
           user: null,
@@ -222,7 +228,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         token: response.jwtToken,
       });
 
-      // Set the profile data in React Query cache
       queryClient.setQueryData(USER_PROFILE_QUERY_KEY, response.user);
 
       setNeedsVerification(false);
@@ -259,7 +264,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         token: response.jwtToken,
       });
 
-      // Set the profile data in React Query cache
       queryClient.setQueryData(USER_PROFILE_QUERY_KEY, response.user);
     } catch (error: any) {
       setAuthState((prev) => ({
@@ -279,7 +283,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout API error:", error);
     } finally {
       await clearAuthData();
-      // Clear all queries on logout
       queryClient.clear();
       setAuthState({
         user: null,
@@ -297,7 +300,9 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       if (!authState.isAuthenticated) return;
 
-      const userData = await authAPI.getUserProfile();
+      const response = await authAPI.getUserProfile();
+      const userData = response.user || response;
+
       await AsyncStorage.setItem(
         STORAGE_CONFIG.keys.USER_DATA,
         JSON.stringify(userData)
@@ -309,7 +314,6 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         error: null,
       }));
 
-      // Update React Query cache
       queryClient.setQueryData(USER_PROFILE_QUERY_KEY, userData);
     } catch (error: any) {
       if (error.response?.status !== 401 && error.response?.status !== 403) {

@@ -204,6 +204,7 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
+  console.log(user, "the user object");
   return (
     <SafeAreaView className="flex-1 bg-[#121212]">
       {/* <StatusBar
