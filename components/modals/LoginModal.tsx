@@ -49,9 +49,47 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const [canResendCode, setCanResendCode] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const { login, error, clearError, verifyLogin } = useAuthState();
+  const [displayedStep, setDisplayedStep] = useState(currentStep);
+  const [prevStep, setPrevStep] = useState<number | null>(null);
+  const [nextStep, setNextStep] = useState<number | null>(null);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [direction, setDirection] = useState(1); // 1: right, -1: left
+
+  const enterAnim = useRef(new Animated.Value(width)).current;
+  const exitAnim = useRef(new Animated.Value(0)).current;
 
   const otpRefs = useRef<TextInput[]>([]);
   const stepTitles = ["Enter details", "Enter verification code"];
+
+  // When you setCurrentStep(nextStep), run this:
+  React.useEffect(() => {
+    if (displayedStep !== currentStep) {
+      setPrevStep(displayedStep);
+      setNextStep(currentStep);
+      setIsAnimating(true);
+
+      enterAnim.setValue(width * direction);
+      exitAnim.setValue(0);
+
+      Animated.parallel([
+        Animated.timing(exitAnim, {
+          toValue: -width * direction,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(enterAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setDisplayedStep(currentStep);
+        setPrevStep(null);
+        setNextStep(null);
+        setIsAnimating(false);
+      });
+    }
+  }, [currentStep]);
 
   // Reset all states when modal closes
   const resetStates = () => {
@@ -248,8 +286,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
       const response = await verifyLogin(email, code);
 
-      router.push(RouterConstantUtil.tabs.home as any);
-      handleModalClose();
+      router.replace(RouterConstantUtil.tabs.home as any);
+      // handleModalClose();
       return { success: true, data: response };
     } catch (error: any) {
       const errorMessage =
@@ -332,6 +370,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       const result = await handleLogin(email);
       if (result.success) {
         console.log(result);
+        setDirection(1);
         setCurrentStep(1);
       }
       return;
@@ -346,6 +385,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
   const handleBack = () => {
     if (currentStep > 0) {
+      setDirection(-1);
       setCurrentStep(currentStep - 1);
       setInputError("");
     }
@@ -377,7 +417,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
   const isValidInput = !getCurrentValidation();
 
-  const renderModalContent = () => {
+  const renderModalContent = (step: number) => {
     const baseInputStyle = (
       hasError: boolean,
       isFocused: boolean,
@@ -408,7 +448,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
           : "bg-[#F5F5F5] border-[#A3A3A321] text-gray-900"
       }`;
 
-    switch (currentStep) {
+    switch (step) {
       case 0:
         return (
           <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
@@ -635,32 +675,59 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="slide"
       onRequestClose={handleModalClose}
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.View style={{ opacity: fadeAnim }} className="flex-1">
-          {/* <ExpoBlurView
-            intensity={0}
-            tint="light"
-            className="absolute inset-0"
-          /> */}
-
           <View className="flex-1 justify-end">
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : "height"}
               keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
-              style={{ flex: 1, justifyContent: "flex-end" }}
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                alignItems: "center",
+              }}
             >
-              <Animated.View
-                style={{
-                  transform: [{ translateY: slideAnim }],
-                  alignSelf: "center",
-                }}
-                className="w-[90vw] max-w-[400px] bg-white rounded-3xl overflow-hidden mb-[10vw]"
+              {/* Sliding cards area */}
+              <View
+                style={{ position: "relative" }}
+                className="justify-center w-[90vw] max-w-[400px] items-center"
               >
-                {renderModalContent()}
-              </Animated.View>
+                {/* Outgoing card */}
+                {isAnimating && prevStep !== null && (
+                  <Animated.View
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      bottom: 0,
+                      width: "100%",
+                      zIndex: 1,
+                      transform: [{ translateX: exitAnim }],
+                    }}
+                    className="rounded-3xl overflow-hidden mb-[10vw]"
+                  >
+                    {renderModalContent(prevStep)}
+                  </Animated.View>
+                )}
+                {/* Incoming/current card */}
+                <Animated.View
+                  style={{
+                    width: "100%",
+                    transform: [{ translateX: isAnimating ? enterAnim : 0 }],
+                    position: isAnimating ? "absolute" : "relative",
+                    left: 0,
+                    bottom: 0,
+                    zIndex: 2,
+                  }}
+                  className="rounded-3xl overflow-hidden mb-[10vw]"
+                >
+                  {renderModalContent(
+                    isAnimating && nextStep !== null ? nextStep : displayedStep
+                  )}
+                </Animated.View>
+              </View>
             </KeyboardAvoidingView>
           </View>
         </Animated.View>

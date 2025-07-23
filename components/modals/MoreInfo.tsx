@@ -5,10 +5,10 @@ import { BlurView } from "expo-blur";
 
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Image,
-  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -48,6 +48,7 @@ export default function MoreInfoModal({
     gender: "",
     interests: [] as string[],
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -84,15 +85,19 @@ export default function MoreInfoModal({
     }
   };
 
-  const handleContinue = () => {
-    if (!isStepValid(currentStep)) {
-      return;
-    }
+  const handleContinue = async () => {
+    if (!isStepValid(currentStep) || isLoading) return;
 
     if (currentStep < 3) {
       goToStep(currentStep + 1);
     } else {
-      onComplete(formData);
+      setIsLoading(true);
+      try {
+        // onComplete can be async!
+        await onComplete(formData);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -108,6 +113,9 @@ export default function MoreInfoModal({
         : [...prev.interests, interest],
     }));
   };
+
+  const enterOpacity = useRef(new Animated.Value(0)).current;
+  const exitOpacity = useRef(new Animated.Value(1)).current;
 
   const slideAnim = useRef(new Animated.Value(width)).current;
   React.useEffect(() => {
@@ -132,18 +140,27 @@ export default function MoreInfoModal({
   const enterAnim = useRef(new Animated.Value(width)).current;
   const exitAnim = useRef(new Animated.Value(0)).current;
 
+  const STEP_CONTAINER_HEIGHT = 350; // Whatever fits the largest content
+
   const goToStep = (next: number) => {
     if (next === currentStep) return;
+
     setPrevStep(currentStep);
     setCurrentStep(next);
     setIsAnimating(true);
-
+    enterOpacity.setValue(0);
+    exitOpacity.setValue(1);
     enterAnim.setValue(width);
     exitAnim.setValue(0);
 
     Animated.parallel([
       Animated.timing(exitAnim, {
         toValue: -width,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(exitOpacity, {
+        toValue: 0,
         duration: 400,
         useNativeDriver: true,
       }),
@@ -176,20 +193,34 @@ export default function MoreInfoModal({
     <View className="px-6 w-full pt-2">
       <TouchableOpacity
         onPress={handleContinue}
-        disabled={!isStepValid(currentStep)}
-        className={`py-4 rounded-full ${
-          isStepValid(currentStep) ? "bg-secondary" : "bg-gray-400"
+        disabled={!isStepValid(currentStep) || isLoading}
+        className={`h-[3.7rem] items-center flex justify-center rounded-full ${
+          isLoading
+            ? "bg-white"
+            : isStepValid(currentStep)
+            ? "bg-secondary"
+            : "bg-gray-400"
         }`}
       >
-        <Text className="text-white text-center font-semibold text-lg">
+        {/* <Text className="text-white text-center font-semibold text-lg">
           {currentStep === 3 ? "Complete" : "Continue"}
-        </Text>
+        </Text> */}
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#0368FF" />
+        ) : (
+          <Text className="text-white text-center font-semibold text-lg">
+            {currentStep === 3 ? "Complete" : "Continue"}
+          </Text>
+        )}
       </TouchableOpacity>
     </View>
   );
 
   const renderDateStep = () => (
-    <View className="flex-1 h-full">
+    <View
+      style={{ minHeight: STEP_CONTAINER_HEIGHT }}
+      className="flex-1  h-full"
+    >
       <View className="px-6 mt-4 mb-8">
         <Text className="text-[#FFFFFF] text-[32px] font-medium text-start mb-2">
           {`We'd love to know your \nbirthday — just the date!`}
@@ -227,7 +258,7 @@ export default function MoreInfoModal({
               value={selectedDate}
               mode="date"
               display={"spinner"}
-              maximumDate={new Date()}
+              // maximumDate={new Date()}
               style={{
                 backgroundColor: "white",
                 width: "100%",
@@ -243,7 +274,10 @@ export default function MoreInfoModal({
   );
 
   const renderAccountTypeStep = () => (
-    <View className="flex-1 justify-between">
+    <View
+      style={{ minHeight: STEP_CONTAINER_HEIGHT }}
+      className="flex-1 justify-between"
+    >
       <View className="px-4 mt-4 mb-8">
         <Text className="text-[#FFFFFF] font-sfpro-medium text-[32px] font-medium text-start mb-2">
           {`Select your \naccount type`}
@@ -395,7 +429,7 @@ export default function MoreInfoModal({
               <TouchableOpacity
                 key={gender}
                 onPress={() => updateFormData("gender", gender)}
-                className={`w-[40vw] h-fit aspect-[1/1.5] flex-1 border2 bg-white rounded-[20px] overflow-hidden relative  ${
+                className={`w-[40vw] h-fit aspect-[1/1.5] flex-1  bg-white rounded-[20px] overflow-hidden relative  ${
                   selected
                     ? "border-2 border-transparent"
                     : "border-2 border-transparent"
@@ -558,56 +592,52 @@ export default function MoreInfoModal({
   }, [visible]);
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      transparent={true}
-      onRequestClose={onClose}
-      className="flex "
+    <SafeAreaView
+      className="flex-1 justify-between relative"
+      style={
+        {
+          // paddingBottom: 70,
+          // top: insets.top,
+        }
+      }
     >
-      <SafeAreaView
-        className="flex-1 justify-between relative"
-        style={{
-          paddingBottom: 70,
-          top: insets.top,
-        }}
-      >
-        <Header />
-        <Animated.View className="flex-1 relative">
-          {/* Outgoing step animation */}
-          {isAnimating && prevStep !== null && (
-            <Animated.View
-              style={{
-                position: "absolute",
-                width,
-                height: "100%",
-                top: 0,
-                left: 0,
-                transform: [{ translateX: exitAnim }],
-                zIndex: 1,
-              }}
-            >
-              {renderStep(prevStep)}
-            </Animated.View>
-          )}
-
-          {/* Current step */}
+      <Header />
+      <Animated.View className="flex-1 relative">
+        {/* Outgoing step animation */}
+        {isAnimating && prevStep !== null && (
           <Animated.View
             style={{
+              position: "absolute",
               width,
               height: "100%",
-              transform: [{ translateX: isAnimating ? enterAnim : 0 }],
-              position: isAnimating ? "absolute" : "relative",
               top: 0,
               left: 0,
-              zIndex: 2,
+              opacity: exitOpacity,
+              transform: [{ translateX: exitAnim }],
+              zIndex: 1,
             }}
           >
-            {renderStep(currentStep)}
+            {renderStep(prevStep)}
           </Animated.View>
+        )}
+
+        {/* Current step */}
+        <Animated.View
+          style={{
+            width,
+            height: "100%",
+            transform: [{ translateX: isAnimating ? enterAnim : 0 }],
+            // opacity: isAnimating ? enterOpacity : 1,
+            position: isAnimating ? "absolute" : "relative",
+            top: 0,
+            left: 0,
+            zIndex: 2,
+          }}
+        >
+          {renderStep(currentStep)}
         </Animated.View>
-        <ButtonFooter />
-      </SafeAreaView>
-    </Modal>
+      </Animated.View>
+      <ButtonFooter />
+    </SafeAreaView>
   );
 }

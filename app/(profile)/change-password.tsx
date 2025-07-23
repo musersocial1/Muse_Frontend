@@ -98,12 +98,16 @@ const ResetPassword = () => {
     } catch (error: any) {
       console.error("Password change request error:", error);
       let errorMessage = "Failed to send verification code";
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
       } else if (error.message) {
         errorMessage = error.message;
       }
 
+      showError("Error", errorMessage);
       showError("Error", errorMessage);
     } finally {
       setIsLoading(false);
@@ -316,7 +320,7 @@ const ResetPassword = () => {
           title="Confirm code"
           subtitle="Enter the 6-digit code sent to your email"
           email={user?.email || "your email"}
-          // isLoading={otpLoading}
+          isLoading={otpLoading}
         />
       </SafeAreaView>
     </KeyboardAvoidingView>

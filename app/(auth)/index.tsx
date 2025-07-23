@@ -13,6 +13,7 @@ import { showError, showSuccess } from "@/lib/toast";
 import { STEPS, StepType } from "@/utils/constants";
 import {
   Animated,
+  Easing,
   Image,
   StatusBar,
   Text,
@@ -57,6 +58,24 @@ export default function Index() {
   const [blurIntensity, setBlurIntensity] = useState(0);
   const bgAnim = useRef(new Animated.Value(0)).current; // 0 (transparent) → 1 (full opacity)
   const [direction, setDirection] = useState(1);
+
+  const slideInAnim = useRef(new Animated.Value(1000)).current; // 1000 = offscreen
+  const [isMoreInfoMounted, setIsMoreInfoMounted] = useState(false);
+
+  useEffect(() => {
+    if (moreInfoVisible) setIsMoreInfoMounted(true);
+
+    Animated.timing(slideInAnim, {
+      toValue: moreInfoVisible ? 0 : 1000,
+      duration: 400,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: true,
+    }).start(() => {
+      if (!moreInfoVisible) {
+        setTimeout(() => setIsMoreInfoMounted(false), 0);
+      }
+    });
+  }, [moreInfoVisible]);
 
   const router = useRouter();
   React.useEffect(() => {
@@ -359,11 +378,32 @@ export default function Index() {
         onComplete={handleComplete}
         direction={direction} // new
       />
-      <MoreInfoModal
+      {/* <MoreInfoModal
         visible={moreInfoVisible}
         onClose={handleMoreInfoClose}
         onComplete={handleMoreInfoComplete}
-      />
+      /> */}
+      {isMoreInfoMounted && (
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 50,
+            transform: [{ translateX: slideInAnim }],
+          }}
+          pointerEvents={moreInfoVisible ? "auto" : "none"}
+        >
+          <MoreInfoModal
+            visible={true} // always true for smooth animation
+            onClose={handleMoreInfoClose}
+            onComplete={handleMoreInfoComplete}
+          />
+        </Animated.View>
+      )}
+
       <LoginModal visible={showLogin} onClose={() => setShowLogin(false)} />
     </View>
   );

@@ -1,6 +1,7 @@
 import { images } from "@/constants/images";
 import React, { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ImageBackground,
   KeyboardAvoidingView,
@@ -20,6 +21,9 @@ interface OTPModalProps {
   title?: string;
   subtitle?: string;
   email?: string;
+  resendTimer?: number;
+  canResend?: boolean;
+  isLoading?: boolean; // 👈 NEW
 }
 
 const OTPModal: React.FC<OTPModalProps> = ({
@@ -30,6 +34,9 @@ const OTPModal: React.FC<OTPModalProps> = ({
   title = "Confirm code",
   subtitle = "Enter the 6-digits code we sent to your mail",
   email,
+  canResend,
+  resendTimer,
+  isLoading,
 }) => {
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [isOTPValid, setIsOTPValid] = useState(true);
@@ -137,7 +144,7 @@ const OTPModal: React.FC<OTPModalProps> = ({
                     <TextInput
                       key={index}
                       ref={(ref) => (otpInputRefs.current[index] = ref) as any}
-                      className={`w-14 h-14 bg-[#2B2B2B] rounded-full text-white text-center text-2xl font-bold border-[3px] border-brandWhite/[11%] ${
+                      className={`w-14 h-14 bg-[#2B2B2B] rounded-full text-white text-center text-[1.5rem] font-bold leading-[24px] border-[3px] border-brandWhite/[11%] ${
                         !isOTPValid && digit === ""
                           ? "border border-red-500"
                           : ""
@@ -159,23 +166,40 @@ const OTPModal: React.FC<OTPModalProps> = ({
                     Please enter the complete 6-digit code
                   </Text>
                 )}
-
+                {/* 
                 <TouchableOpacity onPress={handleResendOTP} className="mb-8">
                   <Text className="text-secondary text-center font-semibold text-lg">
                     Resend
                   </Text>
+                </TouchableOpacity> */}
+                <TouchableOpacity
+                  onPress={onResend}
+                  disabled={!canResend}
+                  className={`mt-2 mb-8 ${
+                    canResend ? "opacity-100" : "opacity-50"
+                  }`}
+                >
+                  <Text className="text-blue-500 text-center font-semibold text-lg">
+                    {canResend ? "Resend code" : `Resend in ${resendTimer}s`}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={`py-5 rounded-full items-center mb-4 ${
-                    validateOTP() ? "bg-secondary" : "bg-brandWhite/[14%]"
+                  className={`py-5 rounded-full items-center justify-center mb-4 ${
+                    validateOTP() && !isLoading
+                      ? "bg-secondary"
+                      : "bg-brandWhite/[14%]"
                   }`}
                   onPress={handleConfirmOTP}
-                  disabled={!validateOTP()}
+                  disabled={!validateOTP() || isLoading}
                 >
-                  <Text className="text-white text-center font-semibold text-lg">
-                    Continue
-                  </Text>
+                  {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white text-center font-semibold text-lg">
+                      Continue
+                    </Text>
+                  )}
                 </TouchableOpacity>
               </View>
             </View>

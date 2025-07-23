@@ -5,7 +5,7 @@ import { useProfileActions } from "@/hooks/useProfile";
 import { authAPI } from "@/lib/api/auth";
 import { showError, showInfo, showSuccess } from "@/lib/toast";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -27,6 +27,14 @@ const ChangeUsername = () => {
   const [newUsername, setNewUsername] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // --- new state for liveness check ---
+  const [isChecking, setIsChecking] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [usernameAvailable, setUsernameAvailable] = useState(false);
+  const inputRef = useRef<TextInput>(null);
+  const usernameCheckTimeout = useRef<any>(null);
+  // ------------------------------------
+
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -46,17 +54,81 @@ const ChangeUsername = () => {
     }
   }, [currentUsername]);
 
+  // --- Username liveness check handler ---
+  useEffect(() => {
+    // Reset all feedback if blank
+    if (
+      !newUsername ||
+      newUsername.trim() === "" ||
+      newUsername.trim().length < 3
+    ) {
+      setUsernameError("");
+      setUsernameAvailable(false);
+      setIsChecking(false);
+      return;
+    }
+
+    // Only check if username has changed and is at least 3 chars
+    if (newUsername.trim() === currentUsername) {
+      setUsernameError(""); // don't show "taken" for current
+      setUsernameAvailable(false);
+      setIsChecking(false);
+      return;
+    }
+
+    // Local validation
+    const usernameRegex = /^[a-zA-Z0-9_]+$/;
+    if (!usernameRegex.test(newUsername)) {
+      setUsernameError(
+        "Username can only contain letters, numbers, and underscores"
+      );
+      setUsernameAvailable(false);
+      setIsChecking(false);
+      return;
+    }
+
+    // Debounce API call (500ms after last keystroke)
+    if (usernameCheckTimeout.current)
+      clearTimeout(usernameCheckTimeout.current);
+
+    setIsChecking(true);
+    setUsernameError("");
+    setUsernameAvailable(false);
+
+    usernameCheckTimeout.current = setTimeout(async () => {
+      try {
+        const uname = newUsername.trim().toLowerCase();
+        const { exists } = await authAPI.checkUsernameExists(uname);
+        if (exists) {
+          setUsernameError("Username is already taken");
+          setUsernameAvailable(false);
+          // Focus the input and highlight red
+          inputRef.current?.focus();
+        } else {
+          setUsernameError("");
+          setUsernameAvailable(true);
+        }
+      } catch (err) {
+        setUsernameError("Could not check username. Try again.");
+        setUsernameAvailable(false);
+      } finally {
+        setIsChecking(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(usernameCheckTimeout.current);
+  }, [newUsername, currentUsername]);
+  // ------------------------------------------
+
   const validateUsername = (username: string): boolean => {
     if (!username || username.trim().length < 3) {
       showInfo("Invalid Username", "Username must be at least 3 characters");
       return false;
     }
-
     if (username.length > 20) {
       showInfo("Invalid Username", "Username must be less than 20 characters");
       return false;
     }
-
     const usernameRegex = /^[a-zA-Z0-9_]+$/;
     if (!usernameRegex.test(username)) {
       showInfo(
@@ -65,7 +137,6 @@ const ChangeUsername = () => {
       );
       return false;
     }
-
     return true;
   };
 
@@ -86,6 +157,13 @@ const ChangeUsername = () => {
     if (!validateUsername(newUsername.trim())) {
       return;
     }
+
+    // --- Must not allow change if error or not available ---
+    if (!usernameAvailable || isChecking || !!usernameError) {
+      showInfo("Invalid Username", usernameError || "Username not available");
+      return;
+    }
+    // ------------------------------------------------------
 
     const usernameChangeData = {
       newUsername: newUsername.trim(),
@@ -116,7 +194,14 @@ const ChangeUsername = () => {
 
   const hasChanges =
     newUsername.trim() !== currentUsername && newUsername.trim().length > 0;
-  const isButtonDisabled = !hasChanges || isLoading || remaining <= 0;
+  // --- updated: button disabled if checking, taken, or not available
+  const isButtonDisabled =
+    !hasChanges ||
+    isLoading ||
+    remaining <= 0 ||
+    isChecking ||
+    !!usernameError ||
+    !usernameAvailable;
 
   return (
     <KeyboardAvoidingView
@@ -146,8 +231,17 @@ const ChangeUsername = () => {
 
           {/* Content */}
           <View className="flex-1 px-6 pt-8">
-            <View className="bg-[#2A2A2A] rounded-full h-[60px] px-[5%] mb-6">
+            <View
+              className={`bg-[#2A2A2A] rounded-full h-[60px] px-[5%] mb-2 border-2 ${
+                usernameError
+                  ? "border-red-500"
+                  : usernameAvailable
+                  ? "border-green-500"
+                  : "border-transparent"
+              }`}
+            >
               <TextInput
+                ref={inputRef}
                 className="text-white font-bold h-full text-[15px] font-sfpro-bold"
                 value={newUsername}
                 onChangeText={setNewUsername}
@@ -158,7 +252,24 @@ const ChangeUsername = () => {
                 editable={!isLoading && remaining > 0}
                 maxLength={20}
               />
+              {/* Spinner on the right inside input */}
+              {isChecking && (
+                <View style={{ position: "absolute", right: 24, top: 18 }}>
+                  <ActivityIndicator size="small" color="#36f" />
+                </View>
+              )}
             </View>
+
+            {/* Username error or available message */}
+            {usernameError ? (
+              <Text className="text-red-500 text-sm mb-2 px-2">
+                {usernameError}
+              </Text>
+            ) : usernameAvailable && newUsername.trim().length >= 3 ? (
+              <Text className="text-green-500 text-sm mb-2 px-2">
+                Username is available
+              </Text>
+            ) : null}
 
             <View className="flex-row items-center justify-between mb-3 px-1">
               <Text className="text-gray-400 text-sm font-medium">

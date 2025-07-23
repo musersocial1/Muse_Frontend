@@ -122,6 +122,7 @@ export const authAPI = {
       "/user/resend",
       data
     );
+    console.log("response");
     return response.data;
   },
 
@@ -140,6 +141,7 @@ export const authAPI = {
       data
     );
 
+    // console.log(response);
     return response.data;
   },
 
@@ -151,6 +153,7 @@ export const authAPI = {
       "/user/confirm-email",
       data
     );
+    console.log(response);
     return response.data;
   },
 
@@ -161,7 +164,6 @@ export const authAPI = {
       "/user/change-password",
       data
     );
-    // console.log(response.data, "theee ");
     // If login is successful and response has code & email, trigger OTP email
     if (response.data?.code && response.data?.email) {
       console.log(response.data.code);
@@ -204,5 +206,57 @@ export const authAPI = {
       data
     );
     return response.data;
+  },
+
+  /**
+   * Check if a phone number already exists (for onboarding)
+   * @param phoneNumber string (should include country code, e.g. +2347012345678)
+   * @returns { exists: boolean, ...data }
+   */
+  checkPhoneNumberExists: async (
+    phoneNumber: string
+  ): Promise<{ exists: boolean; [key: string]: any }> => {
+    try {
+      const response = await userApiClient.get("/user/check-user", {
+        params: { phoneNumber },
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        return { exists: false };
+      }
+      throw error;
+    }
+  },
+  checkEmailExists: async (
+    email: string
+  ): Promise<{ exists: boolean; [key: string]: any }> => {
+    try {
+      const response = await userApiClient.get("/user/check-user", {
+        params: { email },
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        return { exists: false };
+      }
+      throw error;
+    }
+  },
+
+  checkUsernameExists: async (
+    username: string
+  ): Promise<{ exists: boolean; [key: string]: any }> => {
+    try {
+      const response = await userApiClient.get("/user/check-user", {
+        params: { username },
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        return { exists: false };
+      }
+      throw error;
+    }
   },
 };

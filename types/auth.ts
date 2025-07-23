@@ -70,6 +70,7 @@ export interface NormalResponse {
   code: string;
   email: string;
   error: any | null;
+  newEmail: string;
 }
 
 export interface PasswordChangeRequest {

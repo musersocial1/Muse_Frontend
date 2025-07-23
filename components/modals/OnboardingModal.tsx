@@ -81,6 +81,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const otpRefs = useRef<TextInput[]>([]);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [usernameAvailable, setUsernameAvailable] = useState(false);
+
+  const [isUsernameChecking, setIsUsernameChecking] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
@@ -127,6 +131,50 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       });
     }
   }, [currentStep]);
+
+  const usernameCheckTimeout = useRef<any>(null);
+
+  const checkUsernameAvailability = (username: string) => {
+    const uname = username.toLowerCase().replace(/\s/g, "");
+
+    // Reset on empty or < 3 chars
+    if (!uname) {
+      setUsernameError("");
+      setUsernameAvailable(false);
+      setIsUsernameChecking(false);
+      return;
+    }
+
+    if (uname.length < 3) {
+      setUsernameError("Username must be at least 3 characters");
+      setUsernameAvailable(false);
+      setIsUsernameChecking(false);
+      return;
+    }
+
+    if (usernameCheckTimeout.current) {
+      clearTimeout(usernameCheckTimeout.current);
+    }
+    setIsUsernameChecking(true);
+
+    usernameCheckTimeout.current = setTimeout(async () => {
+      try {
+        const { exists } = await authAPI.checkUsernameExists(uname);
+        if (exists) {
+          setUsernameError("Username is already taken");
+          setUsernameAvailable(false);
+        } else {
+          setUsernameError(""); // no error
+          setUsernameAvailable(true);
+        }
+      } catch (e) {
+        setUsernameError("Error checking username");
+        setUsernameAvailable(false);
+      } finally {
+        setIsUsernameChecking(false);
+      }
+    }, 500);
+  };
 
   const stepTitles: Record<StepType, string> = {
     [STEPS.PHONE]: "Enter Phone Number",
@@ -460,6 +508,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   };
 
+  React.useEffect(() => {
+    setInputError("");
+  }, [currentStep]);
+
   const getCurrentValidation = () => {
     switch (currentStep) {
       case STEPS.PHONE:
@@ -479,13 +531,16 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           validateEmail(email)
         );
       case STEPS.USERNAME:
-        return validateName(username);
+        // Prefer dynamic error, fall back to required
+        return usernameError || validateName(username);
       default:
         return "";
     }
   };
 
   const handleContinue = async () => {
+    // DAVIS HERE
+
     if (isLoading) return;
 
     const error = getCurrentValidation();
@@ -496,10 +551,29 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
     switch (currentStep) {
       case STEPS.PHONE:
-        // Send verification code
-        const result = await sendVerificationCode(phoneNumber);
-        if (result.success) {
-          onContinue();
+        try {
+          setIsLoading(true);
+          setInputError("");
+          // 1. Check if phone exists first!
+          const { exists, message } = await authAPI.checkPhoneNumberExists(
+            phoneNumber
+          );
+          if (exists) {
+            setInputError(message || "Phone number already exists.");
+            setIsLoading(false);
+            return; // Stop flow if taken
+          }
+          // 2. If phone is available, continue as normal
+          const result = await sendVerificationCode(phoneNumber);
+          if (result.success) {
+            onContinue();
+          }
+        } catch (err: any) {
+          setInputError(
+            err?.message || "Something went wrong. Please try again."
+          );
+        } finally {
+          setIsLoading(false);
         }
         break;
 
@@ -522,8 +596,27 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         break;
 
       case STEPS.PERSONAL_INFO:
-        console.log("Personal info step completed, moving to username");
-        onContinue();
+        try {
+          setIsLoading(true);
+          setInputError("");
+          const { exists, message } = await authAPI.checkEmailExists(email);
+          if (exists) {
+            setInputError(message || "Email already exists.");
+            setFocusedField("email");
+            setTimeout(() => emailRef.current?.focus(), 100);
+            setIsLoading(false);
+            return;
+          }
+          onContinue();
+        } catch (err: any) {
+          setInputError(
+            err?.message || "Something went wrong. Please try again."
+          );
+          setFocusedField("email");
+          setTimeout(() => emailRef.current?.focus(), 100);
+        } finally {
+          setIsLoading(false);
+        }
         break;
 
       case STEPS.USERNAME:
@@ -534,7 +627,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           lastName,
           email,
           password,
-          username,
+          username: username.toLowerCase().replace(/\s/g, ""), // force again, just in case
         };
 
         console.log("Form submission data:", formData);
@@ -568,7 +661,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         setConfirmPassword(value);
         break;
       case "username":
-        setUsername(value);
+        // Convert to lowercase and trim spaces
+        const usernameValue = value.toLowerCase().replace(/\s/g, "");
+        setUsername(usernameValue);
+        setUsernameError("");
+        checkUsernameAvailability(usernameValue);
         break;
     }
 
@@ -1011,13 +1108,17 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <View>
                   <TextInput
                     value={email}
+                    ref={emailRef}
                     onChangeText={(text) => handleInputChange(text, "email")}
                     onFocus={() => setFocusedField("email")}
                     onBlur={() => setFocusedField(null)}
                     placeholder="Email address"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
-                      !!inputError && !email.trim(),
+                      // Only show error/red if the error is for email!
+                      (!!inputError && focusedField === "email") ||
+                        (!!inputError &&
+                          inputError.toLowerCase().includes("email")),
                       focusedField === "email",
                       !!email.trim()
                     )}
@@ -1048,13 +1149,17 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 }`}
                 activeOpacity={0.8}
               >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
-                  }`}
-                >
-                  Continue
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      isValidInput ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Continue
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -1096,17 +1201,31 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     placeholder="Enter username"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
-                      !!inputError && !username.trim(),
+                      !!usernameError || !!inputError, // error triggers red
                       isInputFocused,
-                      !!username.trim()
+                      !!username.trim() && usernameAvailable && !usernameError // valid triggers green
                     )}
                     returnKeyType="next"
+                    autoCapitalize="none"
                   />
+                  {isUsernameChecking && (
+                    <View style={{ position: "absolute", right: 16, top: 18 }}>
+                      <ActivityIndicator size="small" color="blue" />
+                    </View>
+                  )}
                 </View>
-
-                {inputError ? (
+                {/* {usernameError || inputError ? (
                   <Text className="text-red-500 text-sm px-2">
-                    {inputError}
+                    {usernameError || inputError}
+                  </Text>
+                ) : null} */}
+                {usernameError || inputError ? (
+                  <Text className="text-red-500 text-sm px-2">
+                    {usernameError || inputError}
+                  </Text>
+                ) : usernameAvailable && username.length >= 3 ? (
+                  <Text className="text-green-600 text-sm px-2">
+                    Username is available
                   </Text>
                 ) : null}
               </View>
@@ -1115,18 +1234,22 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
               <TouchableOpacity
                 onPress={handleContinue}
-                disabled={!isValidInput}
+                disabled={!isValidInput || isUsernameChecking}
                 className={`rounded-full p-4 ${
-                  isValidInput ? "bg-secondary" : "bg-disabled"
+                  isValidInput && !isUsernameChecking
+                    ? "bg-secondary"
+                    : "bg-disabled"
                 }`}
                 activeOpacity={0.8}
               >
                 <Text
                   className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
+                    isValidInput && !isUsernameChecking
+                      ? "text-white"
+                      : "text-gray-400"
                   }`}
                 >
-                  Continue
+                  {isUsernameChecking ? "Checking..." : "Continue"}
                 </Text>
               </TouchableOpacity>
             </View>
