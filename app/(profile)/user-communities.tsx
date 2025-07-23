@@ -70,7 +70,7 @@ const UserCommunities = () => {
   return (
     <View className="flex-1 bg-[#121212]">
       <SafeAreaView className="flex-1 gap-7">
-        <View className="flex-row items-center justify-between px-6 pt-8">
+        <View className="flex-row  items-center justify-between px-6 ">
           <TouchableOpacity
             onPress={() =>
               router.replace(RouterConstantUtil.tabs.profile as any)

@@ -70,7 +70,7 @@ const SubscriptionInfo = ({
 
   return (
     <SafeAreaView
-      style={{ paddingTop: insets.top }}
+      // style={{ paddingTop: insets.top }}
       className="flex-1 bg-[#121212]"
     >
       {/* Header */}

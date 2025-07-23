@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import { BlurView as ExpoBlurView } from "expo-blur";
 
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
@@ -195,18 +194,25 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
       const response = await login(email, password);
 
-      console.log(response, "login res");
+      // console.log(response.code, "login res");
 
       setCanResendCode(false);
       setResendTimer(60);
 
       return { success: true, data: response };
     } catch (error: any) {
+      console.log(error, "this is davis here");
+      // const errorMessage =
+      //   error?.response?.data?.message ||
+      //   error?.message ||
+      //   "Failed to send verification code";
       const errorMessage =
+        error?.response?.data?.error || // <-- add this line
         error?.response?.data?.message ||
         error?.message ||
         "Failed to send verification code";
-      console.log(error, "the rrrrr");
+
+      console.log(errorMessage, "the rrrrr");
       setInputError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -325,6 +331,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     if (currentStep === 0) {
       const result = await handleLogin(email);
       if (result.success) {
+        console.log(result);
         setCurrentStep(1);
       }
       return;
@@ -376,7 +383,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       isFocused: boolean,
       isValid: boolean
     ) =>
-      `rounded-[17px] h-[3.9rem] px-[5%] text-base text-gray-900 border ${
+      `rounded-[17px] h-[3.9rem] leading-[17px] px-[5%] text-base text-gray-900 border ${
         hasError
           ? "bg-light-red border-border-red"
           : isFocused
@@ -404,7 +411,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     switch (currentStep) {
       case 0:
         return (
-          <View className="bg-white rounded-t-3xl py-[8%] shadow-2xl">
+          <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-semibold text-gray-900">
@@ -418,7 +425,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 </TouchableOpacity>
               </View>
 
-              <View className="mb-4">
+              <View className="">
                 <TextInput
                   value={email}
                   onChangeText={(text) => handleInputChange(text, "email")}
@@ -457,7 +464,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4"
+                    className="absolute right-4 top-[50%]"
+                    style={{ transform: [{ translateY: "-50%" }] }}
                   >
                     {showPassword ? (
                       <Feather name="eye-off" size={20} color="#666" />
@@ -468,7 +476,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 </View>
               </View>
 
-              <View className=" mb-2  w-full p-2">
+              <View className="  mb-4 mt-2   w-full px-2">
                 <ValidationItem
                   label="At least 1 uppercase letter"
                   passed={passwordValidation.hasUppercase}
@@ -484,15 +492,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
               </View>
 
               {inputError ? (
-                <Text className="text-red-500 text-sm mt-2 px-2">
+                <Text className="text-red-500 text-sm mb-3 px-2">
                   {inputError}
                 </Text>
               ) : null}
 
-              <Text className="text-gray-500 text-md text-center mb-8 leading-5 mt-5">
+              {/* <Text className="text-gray-500 text-md font-neutral-regular text-center mb-4 leading-5 mt-2">
                 Enter your email and password to{"\n"}receive a verification
                 code
-              </Text>
+              </Text> */}
 
               <TouchableOpacity
                 onPress={handleContinue}
@@ -632,11 +640,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.View style={{ opacity: fadeAnim }} className="flex-1">
-          <ExpoBlurView
-            intensity={50}
-            tint="dark"
+          {/* <ExpoBlurView
+            intensity={0}
+            tint="light"
             className="absolute inset-0"
-          />
+          /> */}
 
           <View className="flex-1 justify-end">
             <KeyboardAvoidingView
@@ -649,7 +657,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   transform: [{ translateY: slideAnim }],
                   alignSelf: "center",
                 }}
-                className="w-[90vw] max-w-[400px] bg-white rounded-3xl overflow-hidden mb-[8vw]"
+                className="w-[90vw] max-w-[400px] bg-white rounded-3xl overflow-hidden mb-[10vw]"
               >
                 {renderModalContent()}
               </Animated.View>

@@ -123,7 +123,7 @@ const ChangeUsername = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? -50 : -55}
     >
-      <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
+      <View className="flex-1 bg-[#121212]">
         <StatusBar barStyle="light-content" />
         <SafeAreaView className="flex-1">
           {/* Header */}

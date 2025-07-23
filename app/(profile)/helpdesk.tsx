@@ -34,11 +34,11 @@ export default function HelpDesk() {
 
   return (
     <SafeAreaView
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 10 }}
+      style={{ paddingBottom: insets.bottom + 10 }}
       className="flex-1 bg-[#121212]"
     >
       <View
-        style={{ paddingTop: insets.top }}
+        // style={{ paddingBottom: insets.bottom }}
         className="flex-row items-center justify-between px-6 "
       >
         <TouchableOpacity

@@ -75,8 +75,7 @@ export default function Index() {
   }, []);
 
   // Combined modal visibility flag for animations (either onboarding or more info modal)
-  const anyModalVisible = modalVisible || moreInfoVisible;
-
+  const anyModalVisible = modalVisible || moreInfoVisible || showLogin;
   // Animate main card opacity/position based on modal state
   React.useEffect(() => {
     // Animate bg: 1 for visible, 0 for hidden
@@ -364,6 +363,7 @@ export default function Index() {
         onClose={handleMoreInfoClose}
         onComplete={handleMoreInfoComplete}
       />
+
       <LoginModal visible={showLogin} onClose={() => setShowLogin(false)} />
     </View>
   );

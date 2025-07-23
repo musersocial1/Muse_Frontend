@@ -147,42 +147,41 @@ const Settings = () => {
   const insets = useSafeAreaInsets();
 
   return (
-    <View
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
-      className="flex-1 bg-[#121212]"
+    <SafeAreaView
+      // style={{ top: insets.top, bottom: insets.bottom }}
+      className="flex-1 bg-[#121212] "
     >
       <StatusBar barStyle="light-content" />
-      <SafeAreaView className="flex-1">
-        <View>
-          <View className="flex-row items-center justify-between px-6 pb-4">
-            <TouchableOpacity
-              onPress={() =>
-                router.replace(RouterConstantUtil.tabs.profile as any)
-              }
-              className="w-10 h-10 rounded-full items-center justify-center"
-            >
-              <Image source={icons.back} className="w-14 h-14" />
-            </TouchableOpacity>
-            <Text className="text-white text-[20px] font-bold">Settings</Text>
-            <View className="w-10" />
-          </View>
+
+      <View>
+        <View className="flex-row items-center justify-between px-6 pb-4">
+          <TouchableOpacity
+            onPress={() =>
+              router.replace(RouterConstantUtil.tabs.profile as any)
+            }
+            className="w-10 h-10 rounded-full items-center justify-center"
+          >
+            <Image source={icons.back} className="w-14 h-14" />
+          </TouchableOpacity>
+          <Text className="text-white text-[20px] font-bold">Settings</Text>
+          <View className="w-10" />
         </View>
-        <ScrollView className="px-4 mt-4">
-          <View className="space-y-4 gap-3">
-            {SETTINGS_ITEMS.map((item, idx) => (
-              <SettingsItem
-                key={idx}
-                index={idx}
-                label={item.label}
-                icon={item.icon}
-                route={item.route}
-                type={item.type as any}
-              />
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+      </View>
+      <ScrollView className="px-4 mt-4">
+        <View className="space-y-4 gap-3">
+          {SETTINGS_ITEMS.map((item, idx) => (
+            <SettingsItem
+              key={idx}
+              index={idx}
+              label={item.label}
+              icon={item.icon}
+              route={item.route}
+              type={item.type as any}
+            />
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
