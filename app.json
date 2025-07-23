@@ -2,7 +2,7 @@
   "expo": {
     "name": "muse",
     "slug": "muse",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/muse-logo.png",
     "scheme": "muse",
