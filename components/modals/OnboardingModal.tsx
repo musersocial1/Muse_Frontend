@@ -206,17 +206,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   }, [resendTimer]);
 
   const phoneInputRef = useRef<TextInput>(null);
-  React.useEffect(() => {
-    if (!visible) return;
-    if (currentStep === STEPS.PHONE && phoneInputRef.current) {
-      // phoneInputRef.current?.focus();
-      // setTimeout(() => phoneInputRef.current?.focus(), 0); // Delay for modal open
-    }
-    if (currentStep === STEPS.VERIFY_OTP && otpRefs.current[0]) {
-      // otpRefs.current[0]?.focus();
-      // setTimeout(() => otpRefs.current[0]?.focus(), 0); // Focus first OTP input
-    }
-  }, [visible, currentStep]);
 
   React.useEffect(() => {
     if (!visible) return;
@@ -242,7 +231,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         default:
           break;
       }
-    }, 400); // If you have an animation duration, set timeout to match (400ms is good for yours)
+    }, 600); // If you have an animation duration, set timeout to match (400ms is good for yours)
   }, [currentStep, visible]);
 
   const validatePhoneNumber = (phone: string): string => {
@@ -262,7 +251,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const validateOTP = (): string => {
     const otpString = otpValues.join("");
     if (otpString.length !== 6) {
-      return "Please enter the complete 5-digit code";
+      return "Please enter the complete 6-digit code";
     }
     if (!/^\d{6}$/.test(otpString)) {
       return "Code should contain only numbers";

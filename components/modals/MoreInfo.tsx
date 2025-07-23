@@ -9,7 +9,6 @@ import {
   Dimensions,
   Image,
   Modal,
-  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -227,7 +226,7 @@ export default function MoreInfoModal({
               testID="dateTimePicker"
               value={selectedDate}
               mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "default"}
+              display={"spinner"}
               maximumDate={new Date()}
               style={{
                 backgroundColor: "white",
