@@ -136,7 +136,7 @@ const ResetPassword = () => {
         );
       }
     } catch (error: any) {
-      console.error("Password change confirm error:", error);
+      // console.error("Password change confirm error:", error);
 
       let errorMessage = "Failed to verify code";
 
@@ -198,9 +198,9 @@ const ResetPassword = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? -20 : -36}
     >
-      <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
+      <SafeAreaView className="flex-1 bg-[#121212]">
         <StatusBar barStyle="light-content" />
-        <SafeAreaView className="flex-1">
+        <View className="flex-1">
           {/* Header */}
           <View className="flex-row items-center justify-between px-6 pb-4">
             <TouchableOpacity
@@ -306,7 +306,7 @@ const ResetPassword = () => {
               )}
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
+        </View>
 
         <OTPModal
           visible={showOTP}
@@ -318,7 +318,7 @@ const ResetPassword = () => {
           email={user?.email || "your email"}
           // isLoading={otpLoading}
         />
-      </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

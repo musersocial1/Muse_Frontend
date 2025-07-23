@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import { BlurView as ExpoBlurView } from "expo-blur";
 
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
@@ -412,7 +411,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     switch (currentStep) {
       case 0:
         return (
-          <View className="bg-white rounded-t-3xl py-[8%] shadow-2xl">
+          <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <Text className="text-xl font-semibold text-gray-900">
@@ -493,7 +492,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
               </View>
 
               {inputError ? (
-                <Text className="text-red-500 text-sm mt-2 px-2">
+                <Text className="text-red-500 text-sm mb-3 px-2">
                   {inputError}
                 </Text>
               ) : null}
@@ -641,11 +640,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <Animated.View style={{ opacity: fadeAnim }} className="flex-1">
-          <ExpoBlurView
-            intensity={50}
-            tint="dark"
+          {/* <ExpoBlurView
+            intensity={0}
+            tint="light"
             className="absolute inset-0"
-          />
+          /> */}
 
           <View className="flex-1 justify-end">
             <KeyboardAvoidingView

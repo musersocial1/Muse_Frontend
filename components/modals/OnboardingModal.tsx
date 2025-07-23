@@ -218,6 +218,33 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   }, [visible, currentStep]);
 
+  React.useEffect(() => {
+    if (!visible) return;
+
+    // Wait a tick for modal animation to finish
+    setTimeout(() => {
+      switch (currentStep) {
+        case STEPS.PHONE:
+          phoneInputRef.current?.focus();
+          break;
+        case STEPS.VERIFY_OTP:
+          otpRefs.current[0]?.focus();
+          break;
+        case STEPS.PERSONAL_INFO:
+          firstNameRef.current?.focus();
+          break;
+        case STEPS.PASSWORD:
+          passwordRef.current?.focus();
+          break;
+        case STEPS.USERNAME:
+          usernameRef.current?.focus();
+          break;
+        default:
+          break;
+      }
+    }, 400); // If you have an animation duration, set timeout to match (400ms is good for yours)
+  }, [currentStep, visible]);
+
   const validatePhoneNumber = (phone: string): string => {
     if (!phone || phone.trim().length === 0) {
       return "Phone number is required";
@@ -575,6 +602,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     Keyboard.dismiss();
   };
 
+  const firstNameRef = useRef<TextInput>(null);
+  const lastNameRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+  const usernameRef = useRef<TextInput>(null);
+
   const isValidInput = !getCurrentValidation();
 
   const renderModalContent = (step: string) => {
@@ -814,6 +848,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <View className="relative">
                   <TextInput
                     value={password}
+                    ref={passwordRef}
                     onChangeText={(text) => handleInputChange(text, "password")}
                     onFocus={() => setFocusedField("password")}
                     onBlur={() => setFocusedField(null)}
@@ -950,6 +985,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 <View>
                   <TextInput
                     value={firstName}
+                    ref={firstNameRef}
                     onChangeText={(text) =>
                       handleInputChange(text, "firstName")
                     }
@@ -1067,6 +1103,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     onChangeText={(text) => handleInputChange(text, "username")}
                     onFocus={() => setIsInputFocused(true)}
                     onBlur={() => setIsInputFocused(false)}
+                    ref={usernameRef}
                     placeholder="Enter username"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(

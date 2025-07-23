@@ -1,3 +1,4 @@
+import { showError } from "@/lib/toast";
 import {
   AuthResponse,
   LoginRequest,
@@ -5,6 +6,7 @@ import {
   PasswordChangeRequest,
   PhoneVerificationRequest,
   RegisterRequest,
+  SendOtpRequest,
   SendPhoneVerificationRequest,
   User,
   UsernameChangeRequest,
@@ -18,7 +20,27 @@ export const authAPI = {
       "/user/signin",
       data
     );
-    console.log(response.data);
+
+    // If login is successful and response has code & email, trigger OTP email
+    if (response.data?.code && response.data?.email) {
+      console.log(response.data.code);
+
+      try {
+        // Optionally pass userName if available from response or input data
+        await authAPI.sendOtpEmail({
+          email: response.data.email,
+          otp: response.data.code,
+        });
+        // console.log("OTP email sent!");
+      } catch (error: any) {
+        showError(
+          "Error",
+          `${error.message} || "Failed to send verification code"`
+        );
+        console.error("Failed to send OTP email:", error.message);
+        // Optionally show user a toast or UI feedback
+      }
+    }
     return response.data;
   },
 
@@ -29,6 +51,25 @@ export const authAPI = {
 
   logout: async (): Promise<void> => {
     await userApiClient.post("/user/logout");
+  },
+
+  sendOtpEmail: async (data: SendOtpRequest): Promise<{ message: string }> => {
+    // Get the API endpoint from env
+    const url = `${process.env.EXPO_PUBLIC_EMAIL_LINK}/api/otps`;
+    if (!url) throw new Error("Email OTP API link is not set in env vars");
+    console.log(url, "this is url");
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const resJson = await response.json();
+
+    if (!response.ok) {
+      throw new Error(resJson.error || "Failed to send OTP email");
+    }
+    return resJson;
   },
 
   // Phone verification endpoints
@@ -121,7 +162,27 @@ export const authAPI = {
       "/user/change-password",
       data
     );
-    console.log(response.data, "theee ");
+    // console.log(response.data, "theee ");
+    // If login is successful and response has code & email, trigger OTP email
+    if (response.data?.code && response.data?.email) {
+      console.log(response.data.code);
+
+      try {
+        // Optionally pass userName if available from response or input data
+        await authAPI.sendOtpEmail({
+          email: response.data.email,
+          otp: response.data.code,
+        });
+        // console.log("OTP email sent!");
+      } catch (error: any) {
+        showError(
+          "Error",
+          `${error.message} || "Failed to send verification code"`
+        );
+        console.error("Failed to send OTP email:", error.message);
+        // Optionally show user a toast or UI feedback
+      }
+    }
     return response.data;
   },
 
