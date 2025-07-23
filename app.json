@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.moseleydev.muse"
+      "bundleIdentifier": "com.moseleydev.muse",
+      "buildNumber": "3"
     },
     "android": {
       "bundleIdentifier": "com.moseleydev.muse",
