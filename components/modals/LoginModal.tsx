@@ -465,7 +465,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                 </TouchableOpacity>
               </View>
 
-              <View className="">
+              <View className=" relative ">
                 <TextInput
                   value={email}
                   onChangeText={(text) => handleInputChange(text, "email")}
@@ -504,8 +504,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-[50%]"
-                    style={{ transform: [{ translateY: "-50%" }] }}
+                    className="absolute right-4 top-[17px]"
+                    // style={{ transform: [{ translateY: "-50%" }] }}
                   >
                     {showPassword ? (
                       <Feather name="eye-off" size={20} color="#666" />

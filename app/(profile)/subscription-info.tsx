@@ -28,19 +28,21 @@ const MonthCard = ({ month, amount, paid }: any) => (
       <BlurView
         intensity={Platform.OS === "ios" ? 20 : 70}
         tint="dark"
-        className="absolute inset-0"
-      />
-      <View
-        className={`absolute inset-0 ${
-          paid ? "bg-[#000000]/60" : "bg-[#2E2E2E]"
-        }`}
-      />
-      <View className="p-4 items-center justify-center">
-        <Text className="text-brandWhite font-bold text-[16px]">{month}</Text>
-        <Text className="text-white/50 text-[12px] font-sfpro-regular">
-          {amount}
-        </Text>
-      </View>
+        className=" p-4 w-full  relative"
+      >
+        <View
+          style={{ height: "200%", width: "200%", right: 0, bottom: 0 }}
+          className={`absolute  inset-0 ${
+            paid ? "bg-[#000000]/70" : "bg-[#2E2E2E]"
+          }`}
+        />
+        <View className=" items-center justify-center">
+          <Text className="text-brandWhite font-bold text-[16px]">{month}</Text>
+          <Text className="text-white/50 text-[12px] font-sfpro-regular">
+            {amount}
+          </Text>
+        </View>
+      </BlurView>
     </ImageBackground>
   </View>
 );

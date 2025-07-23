@@ -6,7 +6,6 @@ import { authAPI } from "@/lib/api/auth";
 import { showError, showSuccess } from "@/lib/toast";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { CheckCircle, XCircle } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -33,9 +32,19 @@ const ValidationItem = ({
 }) => (
   <View className="flex-row items-center mb-2">
     {passed ? (
-      <CheckCircle size={18} color="green" className="mr-2" />
+      <Feather
+        name="check-circle"
+        size={18}
+        color="green"
+        style={{ marginRight: 6 }}
+      />
     ) : (
-      <XCircle size={18} color="red" className="mr-2" />
+      <Feather
+        name="x-circle"
+        size={18}
+        color="red"
+        style={{ marginRight: 6 }}
+      />
     )}
     <Text className="text-white text-[20px] font-sfpro-regular capitalize text-sm ml-1">
       {label}

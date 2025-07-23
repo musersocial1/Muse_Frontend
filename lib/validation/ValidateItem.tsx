@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle } from "lucide-react-native";
+import { Feather } from "@expo/vector-icons";
 import { Text, View } from "react-native";
 
 export const ValidationItem = ({
@@ -10,9 +10,19 @@ export const ValidationItem = ({
 }) => (
   <View className="flex-row mt-2 items-center ">
     {passed ? (
-      <CheckCircle size={18} color="green" className="mr-2" />
+      <Feather
+        name="check-circle"
+        size={18}
+        color="green"
+        style={{ marginRight: 8 }}
+      />
     ) : (
-      <XCircle size={18} color="red" className="mr-2" />
+      <Feather
+        name="x-circle"
+        size={18}
+        color="red"
+        style={{ marginRight: 8 }}
+      />
     )}
     <Text className="text-black/50 text-[20px] font-sfpro-regular capitalize text-sm ml-2">
       {label}

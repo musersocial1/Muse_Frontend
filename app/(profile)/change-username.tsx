@@ -4,6 +4,7 @@ import { useAuthState } from "@/hooks/useAuthState";
 import { useProfileActions } from "@/hooks/useProfile";
 import { authAPI } from "@/lib/api/auth";
 import { showError, showInfo, showSuccess } from "@/lib/toast";
+import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -21,7 +22,6 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
-import Svg, { Circle } from "react-native-svg";
 
 const ChangeUsername = () => {
   const [newUsername, setNewUsername] = useState("");
@@ -283,35 +283,19 @@ const ChangeUsername = () => {
                 >
                   {usernameChangeCount}/{maxChanges}
                 </Text>
-                <View style={{ width: 28, height: 28 }}>
-                  <Svg height={28} width={28}>
-                    <Circle
-                      stroke="#333"
-                      fill="none"
-                      cx={14}
-                      cy={14}
-                      r={12}
-                      strokeWidth={4}
-                    />
-                    <Circle
-                      stroke={remaining > 0 ? "#22C55E" : "#EF4444"}
-                      fill="none"
-                      cx={14}
-                      cy={14}
-                      r={12}
-                      strokeWidth={4}
-                      strokeDasharray={2 * Math.PI * 12}
-                      strokeDashoffset={
-                        2 *
-                        Math.PI *
-                        12 *
-                        (1 - usernameChangeCount / maxChanges)
-                      }
-                      strokeLinecap="round"
-                      rotation={-90}
-                      origin="14,14"
-                    />
-                  </Svg>
+                <View
+                  style={{
+                    width: 28,
+                    height: 28,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Feather
+                    name={remaining > 0 ? "check-circle" : "x-circle"}
+                    size={26}
+                    color={remaining > 0 ? "#22C55E" : "#EF4444"}
+                  />
                 </View>
               </View>
             </View>

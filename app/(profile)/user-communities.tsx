@@ -1,7 +1,7 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import { ChevronRight } from "lucide-react-native";
 import React from "react";
 import {
   Image,
@@ -39,7 +39,7 @@ const AnimatedCommunityItem = ({
       style={{ fontFamily: "SFProDisplay-Bold" }}
       href={RouterConstantUtil.profile.subscriptioninfo as any}
     >
-      <View className="flex-row items-center p-3  bg-[#1C1C1C] rounded-full">
+      <View className="flex-row items-center p-3 bg-[#1C1C1C] rounded-full w-full">
         <View className="w-12 h-12 rounded-full  items-center justify-center mr-4 overflow-hidden">
           <Image
             source={icons.dp}
@@ -58,7 +58,13 @@ const AnimatedCommunityItem = ({
           >
             {members}
           </Text>
-          <ChevronRight color={"gray"} opacity={30} size={20} />
+          {/* <ChevronRight color={"gray"} opacity={30} size={20} /> */}
+          <Feather
+            name="chevron-right"
+            size={20}
+            color="gray"
+            style={{ opacity: 0.3 }}
+          />
         </View>
       </View>
     </Link>
@@ -85,7 +91,7 @@ const UserCommunities = () => {
           <View className="w-10" />
         </View>
 
-        <View className="flex-row items-center justify-between px-3">
+        <View className="flex-row items-center justify-between mt-5 px-3">
           <Text
             style={{ fontFamily: "SFProDisplay-Medium" }}
             className="text-white text-lg px-6"
