@@ -114,7 +114,7 @@ const ResetPassword = () => {
     setOtpLoading(true);
 
     try {
-      const response = await authAPI.confirmPasswordChange(otp);
+      const response = await authAPI.confirmPasswordChange(otp, newPassword);
 
       console.log("Password change confirm response:", response);
 
@@ -136,7 +136,7 @@ const ResetPassword = () => {
         );
       }
     } catch (error: any) {
-      console.error("Password change confirm error:", error);
+      // console.error("Password change confirm error:", error);
 
       let errorMessage = "Failed to verify code";
 
@@ -198,9 +198,9 @@ const ResetPassword = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? -20 : -36}
     >
-      <View style={{ paddingTop: insets.top }} className="flex-1 bg-[#121212]">
+      <SafeAreaView className="flex-1 bg-[#121212]">
         <StatusBar barStyle="light-content" />
-        <SafeAreaView className="flex-1">
+        <View className="flex-1">
           {/* Header */}
           <View className="flex-row items-center justify-between px-6 pb-4">
             <TouchableOpacity
@@ -222,7 +222,7 @@ const ResetPassword = () => {
           <View className="flex-1 px-6 pt-8">
             <View className="bg-[#1C1C1C] rounded-full h-[60px] px-[5%] mb-4 flex-row items-center">
               <TextInput
-                className="text-white font-bold flex-1 text-[15px] font-sfpro-bold"
+                className="text-white  h-full leading-[15px] font-bold flex-1 text-[15px] font-sfpro-bold"
                 value={oldPassword}
                 onChangeText={setOldPassword}
                 placeholder="Old password"
@@ -245,7 +245,7 @@ const ResetPassword = () => {
 
             <View className="bg-[#1C1C1C] rounded-full h-[60px] px-[5%] mb-4 flex-row items-center">
               <TextInput
-                className="text-white flex-1 font-bold text-[15px] font-sfpro-bold"
+                className="text-white  h-full leading-[15px] flex-1 font-bold text-[15px] font-sfpro-bold"
                 value={newPassword}
                 onChangeText={setNewPassword}
                 placeholder="New Password"
@@ -306,7 +306,7 @@ const ResetPassword = () => {
               )}
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
+        </View>
 
         <OTPModal
           visible={showOTP}
@@ -318,7 +318,7 @@ const ResetPassword = () => {
           email={user?.email || "your email"}
           // isLoading={otpLoading}
         />
-      </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
