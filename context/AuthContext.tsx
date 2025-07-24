@@ -59,11 +59,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error("Not authenticated");
       }
       const response = await authAPI.getUserProfile();
-
+      console.log(response);
       const profile = response.user || response;
       return profile;
     },
-    enabled: authState.isAuthenticated,
+    enabled: !!authState.isAuthenticated && !!authState.token,
     retry: (failureCount, error: any) => {
       console.log(`⚠️ Profile fetch retry ${failureCount}:`, error?.message);
       // Don't retry on auth errors

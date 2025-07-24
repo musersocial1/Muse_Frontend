@@ -110,25 +110,25 @@ export const useRequestEmailChange = () => {
   });
 };
 
-export const useConfirmEmailChange = () => {
-  const queryClient = useQueryClient();
-  const { refreshUser } = useAuth();
+// export const useConfirmEmailChange = () => {
+//   const queryClient = useQueryClient();
+//   const { refreshUser } = useAuth();
 
-  return useMutation({
-    mutationFn: (code: string) => authAPI.confirmEmailChange(code),
-    onSuccess: async (data) => {
-      console.log("Email change confirmed:", data.message);
-      await refreshUser();
-      queryClient.invalidateQueries({ queryKey: authKeys.profile() });
-    },
-    onError: (error: any) => {
-      console.error(
-        "Confirm email change error:",
-        error.response?.data?.message
-      );
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: (code: string) => authAPI.confirmEmailChange({code}),
+//     onSuccess: async (data) => {
+//       console.log("Email change confirmed:", data.message);
+//       await refreshUser();
+//       queryClient.invalidateQueries({ queryKey: authKeys.profile() });
+//     },
+//     onError: (error: any) => {
+//       console.error(
+//         "Confirm email change error:",
+//         error.response?.data?.message
+//       );
+//     },
+//   });
+// };
 
 export const useRequestPasswordChange = () => {
   return useMutation({
@@ -146,24 +146,24 @@ export const useRequestPasswordChange = () => {
   });
 };
 
-export const useConfirmPasswordChange = () => {
-  const { logout } = useAuth();
+// export const useConfirmPasswordChange = () => {
+//   const { logout } = useAuth();
 
-  return useMutation({
-    mutationFn: (code: string) => authAPI.confirmPasswordChange(code),
-    onSuccess: async (data) => {
-      console.log("Password changed successfully:", data.message);
-      // Log user out after password change for security IIT init
-      await logout();
-    },
-    onError: (error: any) => {
-      console.error(
-        "Confirm password change error:",
-        error.response?.data?.message
-      );
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: (code: string) => authAPI.confirmPasswordChange(code),
+//     onSuccess: async (data) => {
+//       console.log("Password changed successfully:", data.message);
+//       // Log user out after password change for security IIT init
+//       await logout();
+//     },
+//     onError: (error: any) => {
+//       console.error(
+//         "Confirm password change error:",
+//         error.response?.data?.message
+//       );
+//     },
+//   });
+// };
 
 export const useChangeUsername = () => {
   const queryClient = useQueryClient();

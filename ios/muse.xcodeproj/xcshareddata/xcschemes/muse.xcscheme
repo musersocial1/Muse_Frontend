@@ -60,6 +60,98 @@
             ReferencedContainer = "container:muse.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_APP_NAME"
+            value = "MUSE"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_APP_VERSION"
+            value = "1.0.0"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_APP_ENV"
+            value = "development"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_APP_SCHEME"
+            value = "muse"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_BUNDLE_ID"
+            value = "com.moseleydev.muse"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_USER_API_URL"
+            value = "https://muse-backend-user.onrender.com"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_POST_API_URL"
+            value = "https://muse-backend-post.onrender.com"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_API_VERSION"
+            value = "v1"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_API_TIMEOUT"
+            value = "15000"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_MAX_RETRY_ATTEMPTS"
+            value = "5"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_EMAIL_LINK"
+            value = "https://muse-nine-theta.vercel.app"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_STORAGE_PREFIX"
+            value = "muse_"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_ENABLE_ANALYTICS"
+            value = "true"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_ENABLE_CRASH_REPORTING"
+            value = "false"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_ENABLE_DEBUG_MODE"
+            value = "true"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_IS_DEV"
+            value = "true"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_IS_PROD"
+            value = "false"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+         <EnvironmentVariable
+            key = "EXPO_PUBLIC_IS_STAGING"
+            value = "false"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

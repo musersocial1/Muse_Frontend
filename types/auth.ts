@@ -89,3 +89,7 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
 }
+export interface EmailChangeRequest {
+  newEmail: string;
+  code: string;
+}
