@@ -55,7 +55,8 @@ export const authAPI = {
 
   sendOtpEmail: async (data: SendOtpRequest): Promise<{ message: string }> => {
     // Get the API endpoint from env
-    const url = `${extra?.EXPO_PUBLIC_APP_ENV.EXPO_PUBLIC_EMAIL_LINK}/api/otps`;
+    const url = `${extra?.EXPO_PUBLIC_EMAIL_LINK}/api/otps`;
+    console.log(url);
     if (!url) throw new Error("Email OTP API link is not set in env vars");
     console.log(url, "this is url");
     const response = await fetch(url, {
