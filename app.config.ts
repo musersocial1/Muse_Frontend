@@ -1,4 +1,3 @@
-// app.config.ts
 import "dotenv/config";
 import { ConfigContext, ExpoConfig } from "expo/config";
 
@@ -16,7 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     bundleIdentifier: "com.moseleydev.muse",
   },
   android: {
-    package: "com.moseley.muse", // This is the Play Store package name
+    package: "com.moseley.muse",
     adaptiveIcon: {
       foregroundImage: "./assets/images/muse-logo.png",
       backgroundColor: "#ffffff",
@@ -79,7 +78,5 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     EXPO_PUBLIC_IS_STAGING: process.env.EXPO_PUBLIC_IS_STAGING === "true",
 
     EXPO_PUBLIC_EMAIL_LINK: process.env.EXPO_PUBLIC_EMAIL_LINK,
-    // You can expose env vars here if needed:
-    // API_URL: process.env.API_URL
   },
 });

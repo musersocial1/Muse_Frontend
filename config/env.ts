@@ -1,5 +1,7 @@
+import Constants from "expo-constants";
+
 /**
- * Simple environment configuration
+ * Simple environment configuration using Expo Constants
  */
 
 // Environment types
@@ -52,21 +54,55 @@ interface EnvConfig {
   readonly REQUEST_TIMEOUT: number;
 }
 
+/**
+ * Get environment variable from Expo Constants
+ * Falls back to process.env for development, then to fallback
+ */
 function getEnvVar(key: string, fallback: string = ""): string {
-  return process.env[key] || fallback;
+  return (
+    Constants.expoConfig?.extra?.[key] ||
+    Constants.expoConfig?.extra?.[key] ||
+    process.env[key] ||
+    fallback
+  );
 }
 
+/**
+ * Get boolean environment variable from Expo Constants
+ */
 function getBooleanEnvVar(key: string, fallback: boolean = false): boolean {
-  const value = process.env[key];
+  const value =
+    Constants.expoConfig?.extra?.[key] ||
+    Constants.expoConfig?.extra?.[key] ||
+    process.env[key];
+
   if (value === undefined) return fallback;
-  return value.toLowerCase() === "true";
+
+  // Handle both boolean and string values
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") return value.toLowerCase() === "true";
+
+  return fallback;
 }
 
+/**
+ * Get number environment variable from Expo Constants
+ */
 function getNumberEnvVar(key: string, fallback: number): number {
-  const value = process.env[key];
+  const value =
+    Constants.expoConfig?.extra?.[key] ||
+    Constants.expoConfig?.extra?.[key] ||
+    process.env[key];
+
   if (value === undefined) return fallback;
-  const parsed = parseInt(value, 10);
-  return isNaN(parsed) ? fallback : parsed;
+
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? fallback : parsed;
+  }
+
+  return fallback;
 }
 
 const APP_ENV = getEnvVar(
@@ -77,44 +113,53 @@ const IS_DEV = APP_ENV === "development";
 const IS_STAGING = APP_ENV === "staging";
 const IS_PROD = APP_ENV === "production";
 
+/**
+ * Create services configuration using Expo Constants
+ */
 const createServicesConfig = (): ServicesConfig => {
   const defaultTimeout = getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 20000);
 
   return {
     user: {
-      baseURL: process.env.EXPO_PUBLIC_USER_API_URL || "",
+      baseURL: getEnvVar("EXPO_PUBLIC_USER_API_URL", ""),
       timeout: defaultTimeout,
     },
     posts: {
-      baseURL: process.env.EXPO_PUBLIC_POST_API_URL || "",
+      baseURL: getEnvVar("EXPO_PUBLIC_POST_API_URL", ""),
       timeout: defaultTimeout,
     },
   };
 };
 
+/**
+ * Main environment configuration object
+ * All values are now sourced from Expo Constants
+ */
 export const env: EnvConfig = {
   // App Info
-  APP_NAME: process.env.EXPO_PUBLIC_APP_NAME || "MUSE",
-  APP_VERSION: process.env.EXPO_PUBLIC_APP_VERSION || "1.0.0",
+  APP_NAME: getEnvVar("EXPO_PUBLIC_APP_NAME", "MUSE"),
+  APP_VERSION: getEnvVar("EXPO_PUBLIC_APP_VERSION", "1.0.0"),
   APP_ENV,
-  APP_SCHEME: process.env.EXPO_PUBLIC_APP_SCHEME || "muse",
-  BUNDLE_ID: process.env.EXPO_PUBLIC_BUNDLE_ID || "com.moseleydev.muse",
+  APP_SCHEME: getEnvVar("EXPO_PUBLIC_APP_SCHEME", "muse"),
+  BUNDLE_ID: getEnvVar("EXPO_PUBLIC_BUNDLE_ID", "com.moseleydev.muse"),
 
   // API Configuration
-  API_VERSION: process.env.EXPO_PUBLIC_API_VERSION || "v1",
+  API_VERSION: getEnvVar("EXPO_PUBLIC_API_VERSION", "v1"),
   API_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 20000),
 
   // Services Configuration
   SERVICES: createServicesConfig(),
 
   // Authentication
-  AUTH_TOKEN_KEY: process.env.EXPO_PUBLIC_AUTH_TOKEN_KEY || "auth_token",
-  REFRESH_TOKEN_KEY:
-    process.env.EXPO_PUBLIC_REFRESH_TOKEN_KEY || "refresh_token",
-  AUTH_REDIRECT_URL: process.env.EXPO_PUBLIC_AUTH_REDIRECT_URL || "muse://auth",
+  AUTH_TOKEN_KEY: getEnvVar("EXPO_PUBLIC_AUTH_TOKEN_KEY", "auth_token"),
+  REFRESH_TOKEN_KEY: getEnvVar(
+    "EXPO_PUBLIC_REFRESH_TOKEN_KEY",
+    "refresh_token"
+  ),
+  AUTH_REDIRECT_URL: getEnvVar("EXPO_PUBLIC_AUTH_REDIRECT_URL", "muse://auth"),
 
   // Storage
-  STORAGE_PREFIX: process.env.EXPO_PUBLIC_STORAGE_PREFIX || "muse_",
+  STORAGE_PREFIX: getEnvVar("EXPO_PUBLIC_STORAGE_PREFIX", "muse_"),
 
   // Feature Flags
   ENABLE_CRASH_REPORTING: getBooleanEnvVar(
@@ -123,7 +168,7 @@ export const env: EnvConfig = {
   ),
   ENABLE_DEBUG_MODE: getBooleanEnvVar("EXPO_PUBLIC_ENABLE_DEBUG_MODE", true),
 
-  // Development
+  // Development flags
   IS_DEV: getBooleanEnvVar("EXPO_PUBLIC_IS_DEV", IS_DEV),
   IS_STAGING: getBooleanEnvVar("EXPO_PUBLIC_IS_STAGING", IS_STAGING),
   IS_PROD: getBooleanEnvVar("EXPO_PUBLIC_IS_PROD", IS_PROD),
@@ -133,8 +178,18 @@ export const env: EnvConfig = {
   REQUEST_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_REQUEST_TIMEOUT", 10000),
 } as const;
 
-// Export services config for easy access
+// Export services config
 export const SERVICES_CONFIG = env.SERVICES;
 
 // Type exports
 export type { AppEnvironment, EnvConfig, ServiceConfig, ServicesConfig };
+
+// Debug helper - not included in production
+if (__DEV__) {
+  console.log("Environment Configuration Loaded:", {
+    APP_ENV: env.APP_ENV,
+    IS_PROD: env.IS_PROD,
+    USER_API_URL: env.SERVICES.user.baseURL,
+    AVAILABLE_CONSTANTS: Object.keys(Constants.expoConfig?.extra || {}),
+  });
+}

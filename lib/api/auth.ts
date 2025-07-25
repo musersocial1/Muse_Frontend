@@ -1,5 +1,6 @@
 import { showError } from "@/lib/toast";
 import {
+  ApiResponse,
   AuthResponse,
   LoginRequest,
   NormalResponse,
@@ -11,7 +12,10 @@ import {
   User,
   UsernameChangeRequest,
 } from "@/types/auth";
+import Constants from "expo-constants";
 import { userApiClient } from "./apiClient";
+
+const { extra } = Constants.expoConfig || {};
 
 export const authAPI = {
   // Authentication endpoints
@@ -21,24 +25,20 @@ export const authAPI = {
       data
     );
 
-    // If login is successful and response has code & email, trigger OTP email
     if (response.data?.code && response.data?.email) {
       console.log(response.data.code);
 
       try {
-        // Optionally pass userName if available from response or input data
         await authAPI.sendOtpEmail({
           email: response.data.email,
           otp: response.data.code,
         });
-        // console.log("OTP email sent!");
       } catch (error: any) {
         showError(
           "Error",
           `${error.message} || "Failed to send verification code"`
         );
         console.error("Failed to send OTP email:", error.message);
-        // Optionally show user a toast or UI feedback
       }
     }
     return response.data;
@@ -55,7 +55,7 @@ export const authAPI = {
 
   sendOtpEmail: async (data: SendOtpRequest): Promise<{ message: string }> => {
     // Get the API endpoint from env
-    const url = `${process.env.EXPO_PUBLIC_EMAIL_LINK}/api/otps`;
+    const url = `${extra?.EXPO_PUBLIC_APP_ENV.EXPO_PUBLIC_EMAIL_LINK}/api/otps`;
     if (!url) throw new Error("Email OTP API link is not set in env vars");
     console.log(url, "this is url");
     const response = await fetch(url, {
@@ -75,8 +75,8 @@ export const authAPI = {
   // Phone verification endpoints
   sendPhoneVerificationCode: async (
     data: SendPhoneVerificationRequest
-  ): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  ): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/send-code",
       data
     );
@@ -85,8 +85,8 @@ export const authAPI = {
 
   resendPhoneVerificationCode: async (
     data: SendPhoneVerificationRequest
-  ): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  ): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/resend-code",
       data
     );
@@ -95,8 +95,8 @@ export const authAPI = {
 
   verifyPhoneVerificationCode: async (
     data: PhoneVerificationRequest
-  ): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  ): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/verify-code",
       data
     );
@@ -117,8 +117,8 @@ export const authAPI = {
 
   resendEmailVerificationCode: async (data: {
     email: string;
-  }): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  }): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/resend",
       data
     );
@@ -133,13 +133,8 @@ export const authAPI = {
   },
 
   // Account management endpoints
-  requestEmailChange: async (data: {
-    newEmail: string;
-  }): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
-      "/user/change-email",
-      data
-    );
+  requestEmailChange: async (data: { newEmail: string }): Promise<any> => {
+    const response = await userApiClient.post<any>("/user/change-email", data);
 
     // console.log(response);
     return response.data;
@@ -148,8 +143,8 @@ export const authAPI = {
   confirmEmailChange: async (data: {
     newEmail: string;
     code: string;
-  }): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  }): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/confirm-email",
       data
     );
@@ -164,24 +159,20 @@ export const authAPI = {
       "/user/change-password",
       data
     );
-    // If login is successful and response has code & email, trigger OTP email
     if (response.data?.code && response.data?.email) {
       console.log(response.data.code);
 
       try {
-        // Optionally pass userName if available from response or input data
         await authAPI.sendOtpEmail({
           email: response.data.email,
           otp: response.data.code,
         });
-        // console.log("OTP email sent!");
       } catch (error: any) {
         showError(
           "Error",
           `${error.message} || "Failed to send verification code"`
         );
         console.error("Failed to send OTP email:", error.message);
-        // Optionally show user a toast or UI feedback
       }
     }
     return response.data;
@@ -190,29 +181,22 @@ export const authAPI = {
   confirmPasswordChange: async (
     code: string,
     newPassword: string
-  ): Promise<NormalResponse> => {
-    const response = await userApiClient.post<NormalResponse>(
+  ): Promise<ApiResponse> => {
+    const response = await userApiClient.post<ApiResponse>(
       "/user/confirm-password",
       { code, newPassword }
     );
     return response.data;
   },
 
-  changeUsername: async (
-    data: UsernameChangeRequest
-  ): Promise<NormalResponse> => {
-    const response = await userApiClient.patch<NormalResponse>(
+  changeUsername: async (data: UsernameChangeRequest): Promise<ApiResponse> => {
+    const response = await userApiClient.patch<ApiResponse>(
       "/user/username",
       data
     );
     return response.data;
   },
 
-  /**
-   * Check if a phone number already exists (for onboarding)
-   * @param phoneNumber string (should include country code, e.g. +2347012345678)
-   * @returns { exists: boolean, ...data }
-   */
   checkPhoneNumberExists: async (
     phoneNumber: string
   ): Promise<{ exists: boolean; [key: string]: any }> => {
