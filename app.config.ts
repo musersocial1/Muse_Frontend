@@ -10,12 +10,15 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "muse",
   userInterfaceStyle: "dark",
   newArchEnabled: true,
+
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.moseleydev.muse",
+    buildNumber: "11",
   },
   android: {
     package: "com.moseley.muse",
+    versionCode: 11,
     adaptiveIcon: {
       foregroundImage: "./assets/images/muse-logo.png",
       backgroundColor: "#ffffff",
