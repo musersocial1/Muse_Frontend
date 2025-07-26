@@ -378,11 +378,7 @@ export default function Index() {
         onComplete={handleComplete}
         direction={direction} // new
       />
-      {/* <MoreInfoModal
-        visible={moreInfoVisible}
-        onClose={handleMoreInfoClose}
-        onComplete={handleMoreInfoComplete}
-      /> */}
+
       {isMoreInfoMounted && (
         <Animated.View
           style={{

@@ -54,12 +54,33 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const [nextStep, setNextStep] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState(1); // 1: right, -1: left
+  const [resetResendTimer, setResetResendTimer] = useState(60);
+  const [canResendResetCode, setCanResendResetCode] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] =
+    useState(false);
 
   const enterAnim = useRef(new Animated.Value(width)).current;
   const exitAnim = useRef(new Animated.Value(0)).current;
 
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const forgotEmailRef = useRef<TextInput>(null);
+  const resetPasswordRef = useRef<TextInput>(null); // Only if you want for step 4
+
   const otpRefs = useRef<TextInput[]>([]);
-  const stepTitles = ["Enter details", "Enter verification code"];
+  const stepTitles = [
+    "Enter details", // 0
+    "Enter verification code", // 1
+    "Forgot password", // 2
+    "Reset password", // 3
+  ];
+
+  const [resetOtpValues, setResetOtpValues] = useState(Array(6).fill(""));
+  const [resetPassword, setResetPassword] = useState("");
+  const [resetConfirmPassword, setResetConfirmPassword] = useState("");
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const resetOtpRefs = useRef<TextInput[]>([]);
 
   // When you setCurrentStep(nextStep), run this:
   React.useEffect(() => {
@@ -90,6 +111,37 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       });
     }
   }, [currentStep]);
+  React.useEffect(() => {
+    let interval: any;
+    if (resetResendTimer > 0) {
+      setCanResendResetCode(false);
+      interval = setInterval(() => {
+        setResetResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResendResetCode(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resetResendTimer]);
+
+  const handleResendResetCode = async () => {
+    if (!canResendResetCode || isLoading) return;
+    setIsLoading(true);
+    setInputError("");
+    try {
+      await authAPI.forgotPassword(forgotPasswordEmail); // Call API to resend
+      setResetResendTimer(60); // Reset timer
+      setCanResendResetCode(false);
+      // Optionally show toast: showSuccess("Code resent!");
+    } catch (err: any) {
+      setInputError(err?.toString() || "Failed to resend code.");
+    }
+    setIsLoading(false);
+  };
 
   // Reset all states when modal closes
   const resetStates = () => {
@@ -103,6 +155,71 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     setIsLoading(false);
     setCanResendCode(false);
     setResendTimer(0);
+  };
+
+  // Step 2: Request OTP for forgot password
+  const handleForgotPassword = async () => {
+    setIsLoading(true);
+    setInputError("");
+    console.log("working");
+    try {
+      await authAPI.forgotPassword(forgotPasswordEmail);
+      // If success, move to next step, show toast, etc.
+      setDirection(1);
+      setCurrentStep(3);
+      setEmail(forgotPasswordEmail);
+    } catch (err: any) {
+      // Here you can set your error state!
+      setInputError(err?.toString() || "Couldn't send reset email.");
+    }
+    setIsLoading(false);
+  };
+
+  // Step 3: Reset password with OTP + new passwords
+  const handleResetPassword = async () => {
+    setIsLoading(true);
+    setInputError("");
+    if (resetPassword !== resetConfirmPassword) {
+      setInputError("Passwords do not match.");
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const otpString = resetOtpValues.join("");
+      await authAPI.resetPassword(
+        otpString,
+        resetPassword,
+        resetConfirmPassword
+      );
+
+      // If successful:
+      setInputError("");
+      setDirection(1);
+      setCurrentStep(0); // Go to login
+      setPassword("");
+      setResetPassword("");
+      setEmail("");
+      setForgotPasswordEmail("");
+
+      setResetConfirmPassword("");
+      setResetOtpValues(Array(6).fill(""));
+    } catch (e: any) {
+      const errMsg = e?.toString() || "Couldn't reset password.";
+
+      if (
+        errMsg.includes("Invalid or expired reset token") ||
+        errMsg.includes("Invalid or expired code") // in case your backend changes msg slightly
+      ) {
+        // Go back to OTP step (step 3), direction 1 (forward)
+        setDirection(1);
+        setCurrentStep(3);
+        setInputError("Invalid or expired reset code. Please try again.");
+        setResetOtpValues(Array(6).fill(""));
+      } else {
+        setInputError(errMsg);
+      }
+    }
+    setIsLoading(false);
   };
 
   // Animation effects
@@ -140,15 +257,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   // Auto-focus inputs when step changes
   React.useEffect(() => {
     if (!visible) return;
-
-    if (currentStep === 0) {
-      setTimeout(() => {
-        // Focus first input in step 0
-      }, 200);
-    }
-    if (currentStep === 1 && otpRefs.current[0]) {
-      setTimeout(() => otpRefs.current[0]?.focus(), 200);
-    }
+    const timer = setTimeout(() => {
+      if (currentStep === 0) {
+        emailRef.current?.focus();
+      } else if (currentStep === 1) {
+        otpRefs.current[0]?.focus();
+      } else if (currentStep === 2) {
+        forgotEmailRef.current?.focus();
+      } else if (currentStep === 3) {
+        resetOtpRefs.current[0]?.focus();
+      } else if (currentStep === 4) {
+        resetPasswordRef.current?.focus();
+      }
+    }, 700);
+    return () => clearTimeout(timer);
   }, [visible, currentStep]);
 
   // Resend timer effect
@@ -175,6 +297,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     if (!emailRegex.test(email)) return "Please enter a valid email";
     return "";
   };
+  const forgotEmailValidation = validateEmail(forgotPasswordEmail);
+  const canSendReset =
+    !!forgotPasswordEmail && forgotEmailValidation === "" && !isLoading;
 
   const validatePassword = (password: string) => {
     const hasMinLength = password.length >= 8;
@@ -210,6 +335,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       error, // empty string if all valid
     };
   };
+
+  const resetPasswordValidation = validatePassword(resetPassword);
+  const passwordsMatch =
+    !!resetPassword &&
+    !!resetConfirmPassword &&
+    resetPassword === resetConfirmPassword;
 
   const validateOTP = (): string => {
     const otpString = otpValues.join("");
@@ -302,39 +433,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   };
 
   // Handler functions
+  // For login/verify OTP
   const handleOTPChange = (text: string, index: number) => {
     const cleaned = text.replace(/\D/g, "");
-
     if (cleaned.length > 1) {
+      // User pasted all digits at once!
       const chars = cleaned.slice(0, 6).split("");
-      const newOtpValues = Array(6).fill("");
-      chars.forEach((char, i) => {
-        newOtpValues[i] = char;
-      });
-      setOtpValues(newOtpValues);
-
-      if (chars.length === 6) {
-        setTimeout(() => otpRefs.current[5]?.blur(), 10);
-      } else {
-        setTimeout(() => otpRefs.current[chars.length]?.focus(), 10);
-      }
-
+      setOtpValues(chars);
+      setTimeout(() => {
+        if (chars.length < 6) {
+          otpRefs.current[chars.length]?.focus();
+        } else {
+          otpRefs.current[5]?.blur();
+        }
+      }, 10);
       if (inputError) setInputError("");
       return;
     }
-
+    // Normal flow...
     const newOtpValues = [...otpValues];
     newOtpValues[index] = cleaned[0] || "";
     setOtpValues(newOtpValues);
-
-    if (cleaned && index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-
-    if (index === 5 && cleaned) {
+    if (cleaned && index < 5) otpRefs.current[index + 1]?.focus();
+    if (index === 5 && cleaned)
       setTimeout(() => otpRefs.current[5]?.blur(), 10);
-    }
-
     if (inputError) setInputError("");
   };
 
@@ -366,29 +488,79 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       return;
     }
 
+    // Step 0: Login (forward to OTP)
     if (currentStep === 0) {
+      setDirection(1); // Animate forward
       const result = await handleLogin(email);
       if (result.success) {
-        console.log(result);
-        setDirection(1);
         setCurrentStep(1);
       }
       return;
     }
 
+    // Step 1: OTP Verification (login finish)
     if (currentStep === 1) {
+      // You probably want to remain on this page if verify fails.
       const otpString = otpValues.join("");
       await verifyCode(otpString);
       return;
     }
+
+    // Step 2: Forgot password email (go to reset password)
+    if (currentStep === 2) {
+      setDirection(1); // Animate forward
+      await handleForgotPassword();
+      // handleForgotPassword sets step to 3 internally
+      return;
+    }
+
+    // Step 3: Reset password
+    if (currentStep === 3) {
+      // Don't set direction, since you already set -1 on successful reset
+
+      setDirection(1);
+      await setCurrentStep(4);
+      return;
+    }
+    // Step 3: Reset password
+    if (currentStep === 4) {
+      // Don't set direction, since you already set -1 on successful reset
+      await handleResetPassword();
+      return;
+    }
+  };
+  const handleResetOTPChange = (text: string, index: number) => {
+    const cleaned = text.replace(/\D/g, "");
+    if (cleaned.length > 1) {
+      const chars = cleaned.slice(0, 6).split("");
+      setResetOtpValues(chars);
+      setTimeout(() => {
+        if (chars.length < 6) {
+          resetOtpRefs.current[chars.length]?.focus();
+        } else {
+          resetOtpRefs.current[5]?.blur();
+        }
+      }, 10);
+      if (inputError) setInputError("");
+      return;
+    }
+    const newResetValues = [...resetOtpValues];
+    newResetValues[index] = cleaned[0] || "";
+    setResetOtpValues(newResetValues);
+    if (cleaned && index < 5) resetOtpRefs.current[index + 1]?.focus();
+    if (index === 5 && cleaned)
+      setTimeout(() => resetOtpRefs.current[5]?.blur(), 10);
+    if (inputError) setInputError("");
   };
 
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setDirection(-1);
+  const handleBack = (toStep?: number) => {
+    setDirection(-1); // Left-to-right (backwards) animation
+    if (typeof toStep === "number") {
+      setCurrentStep(toStep);
+    } else if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
-      setInputError("");
     }
+    setInputError("");
   };
 
   const handleInputChange = (value: string, field: string) => {
@@ -414,6 +586,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
+  // Add this above your render (if not already there)
+  const isOtpComplete = resetOtpValues.every((d) => d && d.length === 1);
+  const canContinue = isOtpComplete && !isLoading;
+  const canReset =
+    isOtpComplete &&
+    resetPasswordValidation.hasUppercase &&
+    resetPasswordValidation.hasSpecialChar &&
+    resetPasswordValidation.hasMinLength &&
+    passwordsMatch &&
+    !isLoading;
 
   const isValidInput = !getCurrentValidation();
 
@@ -438,7 +620,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       isFocused: boolean,
       hasValue: boolean
     ) =>
-      `w-14 h-14 rounded-2xl text-center text-xl font-semibold border ${
+      `w-14 h-14 rounded-2xl leading-[20px] text-center text-xl font-semibold border ${
         hasError
           ? "bg-light-red border-border-red text-red-600"
           : isFocused
@@ -471,6 +653,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   onChangeText={(text) => handleInputChange(text, "email")}
                   onFocus={() => setFocusedField("email")}
                   onBlur={() => setFocusedField(null)}
+                  ref={emailRef}
                   placeholder="Email address"
                   placeholderTextColor="#9CA3AF"
                   className={baseInputStyle(
@@ -543,6 +726,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
               </Text> */}
 
               <TouchableOpacity
+                onPress={() => {
+                  setDirection(1); // 👈 Set direction to -1 for right-to-left animation
+                  setCurrentStep(2);
+                }}
+                className="w-full mb-3"
+                activeOpacity={0.8}
+              >
+                <Text className="text-center py-2 font-sfpro-bold text-black/50 font-semibold text-lg">
+                  Forgot password?
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 onPress={handleContinue}
                 disabled={!isValidInput || isLoading}
                 className={`rounded-full p-4 mb-3 ${
@@ -560,7 +756,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                         : "text-gray-400"
                     }`}
                   >
-                    Send Code
+                    Continue
                   </Text>
                 )}
               </TouchableOpacity>
@@ -574,7 +770,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={handleBack}
+                  onPress={() => handleBack()}
                   className="p-2 bg-gray-100 rounded-full"
                   disabled={isLoading}
                 >
@@ -596,7 +792,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   {otpValues.map((value, index) => (
                     <TextInput
                       key={index}
-                      ref={(ref) => (otpRefs.current[index] = ref!) as any}
+                      ref={(ref: any) => (otpRefs.current[index] = ref!)}
                       value={value}
                       onChangeText={(text) => handleOTPChange(text, index)}
                       onKeyPress={({ nativeEvent }) =>
@@ -659,6 +855,317 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                     }`}
                   >
                     Verify Code
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+
+      // Step 2: Forgot Password (input email)
+      case 2:
+        return (
+          <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
+            <View className="px-6">
+              <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={() => handleBack(0)}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
+                <Text className="text-xl font-semibold text-gray-900">
+                  Forgot password
+                </Text>
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+              <Text className="text-gray-700 text-base mb-4">
+                Enter your email to get a reset code.
+              </Text>
+              <TextInput
+                value={forgotPasswordEmail}
+                onChangeText={(text) => {
+                  setForgotPasswordEmail(text);
+                  setInputError(""); // clear error on input
+                }}
+                placeholder="Email address"
+                ref={forgotEmailRef}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onFocus={() => setFocusedField("forgotPasswordEmail")}
+                onBlur={() => setFocusedField(null)}
+                className={baseInputStyle(
+                  !!inputError && !forgotPasswordEmail.trim(),
+                  focusedField === "forgotPasswordEmail",
+                  !!forgotPasswordEmail.trim()
+                )}
+                returnKeyType="done" // This sets the keyboard button text to "Done"
+                onSubmitEditing={handleContinue}
+              />
+              <View className=" mt-2 w-full px-2">
+                <ValidationItem
+                  label="Must be a valid email"
+                  passed={forgotEmailValidation === ""}
+                />
+              </View>
+              {inputError ? (
+                <Text className="text-red-500 text-sm ">{inputError}</Text>
+              ) : null}
+              <TouchableOpacity
+                onPress={handleContinue}
+                disabled={!canSendReset}
+                className={`rounded-full p-4 mt-5 ${
+                  canSendReset ? "bg-secondary" : "bg-disabled"
+                }`}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="blue" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      canSendReset ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Send Code
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+
+      case 3:
+        return (
+          <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
+            <View className="px-6">
+              <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={() => handleBack(2)}
+                  className="p-2 bg-gray-100 rounded-full"
+                  disabled={isLoading}
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
+                <Text className="text-xl font-semibold text-gray-900">
+                  Reset password
+                </Text>
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+              <Text className="text-gray-700 text-base mb-4">
+                Enter the 6-digit code sent to your email, and your new
+                password.
+              </Text>
+              {/* OTP Input UI */}
+              <View className="mb-4">
+                <View className="flex-row justify-center space-x-3 gap-2 mb-4">
+                  {resetOtpValues.map((value, index) => (
+                    <TextInput
+                      key={index}
+                      value={value}
+                      ref={(ref: any) => (resetOtpRefs.current[index] = ref!)}
+                      onChangeText={(text) => handleResetOTPChange(text, index)}
+                      onKeyPress={({ nativeEvent }) => {
+                        if (
+                          nativeEvent.key === "Backspace" &&
+                          !resetOtpValues[index] &&
+                          index > 0
+                        ) {
+                          resetOtpRefs.current[index - 1]?.focus();
+                        }
+                      }}
+                      keyboardType="number-pad"
+                      className={otpInputStyle(!!inputError, false, !!value)}
+                      maxLength={1}
+                      selectTextOnFocus
+                      editable={!isLoading}
+                      placeholder="–"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  ))}
+                </View>
+              </View>
+              <View className="flex-row items-center justify-center mt-3 mb-3">
+                <Text className="text-black font-semibold text-sm mr-2">
+                  Resend code in
+                </Text>
+                <View className="bg-[#F7F7F7] rounded-full px-2 py-1">
+                  <Text className="text-black font-bold text-sm">
+                    {resetResendTimer > 0
+                      ? `0${Math.floor(resetResendTimer / 60)}:${String(
+                          resetResendTimer % 60
+                        ).padStart(2, "0")}`
+                      : "00:00"}
+                  </Text>
+                </View>
+                {canResendResetCode && (
+                  <TouchableOpacity
+                    onPress={handleResendResetCode}
+                    className="ml-4"
+                    disabled={isLoading}
+                  >
+                    <Text className="text-blue-600 font-bold">Resend</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {inputError ? (
+                <Text className="text-red-500 text-sm mt-3">{inputError}</Text>
+              ) : null}
+              <TouchableOpacity
+                onPress={handleContinue}
+                disabled={!canContinue}
+                className={`rounded-full p-4 mt-2 ${
+                  canContinue ? "bg-secondary" : "bg-disabled"
+                }`}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="blue" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      canContinue ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Continue
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+
+      // Step 3: Reset Password (OTP + New Passwords)
+      case 4:
+        return (
+          <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
+            <View className="px-6">
+              <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={() => handleBack(3)}
+                  className="p-2 bg-gray-100 rounded-full"
+                  disabled={isLoading}
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
+                <Text className="text-xl font-semibold text-gray-900">
+                  Reset password
+                </Text>
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+              <Text className="text-gray-700 text-base mb-4">
+                Enter the 6-digit code sent to your email, and your new
+                password.
+              </Text>
+              <View className=" gap-3">
+                <View className="relative">
+                  <TextInput
+                    value={resetPassword}
+                    onChangeText={setResetPassword}
+                    ref={resetPasswordRef}
+                    placeholder="New password"
+                    secureTextEntry={!showResetPassword}
+                    onFocus={() => setFocusedField("resetPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    className={baseInputStyle(
+                      !!inputError && !resetPassword.trim(),
+                      focusedField === "resetPassword",
+                      !!resetPassword.trim()
+                    )}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowResetPassword((prev) => !prev)}
+                    className="absolute right-4 top-4"
+                    style={{ padding: 4 }}
+                  >
+                    <Feather
+                      name={showResetPassword ? "eye-off" : "eye"}
+                      size={20}
+                      color="#666"
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <View className="relative">
+                  <TextInput
+                    value={resetConfirmPassword}
+                    onChangeText={setResetConfirmPassword}
+                    placeholder="Confirm new password"
+                    secureTextEntry={!showResetPassword}
+                    onFocus={() => setFocusedField("resetConfirmPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    className={baseInputStyle(
+                      !!inputError && !resetConfirmPassword.trim(),
+                      focusedField === "resetConfirmPassword",
+                      !!resetConfirmPassword.trim()
+                    )}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowResetPassword((prev) => !prev)}
+                    className="absolute right-4 top-4"
+                    style={{ padding: 4 }}
+                  >
+                    <Feather
+                      name={showResetPassword ? "eye-off" : "eye"}
+                      size={20}
+                      color="#666"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View className="mb-2 w-full p-2">
+                <ValidationItem
+                  label="At least 1 uppercase letter"
+                  passed={resetPasswordValidation.hasUppercase}
+                />
+                <ValidationItem
+                  label="At least 1 special character"
+                  passed={resetPasswordValidation.hasSpecialChar}
+                />
+                <ValidationItem
+                  label="Minimum 8 characters"
+                  passed={resetPasswordValidation.hasMinLength}
+                />
+                <ValidationItem
+                  label="Passwords must match"
+                  passed={passwordsMatch}
+                />
+              </View>
+
+              {inputError ? (
+                <Text className="text-red-500 text-sm ">{inputError}</Text>
+              ) : null}
+              <TouchableOpacity
+                onPress={handleContinue}
+                disabled={!canReset}
+                className={`rounded-full p-4 mt-2 ${
+                  canReset ? "bg-secondary" : "bg-disabled"
+                }`}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="blue" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      canReset ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Reset Password
                   </Text>
                 )}
               </TouchableOpacity>

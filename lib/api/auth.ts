@@ -244,4 +244,55 @@ export const authAPI = {
       throw error;
     }
   },
+
+  forgotPassword: async (email: string): Promise<ApiResponse> => {
+    try {
+      const response = await userApiClient.post<ApiResponse>(
+        "/user/forgot-password",
+        { email }
+      );
+      // If backend returns the code (not recommended in prod)
+      if (response.data?.token) {
+        try {
+          await authAPI.sendOtpEmail({
+            email: email,
+            otp: response.data.token,
+          });
+        } catch (error: any) {
+          showError(
+            "Error",
+            `${error.message || "Failed to send verification code"}`
+          );
+          console.error("Failed to send OTP email:", error.message);
+        }
+      }
+      return response.data;
+    } catch (error: any) {
+      console.log("Error in forgotPassword:", error.response?.data.error);
+      throw (
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to send reset code"
+      );
+    }
+  },
+  resetPassword: async (
+    token: string,
+    newPassword: string,
+    confirmPassword: string
+  ): Promise<ApiResponse> => {
+    try {
+      const response = await userApiClient.post<ApiResponse>(
+        "/user/reset-password",
+        { token, newPassword, confirmPassword }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw (
+        error?.response?.data?.error ||
+        error?.message ||
+        "Failed to reset password"
+      );
+    }
+  },
 };
