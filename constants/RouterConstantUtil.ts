@@ -19,6 +19,9 @@ export const RouterConstantUtil = {
     notifications: "/(profile)/notifications",
     tags: "/(profile)/tags",
   },
+  discover: {
+    podcats: "/(discover)/podcasts",
+  },
 
   auth: {
     login: "/(auth)",

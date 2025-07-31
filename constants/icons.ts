@@ -14,6 +14,7 @@ import notifications from "@/assets/icons/notification.png";
 import ring from "@/assets/icons/ring.png";
 import search from "@/assets/icons/search.png";
 import settings from "@/assets/icons/settings.png";
+import settings_2 from "@/assets/icons/settings_2.png";
 import tags from "@/assets/icons/tags.png";
 import terms from "@/assets/icons/terms.png";
 import user_icon from "@/assets/icons/user-icon.png";
@@ -42,4 +43,5 @@ export const icons = {
   tags,
   terms,
   communities,
+  settings_2,
 };
