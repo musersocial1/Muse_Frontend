@@ -7,8 +7,8 @@ import DoneCreating from "@/components/community/DoneCreating";
 import Guidelines from "@/components/community/GuildeLines";
 import PricingScreen from "@/components/community/Pricing";
 import { CommunityData } from "@/types/community";
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, StatusBar } from "react-native";
+import React, { useRef, useState } from "react";
+import { Animated, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
@@ -67,14 +67,6 @@ const CreateCommunity: React.FC = () => {
       });
     }
   };
-
-  useEffect(() => {
-    if ([1, 2, 7].includes(currentStep)) {
-      StatusBar.setBackgroundColor("#0368FF", true); // blue
-    } else {
-      StatusBar.setBackgroundColor("#FF6A00", true); // orange
-    }
-  }, [currentStep]);
 
   const handleSubmit = () => {
     console.log("Community Created:", communityData);
