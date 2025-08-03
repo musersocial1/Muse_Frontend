@@ -62,6 +62,12 @@ const SETTINGS_ITEMS = [
     type: "normal",
   },
   {
+    label: "Create community",
+    icon: icons.communities,
+    route: RouterConstantUtil.community.start,
+    type: "normal",
+  },
+  {
     label: "Log out",
     icon: null,
     route: "/",

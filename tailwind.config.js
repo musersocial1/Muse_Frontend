@@ -28,7 +28,7 @@ module.exports = {
         disabled: "#F2F2F2",
       },
       fontFamily: {
-        sans: ["NeutralSans-Regular"],
+        sans: ["SFProDisplay-Regular"],
 
         "neutral-regular": ["NeutralSans-Regular"],
         "neutral-bold": ["NeutralSans-Bold"],
