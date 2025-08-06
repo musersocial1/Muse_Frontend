@@ -18,6 +18,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import CountryPicker from "react-native-country-picker-modal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -103,6 +104,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   const enterAnim = useRef(new Animated.Value(width)).current; // incoming card
   const exitAnim = useRef(new Animated.Value(0)).current; // outgoing card
+  const [countryCode, setCountryCode] = useState<any>("NG"); // default to Nigeria
+  const [callingCode, setCallingCode] = useState("234");
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   React.useEffect(() => {
     if (displayedStep !== currentStep) {
@@ -745,7 +749,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <View className="">
+              {/* <View className="">
                 <TextInput
                   value={phoneNumber}
                   ref={phoneInputRef}
@@ -770,7 +774,78 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     {inputError}
                   </Text>
                 ) : null}
+              </View> */}
+              <View className="flex-row mb-2 items-center rounded-[17px] overflow-hidden  ">
+                {/* Country Picker Button */}
+                <TouchableOpacity
+                  className="flex-row  items-center h-full pr-2 bg-white rounded-[8px] "
+                  onPress={() => setShowCountryPicker(true)}
+                  activeOpacity={0.9}
+                >
+                  <CountryPicker
+                    countryCode={countryCode}
+                    withFlag
+                    withCallingCode
+                    withFilter
+                    withEmoji
+                    visible={showCountryPicker}
+                    onClose={() => setShowCountryPicker(false)}
+                    onSelect={(country) => {
+                      setCountryCode(country.cca2);
+                      setCallingCode(country.callingCode[0]);
+                    }}
+                    containerButtonStyle={{
+                      padding: 0,
+                      margin: 0,
+                      minHeight: 0,
+                      minWidth: 0,
+                    }}
+                    modalProps={{
+                      animationType: "slide",
+                      presentationStyle: "overFullScreen", // iOS
+                      transparent: true,
+                    }}
+                    theme={{
+                      fontFamily: "System",
+                      backgroundColor: "#ffffff",
+                      onBackgroundTextColor: "#333333",
+                      filterPlaceholderTextColor: "#aaa",
+                      activeOpacity: 0.7,
+                      itemHeight: 48,
+                    }}
+                  />
+                  <Text className=" text-base text-black">+{callingCode}</Text>
+                </TouchableOpacity>
+
+                {/* Phone number input (only local part, no +234) */}
+                <TextInput
+                  value={phoneNumber.replace(`+${callingCode}`, "")} // Remove any accidental country code
+                  ref={phoneInputRef}
+                  onChangeText={(text) => {
+                    // Always store as full international phone number!
+                    setPhoneNumber(`+${callingCode}${text.replace(/\D/g, "")}`);
+                  }}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
+                  placeholder="Enter Phone number"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="phone-pad"
+                  returnKeyType="done"
+                  style={{ flex: 1, height: 64 }}
+                  className={baseInputStyle(
+                    !!inputError,
+                    isInputFocused,
+                    isValidInput && !isLoading
+                  )}
+                  maxLength={15}
+                  editable={!isLoading}
+                />
               </View>
+              {inputError ? (
+                <Text className="text-red-500 text-sm mt-2 px-2">
+                  {inputError}
+                </Text>
+              ) : null}
 
               <Text className="text-gray-500 text-md text-center mb-8 leading-5 mt-5">
                 Enter your number so we can send a{"\n"}confirmation code to
