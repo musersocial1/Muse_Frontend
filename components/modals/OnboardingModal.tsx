@@ -782,6 +782,16 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   onPress={() => setShowCountryPicker(true)}
                   activeOpacity={0.9}
                 >
+                    <View
+    style={{
+      height: screenHeight * 0.7,
+      marginTop: screenHeight * 0.3,
+      backgroundColor: "#fff",
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      overflow: "hidden",
+    }}
+  >
                   <CountryPicker
                     countryCode={countryCode}
                     withFlag
@@ -814,6 +824,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       itemHeight: 48,
                     }}
                   />
+                  </View>
                   <Text className=" text-base text-black">+{callingCode}</Text>
                 </TouchableOpacity>
 

@@ -48,4 +48,4 @@ with_node \
   --target "/Users/ew/Documents/Muse_FrontendUpdatedThisTime/ios/Pods/Target Support Files/Pods-muse/ExpoModulesProvider.swift" \
   --entitlement "/Users/ew/Documents/Muse_FrontendUpdatedThisTime/ios/muse/muse.entitlements" \
   --platform "apple" \
-  --packages "expo" "expo-asset" "expo-blur" "expo-constants" "expo-dev-launcher" "expo-dev-menu" "expo-file-system" "expo-font" "expo-haptics" "expo-image" "expo-keep-awake" "expo-linear-gradient" "expo-linking" "expo-router" "expo-secure-store" "expo-splash-screen" "expo-symbols" "expo-system-ui" "expo-web-browser"
+  --packages "expo" "expo-asset" "expo-blur" "expo-constants" "expo-dev-launcher" "expo-dev-menu" "expo-document-picker" "expo-file-system" "expo-font" "expo-haptics" "expo-image" "expo-image-picker" "expo-keep-awake" "expo-linear-gradient" "expo-linking" "expo-router" "expo-secure-store" "expo-splash-screen" "expo-symbols" "expo-system-ui" "expo-web-browser" "react-native-image-colors"

@@ -10,10 +10,12 @@ import Expo
 import ExpoAsset
 import ExpoBlur
 import EXConstants
+import ExpoDocumentPicker
 import ExpoFileSystem
 import ExpoFont
 import ExpoHaptics
 import ExpoImage
+import ExpoImagePicker
 import ExpoKeepAwake
 import ExpoLinearGradient
 import ExpoLinking
@@ -23,6 +25,7 @@ import ExpoSplashScreen
 import ExpoSymbols
 import ExpoSystemUI
 import ExpoWebBrowser
+import ImageColors
 #if EXPO_CONFIGURATION_DEBUG
 import EXDevLauncher
 import EXDevMenu
@@ -37,12 +40,14 @@ public class ExpoModulesProvider: ModulesProvider {
       AssetModule.self,
       BlurViewModule.self,
       ConstantsModule.self,
+      DocumentPickerModule.self,
       FileSystemModule.self,
       FileSystemNextModule.self,
       FontLoaderModule.self,
       FontUtilsModule.self,
       HapticsModule.self,
       ImageModule.self,
+      ImagePickerModule.self,
       KeepAwakeModule.self,
       LinearGradientModule.self,
       ExpoLinkingModule.self,
@@ -52,6 +57,7 @@ public class ExpoModulesProvider: ModulesProvider {
       SymbolModule.self,
       ExpoSystemUIModule.self,
       WebBrowserModule.self,
+      ImageColorsModule.self,
       DevLauncherInternal.self,
       DevLauncherAuth.self,
       RNCSafeAreaProviderManager.self,
@@ -66,12 +72,14 @@ public class ExpoModulesProvider: ModulesProvider {
       AssetModule.self,
       BlurViewModule.self,
       ConstantsModule.self,
+      DocumentPickerModule.self,
       FileSystemModule.self,
       FileSystemNextModule.self,
       FontLoaderModule.self,
       FontUtilsModule.self,
       HapticsModule.self,
       ImageModule.self,
+      ImagePickerModule.self,
       KeepAwakeModule.self,
       LinearGradientModule.self,
       ExpoLinkingModule.self,
@@ -80,7 +88,8 @@ public class ExpoModulesProvider: ModulesProvider {
       SplashScreenModule.self,
       SymbolModule.self,
       ExpoSystemUIModule.self,
-      WebBrowserModule.self
+      WebBrowserModule.self,
+      ImageColorsModule.self
     ]
     #endif
   }

@@ -24,6 +24,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>EXImageLoader.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>EXJSONUtils.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -54,6 +59,11 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
+		<key>ExpoDocumentPicker.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
 		<key>ExpoFileSystem-ExpoFileSystem_privacy.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -80,6 +90,11 @@
 			<false/>
 		</dict>
 		<key>ExpoImage.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ExpoImagePicker.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -135,6 +150,11 @@
 			<false/>
 		</dict>
 		<key>FBLazyVector.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>ImageColors.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -625,6 +645,11 @@
 			<false/>
 		</dict>
 		<key>react-native-blur.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>react-native-date-picker.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
