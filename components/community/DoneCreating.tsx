@@ -1,6 +1,4 @@
 import { icons } from "@/constants/icons";
-import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
-import { router } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
@@ -63,7 +61,7 @@ const DoneCreating: React.FC = () => {
     rotationAnimation.start();
 
     const timeout = setTimeout(() => {
-      router.replace(RouterConstantUtil.tabs.home as any);
+      // router.replace(RouterConstantUtil.tabs.home as any);
     }, 5000);
 
     return () => {
@@ -74,9 +72,15 @@ const DoneCreating: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView className="flex-1 bg-primary">
+    <SafeAreaView className="flex-1 ">
       <View className="flex-1 justify-center items-center px-8">
-        <Image source={icons.person_morph} />
+        <View className="w-20 h-28 ">
+          <Image
+            source={icons.person_morph}
+            className="w-full h-full "
+            resizeMode="contain"
+          />
+        </View>
 
         <Text className="text-white text-2xl font-neutral-medium tracking-wider text-center">
           Creating community
@@ -86,6 +90,7 @@ const DoneCreating: React.FC = () => {
           <LoadingDot delay={0} />
           <LoadingDot delay={200} />
           <LoadingDot delay={400} />
+          <LoadingDot delay={600} />
         </View>
       </View>
     </SafeAreaView>
@@ -126,7 +131,7 @@ const LoadingDot: React.FC<{ delay: number }> = ({ delay }) => {
 
   return (
     <Animated.View
-      className="w-2 h-2 rounded-full bg-white"
+      className="w-3 h-3 mx-1 rounded-full bg-white"
       style={{ opacity: fadeAnim }}
     />
   );
