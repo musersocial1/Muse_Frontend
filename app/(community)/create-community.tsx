@@ -326,13 +326,13 @@ const CreateCommunity: React.FC = () => {
               </Animated.View>
             </View>
             {/* Progress & Actions */}
-            <View className="pb-8 px-4">
-              <ProgressBar
-                currentStep={Math.min(currentStep, 7)}
-                totalSteps={7}
-              />
 
-              {currentStep < 8 && (
+            {currentStep < 8 && (
+              <View className="pb-8 px-4">
+                <ProgressBar
+                  currentStep={Math.min(currentStep, 7)}
+                  totalSteps={7}
+                />
                 <TouchableOpacity
                   onPress={goNextStep}
                   className="rounded-full bg-[#0368FF] py-4 mt-6"
@@ -341,8 +341,8 @@ const CreateCommunity: React.FC = () => {
                     {currentStep === 7 ? "Create Community" : "Save & Continue"}
                   </Text>
                 </TouchableOpacity>
-              )}
-            </View>
+              </View>
+            )}
           </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
       </View>

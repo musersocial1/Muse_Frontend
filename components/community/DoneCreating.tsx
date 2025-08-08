@@ -1,4 +1,6 @@
 import { icons } from "@/constants/icons";
+import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
@@ -14,6 +16,7 @@ const DoneCreating: React.FC = () => {
   const opacityAnim = useRef(new Animated.Value(0.3)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
 
+  const router = useRouter();
   useEffect(() => {
     const breathingAnimation = Animated.loop(
       Animated.sequence([
@@ -61,7 +64,7 @@ const DoneCreating: React.FC = () => {
     rotationAnimation.start();
 
     const timeout = setTimeout(() => {
-      // router.replace(RouterConstantUtil.tabs.home as any);
+      router.replace(RouterConstantUtil.tabs.home as any);
     }, 5000);
 
     return () => {
