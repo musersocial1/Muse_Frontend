@@ -14,7 +14,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   ios: {
     supportsTablet: true,
     bundleIdentifier: "com.moseleydev.muse",
-    buildNumber: "11",
+    buildNumber: "20",
   },
   android: {
     package: "com.moseley.muse",
