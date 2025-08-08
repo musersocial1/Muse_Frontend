@@ -130,9 +130,9 @@ const Home: React.FC = () => {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-primary">
+    <SafeAreaView className="flex-1  pb-20 bg-primary">
       {/* Header */}
-      <Animated.View style={{ opacity: headerAnimated }} className="px-4 py-4">
+      <Animated.View style={{ opacity: headerAnimated }} className="px-4  py-4">
         <View className="flex-row items-center justify-between">
           <Image
             source={images.logo_white}
@@ -158,66 +158,65 @@ const Home: React.FC = () => {
       </Animated.View>
 
       {/* Marquee Rows */}
-      <View className="mt-8 flex-1">
-        {/* First Row - Moving Right */}
-        <MarqueeRow>
-          <UserImage source={userImages[0]} />
-          <UserImage source={userImages[1]} />
-          <IconButton iconSource={images.img15} />
-          <UserImage source={userImages[2]} />
-          <UserImage source={userImages[3]} />
-          <UserImage source={userImages[4]} />
-          <IconButton iconSource={images.img18} />
-          <UserImage source={userImages[5]} />
-        </MarqueeRow>
+      <View className="mt-8  justify-evenly flex-1">
+        <View className="">
+          {/* First Row - Moving Right */}
+          <MarqueeRow>
+            <UserImage source={userImages[0]} />
+            <UserImage source={userImages[1]} />
+            <IconButton iconSource={images.img15} />
+            <UserImage source={userImages[2]} />
+            <UserImage source={userImages[3]} />
+            <UserImage source={userImages[4]} />
+            <IconButton iconSource={images.img18} />
+            <UserImage source={userImages[5]} />
+          </MarqueeRow>
 
-        {/* Second Row - Moving Left */}
-        <MarqueeRow reverse>
-          <UserImage source={userImages[6]} />
-          <IconButton iconSource={images.img16} />
-          <UserImage source={userImages[7]} />
-          <UserImage source={userImages[8]} />
-          <UserImage source={userImages[9]} />
-          <IconButton iconSource={images.img19} />
-          <UserImage source={userImages[10]} />
-        </MarqueeRow>
+          {/* Second Row - Moving Left */}
+          <MarqueeRow reverse>
+            <UserImage source={userImages[6]} />
+            <IconButton iconSource={images.img16} />
+            <UserImage source={userImages[7]} />
+            <UserImage source={userImages[8]} />
+            <UserImage source={userImages[9]} />
+            <IconButton iconSource={images.img19} />
+            <UserImage source={userImages[10]} />
+          </MarqueeRow>
 
-        {/* Third Row - Moving Right */}
-        <MarqueeRow>
-          <UserImage source={userImages[11]} />
-          <UserImage source={userImages[12]} />
-          <UserImage source={userImages[13]} />
-          <UserImage source={userImages[0]} />
-          <IconButton iconSource={images.img20} />
-          <UserImage source={userImages[1]} />
-        </MarqueeRow>
+          {/* Third Row - Moving Right */}
+          <MarqueeRow>
+            <UserImage source={userImages[11]} />
+            <UserImage source={userImages[12]} />
+            <UserImage source={userImages[13]} />
+            <UserImage source={userImages[0]} />
+            <IconButton iconSource={images.img20} />
+            <UserImage source={userImages[1]} />
+          </MarqueeRow>
 
-        {/* Fourth Row - Moving Left */}
-        <MarqueeRow reverse>
-          <UserImage source={userImages[2]} />
-          <IconButton iconSource={images.img17} />
-          <UserImage source={userImages[3]} />
-          <UserImage source={userImages[4]} />
-          <UserImage source={userImages[5]} />
-          <IconButton iconSource={images.img15} />
-          <UserImage source={userImages[6]} />
-        </MarqueeRow>
-
+          {/* Fourth Row - Moving Left */}
+          <MarqueeRow reverse>
+            <UserImage source={userImages[2]} />
+            <IconButton iconSource={images.img17} />
+            <UserImage source={userImages[3]} />
+            <UserImage source={userImages[4]} />
+            <UserImage source={userImages[5]} />
+            <IconButton iconSource={images.img15} />
+            <UserImage source={userImages[6]} />
+          </MarqueeRow>
+        </View>
         {/* Empty state */}
-        <View className="flex-1 items-center justify-center px-6 mt-16">
-          <Text className="text-gray-400 text-[20px] text-center mb-2 font-bold">
-            You haven't created any
+        <View className=" items-center gap-5 justify-center px-6 ">
+          <Text className="text-white/50 text-[18px] tracking-wider text-center  font-sfpro-bold">
+            You haven't created any {"\n"} communities yet
           </Text>
-          <Text className="text-gray-400 text-[20px]  text-center mb-8 font-bold">
-            communities yet
-          </Text>
+
           <TouchableOpacity
             onPress={() =>
               router.push(RouterConstantUtil.community.create as any)
             }
-            className="bg-secondary px-8 py-5 rounded-full"
+            className="bg-[#0368FF] px-6 py-4 rounded-full"
           >
-            <Text className="text-[#FFFFFF] text-[17px] font-bold">
+            <Text className="text-white text-[17px] font-bold">
               Create your community
             </Text>
           </TouchableOpacity>
@@ -228,13 +227,13 @@ const Home: React.FC = () => {
         style={{
           transform: [{ scale: fabScale }],
           position: "absolute",
-          bottom: 100,
+          bottom: 55,
           right: 10,
           zIndex: 1000,
         }}
       >
         <TouchableOpacity
-          className="w-28 h-28  rounded-full items-center justify-center shadow-lg"
+          className="w-24 h-24  rounded-full items-center justify-center shadow-lg"
           onPress={() => console.log("Create muse pressed")}
         >
           <Image source={images.muse} className="h-full w-full" />
