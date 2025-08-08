@@ -43,16 +43,18 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
     <Animated.View
       style={{
         transform: [{ scale }],
-        width: width - 40,
-        marginHorizontal: 20,
+        width: width,
+        // marginHorizontal: 20,
+        // marginLeft: 5,
+        // marginRight: 5,
       }}
     >
       <View
         style={{
-          borderRadius: 24,
+          borderRadius: 15,
           overflow: "hidden",
-          height: 256,
         }}
+        className=" aspect-[1/0.7]"
       >
         <ImageBackground
           source={podcast.image}
@@ -69,14 +71,14 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
 
           {/* Black linear gradient at the bottom for content */}
           <LinearGradient
-            colors={["transparent", "rgba(0,0,0,0.95)"]}
+            colors={["transparent", "rgba(0,0,0,1)"]}
             style={{
               width: "100%",
               position: "absolute",
               bottom: 0,
               left: 0,
               right: 0,
-              height: 100,
+              height: 150,
               justifyContent: "flex-end",
               paddingHorizontal: 24,
               paddingBottom: 20,
@@ -95,6 +97,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
               paddingBottom: 20,
               zIndex: 2,
             }}
+            className=" gap-1"
           >
             <Text
               style={{
@@ -103,29 +106,33 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
                 fontWeight: "bold",
                 marginBottom: 4,
               }}
+              className="font-sfpro-bold"
             >
               {podcast.title}
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View
                 style={{
-                  width: 16,
-                  height: 16,
-                  borderRadius: 4,
+                  width: 22,
+                  height: 22,
                   marginRight: 8,
                   alignItems: "center",
                   justifyContent: "center",
                 }}
+                className="rounded-full overflow-hidden"
               >
-                <Image source={icons.user} className="h-6 w-6" />
+                <Image
+                  source={icons.dp}
+                  className="h-full w-full"
+                  resizeMode="cover"
+                />
               </View>
               <Text
                 style={{
-                  color: "#fff",
                   fontSize: 14,
                   fontWeight: "500",
-                  opacity: 0.95,
                 }}
+                className="text-white/70"
               >
                 {podcast.creator} · {podcast.creatorType}
               </Text>

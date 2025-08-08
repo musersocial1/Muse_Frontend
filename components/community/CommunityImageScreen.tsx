@@ -1,20 +1,19 @@
-import { icons } from "@/constants/icons";
 import { CommunityData } from "@/types/community";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   Alert,
   Image,
   Platform,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import ProgressBar from "./ProgressBar";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 const CommunityImageScreen: React.FC<{
   data: CommunityData;
@@ -114,29 +113,34 @@ const CommunityImageScreen: React.FC<{
     );
   };
 
-  return (
-    <View className="flex-1 items-center justify-center max-h-screen">
-      <LinearGradient
-        colors={["#0368FF", "#703636", "#000000"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.background}
-      />
+  const insets = useSafeAreaInsets();
 
+  return (
+    <View
+      style={{ paddingTop: insets.top }}
+      className="flex-1 justify-center max-h-screen"
+    >
       <TouchableOpacity
-        className="absolute top-3 left-2 h-14 w-14 z-20"
         onPress={onBack}
+        activeOpacity={0.7}
+        className="ml-5 h-14 w-14  border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
+        // bg-white/10 = white at 10% opacity, matches that soft look in your image
       >
-        <Image source={icons.back_2} className="h-14 w-14 opacity-50" />
+        <Feather
+          name="chevron-left"
+          size={20}
+          color="#fff"
+          style={{ opacity: 0.7 }}
+        />
       </TouchableOpacity>
 
-      <SafeAreaView className="flex-1 w-[80%] mx-auto">
-        <View className="flex-1 justify-center items-center">
-          <View className="w-full max-w-2xl">
+      <SafeAreaView className="flex-1   mx-auto">
+        <View className="  justify-center items-center">
+          <View className="w-full  max-w-2xl">
             <TouchableOpacity
               onPress={showImageOptions}
               disabled={uploading}
-              className="w-full h-80 rounded-3xl overflow-hidden mb-8 bg-[#00000026]/[6%]"
+              className="w-full h-80  aspect-[1/0.8] rounded-3xl overflow-hidden mb-8 bg-[#00000026]/20"
             >
               {data.coverImage ? (
                 <View className="relative w-full h-full">
@@ -158,43 +162,23 @@ const CommunityImageScreen: React.FC<{
                 </View>
               ) : (
                 <View className="flex-1 justify-center items-center">
-                  <View className="bg-white bg-opacity-90 px-6 py-3.5 rounded-full flex-row items-center">
+                  <View className="bg-white bg-opacity-90 pr-2 pl-3.5 py-2.5 rounded-full flex-row items-center">
                     <Text className="text-[#000000] font-bold mr-2">
-                      {uploading ? "Uploading..." : "Add cover image"}
+                      Add cover image
                     </Text>
-                    {!uploading && (
-                      <View className="p-1 bg-gray-100 rounded-full">
-                        <Ionicons name="add" size={20} color="black" />
-                      </View>
-                    )}
+                    <View className="p-1 bg-black/10 rounded-full">
+                      <Ionicons name="add" size={18} color="black" />
+                    </View>
                   </View>
                 </View>
               )}
             </TouchableOpacity>
 
             {/* Community Name */}
-            <Text className="text-white text-2xl font-bold text-center">
+            <Text className="text-white/80 tracking-wider text-2xl font-sfpro-bold text-center">
               {data.name || "Community Name"}
             </Text>
           </View>
-        </View>
-
-        {/* Bottom Section */}
-        <View className="pb-0">
-          <ProgressBar currentStep={2} totalSteps={7} />
-
-          <TouchableOpacity
-            onPress={onNext}
-            className="bg-secondary rounded-full py-4"
-            disabled={uploading}
-            style={{
-              opacity: uploading ? 0.7 : 1,
-            }}
-          >
-            <Text className="text-white text-lg font-semibold text-center">
-              Save & Continue
-            </Text>
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </View>
@@ -202,13 +186,3 @@ const CommunityImageScreen: React.FC<{
 };
 
 export default CommunityImageScreen;
-
-const styles = StyleSheet.create({
-  background: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-});

@@ -32,7 +32,7 @@ const userImages = [
   images.img13,
 ];
 
-const MARQUEE_ROW_HEIGHT = 80;
+const MARQUEE_ROW_HEIGHT = 60;
 
 interface MarqueeRowProps {
   children: React.ReactNode;
@@ -70,6 +70,7 @@ const MarqueeRow: React.FC<MarqueeRowProps> = ({
         overflow: "hidden",
         marginBottom: 16,
       }}
+      className=""
     >
       <Animated.View
         style={{
@@ -88,13 +89,13 @@ const MarqueeRow: React.FC<MarqueeRowProps> = ({
 };
 
 const IconButton: React.FC<{ iconSource: any }> = ({ iconSource }) => (
-  <TouchableOpacity className="mr-4 h-20 w-40 items-center justify-center">
+  <TouchableOpacity className=" w-32 items-center justify-center">
     <Image source={iconSource} className="w-full h-full" resizeMode="contain" />
   </TouchableOpacity>
 );
 
 const UserImage: React.FC<{ source: any }> = ({ source }) => (
-  <TouchableOpacity className="mr-4">
+  <TouchableOpacity className="mx-1">
     <Image
       source={source}
       style={{ width: MARQUEE_ROW_HEIGHT, height: MARQUEE_ROW_HEIGHT }}

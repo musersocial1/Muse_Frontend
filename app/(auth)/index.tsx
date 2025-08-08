@@ -11,6 +11,7 @@ import { useAuthState } from "@/hooks/useAuthState";
 import { tokenManager } from "@/lib/api/apiClient";
 import { showError, showSuccess } from "@/lib/toast";
 import { STEPS, StepType } from "@/utils/constants";
+
 import {
   Animated,
   Easing,
@@ -26,7 +27,6 @@ const stepOrder: StepType[] = [
   STEPS.VERIFY_OTP,
   STEPS.PASSWORD,
   STEPS.PERSONAL_INFO,
-  STEPS.USERNAME,
 ];
 
 export default function Index() {
@@ -50,6 +50,7 @@ export default function Index() {
   const [moreInfoVisible, setMoreInfoVisible] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const { register, isLoading, error, clearError } = useAuthState();
+  const [fullName, setFullName] = useState("");
 
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -227,8 +228,7 @@ export default function Index() {
         password,
         phoneNumber,
         username,
-        firstName,
-        lastName,
+        fullName,
         confirmPassword,
         dateOfBirth,
         accountType: moreInfoData.accountType,
@@ -266,6 +266,29 @@ export default function Index() {
         router.replace(RouterConstantUtil.tabs.home as any);
       }
     })();
+  }, []);
+
+  const [detectedCountryCode, setDetectedCountryCode] = useState("US");
+  const [detectedCallingCode, setDetectedCallingCode] = useState("1");
+  useEffect(() => {
+    const fetchUserCountry = async () => {
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+        const userCountry = data?.country?.toUpperCase() || "NG";
+
+        // Remove "+" from calling code
+        const dialCode = data?.country_calling_code?.replace("+", "") || "234";
+        console.log(data);
+        setDetectedCountryCode(userCountry);
+        setDetectedCallingCode(dialCode);
+      } catch (err) {
+        setDetectedCountryCode("NG");
+        setDetectedCallingCode("234");
+      }
+    };
+
+    fetchUserCountry();
   }, []);
 
   return (
@@ -377,6 +400,10 @@ export default function Index() {
         setUsername={setUsername}
         onComplete={handleComplete}
         direction={direction} // new
+        detectedCountryCode={detectedCountryCode}
+        detectedCallingCode={detectedCallingCode}
+        fullName={fullName}
+        setFullName={setFullName}
       />
 
       {isMoreInfoMounted && (

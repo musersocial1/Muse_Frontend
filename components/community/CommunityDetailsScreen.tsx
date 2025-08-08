@@ -1,23 +1,22 @@
-import { icons } from "@/constants/icons";
+import { Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import * as ImagePicker from "expo-image-picker";
-import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+
 import {
   ActionSheetIOS,
   Alert,
-  Image,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
-import ProgressBar from "./ProgressBar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import CircleProgress from "../ui/CircleProgress";
 
 interface CommunityData {
   name: string;
@@ -34,8 +33,10 @@ const CommunityEdit: React.FC<{
   const [bioText, setBioText] = useState(data.bio || "");
   const [showActions, setShowActions] = useState(false);
 
-  const wordCount = bioText.split(" ").filter((word) => word.length > 0).length;
-  const remainingWords = Math.max(0, 65 - wordCount);
+  // Instead of wordCount and remainingWords
+  const MAX_CHARS = 150;
+  const charCount = bioText.length;
+  const remainingChars = Math.max(0, MAX_CHARS - charCount);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -124,372 +125,107 @@ const CommunityEdit: React.FC<{
     Keyboard.dismiss();
   };
 
+  const insets = useSafeAreaInsets();
+
+  const badRef = useRef<ScrollView>(null);
+
+  const handleBioFocus = () => {
+    setTimeout(
+      () => {
+        badRef.current?.scrollTo({ y: 10000, animated: true });
+      },
+      Platform.OS === "ios" ? 250 : 350
+    ); // adjust as needed
+  };
+
   return (
-    <TouchableWithoutFeedback onPress={dismissKeyboard}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
-      >
-        <View style={styles.headerSection}>
-          <Image
-            source={{
-              uri:
-                data.coverImage ||
-                "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=400",
-            }}
-            style={styles.backgroundImage}
-            resizeMode="cover"
-          />
-
-          <LinearGradient
-            colors={[
-              "rgba(255,106,0,0.9)",
-              "rgba(255,106,0,0.9)",
-              "rgba(255,106,0,0.7)",
-              "#000000",
-            ]}
-            locations={[0, 0.35, 0.7, 1]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.gradientOverlay}
-          />
-
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      // className="flex-1"
+      ref={badRef}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={{ paddingTop: insets.top }} className="   relative">
+        {/* Header Section */}
+        <View className=" aspect-[1/0.6] justify-center items-center w-full relative">
           <TouchableOpacity
-            className="absolute top-3 left-2 h-14 w-14 z-20"
             onPress={onBack}
+            activeOpacity={0.7}
+            className="ml-5 h-14 left-0 w-14 absolute top-0  overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
+            // bg-white/10 = white at 10% opacity, matches that soft look in your image
           >
-            <Image source={icons.back_3} className="h-14 w-14 opacity-50" />
+            <BlurView style={[StyleSheet.absoluteFill]} />
+            <Feather
+              name="chevron-left"
+              size={20}
+              color="#fff"
+              style={{ opacity: 0.7 }}
+            />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.editImageButton}
-            onPress={showImageOptions}
+            className="justify-center items-center "
+            onPress={onBack}
           >
-            <View style={styles.editImageContainer}>
-              <Text style={styles.editImageText}>Edit image</Text>
+            <View className="bg-[rgba(255,255,255,0.9)] px-6 py-3 rounded-[25px]">
+              <Text className="text-black text-[16px] font-semibold">
+                Edit image
+              </Text>
             </View>
           </TouchableOpacity>
         </View>
 
         {/* Content Section */}
-        <View style={styles.contentSection}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={styles.scrollView}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View className="bg-[#1C1C1CB2]/[70%] p-2 rounded-xl">
-              <Text style={styles.communityName}>
-                {data.name || "Dancemania"}
+        <View className="flex-1  px-5">
+          <View className=" px-6 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-2">
+            <BlurView
+              intensity={30}
+              tint="light"
+              style={[StyleSheet.absoluteFill]}
+            />
+
+            <Text className="text-[20px] font-sfpro-bold tracking-wider text-white/80 my-2">
+              {data.name || "Dancemania"}
+            </Text>
+          </View>
+
+          {/* Bio Section */}
+          <View className="mt-2 mb-8">
+            <View className=" overflow-hidden rounded-[20px] px-6 py-8">
+              <BlurView
+                intensity={30}
+                tint="light"
+                style={[StyleSheet.absoluteFill]}
+              />
+              <Text className="text-[16px] font-sfpro-bold text-white">
+                Community bio
               </Text>
-            </View>
-
-            <View style={styles.bioSection}>
-              <View style={styles.textInputContainer}>
-                <Text style={styles.sectionTitle}>Community bio</Text>
-
-                <TextInput
-                  value={bioText}
-                  onChangeText={(text) => {
-                    setBioText(text);
-                    onUpdate({ bio: text });
-                  }}
-                  placeholder="Tell people what this community is about..."
-                  placeholderTextColor="rgba(255, 255, 255, 0.4)"
-                  style={styles.textInput}
-                  multiline
-                  maxLength={500}
-                />
-                <View style={styles.wordCounterContainer}>
-                  <Text style={styles.wordCounterText}>
-                    {remainingWords} words remaining
-                  </Text>
-                  <View style={styles.progressCircleContainer}>
-                    <View style={styles.progressCircleBackground} />
-                    <View
-                      style={[
-                        styles.progressCircle,
-                        {
-                          borderTopColor:
-                            wordCount <= 65 ? "#10B981" : "#EF4444",
-                          transform: [
-                            { rotate: `${(wordCount / 65) * 360 - 90}deg` },
-                          ],
-                        },
-                      ]}
-                    />
-                  </View>
-                </View>
+              <TextInput
+                value={bioText}
+                onChangeText={(text) => {
+                  setBioText(text);
+                  onUpdate({ bio: text });
+                }}
+                onFocus={handleBioFocus}
+                // placeholder="Tell people what this community is about..."
+                placeholderTextColor="rgba(255, 255, 255, 0.4)"
+                className="text-white/60 text-[16px] font-neutral-regular tracking-widest leading-6 min-h-[100px] text-top"
+                multiline
+                maxLength={500}
+              />
+              <View className="flex-row items-center mt-3">
+                <Text className="text-[13px] font-neutral-regular mr-3 text-white/40">
+                  {remainingChars} characters remaining
+                </Text>
+                {/* CircleProgress, pass charCount/MAX_CHARS */}
+                <CircleProgress progress={Math.min(charCount / MAX_CHARS, 1)} />
               </View>
             </View>
-
-            <View style={styles.spacer} />
-          </ScrollView>
-
-          <View style={styles.bottomSection}>
-            <ProgressBar currentStep={3} totalSteps={7} />
-
-            <TouchableOpacity onPress={onNext} style={styles.continueButton}>
-              <Text style={styles.continueButtonText}>Save & Continue</Text>
-            </TouchableOpacity>
           </View>
         </View>
-
-        {showActions && Platform.OS === "android" && (
-          <View style={styles.actionSheetOverlay}>
-            <View style={styles.actionSheetContainer}>
-              <TouchableOpacity
-                style={styles.actionSheetButtonHighlight}
-                onPress={pickImage}
-              >
-                <Text style={styles.actionSheetTextHighlight}>Edit image</Text>
-              </TouchableOpacity>
-
-              <View style={styles.actionSheetSeparator} />
-
-              <TouchableOpacity
-                style={styles.actionSheetButton}
-                onPress={deleteImage}
-              >
-                <Text style={styles.actionSheetText}>Delete image</Text>
-              </TouchableOpacity>
-
-              <View style={styles.actionSheetSeparator} />
-
-              <TouchableOpacity
-                style={styles.actionSheetButton}
-                onPress={pickImage}
-              >
-                <Text style={styles.actionSheetText}>Upload from gallery</Text>
-              </TouchableOpacity>
-
-              <View style={styles.actionSheetSeparator} />
-
-              <TouchableOpacity
-                style={styles.actionSheetButton}
-                onPress={takePhoto}
-              >
-                <Text style={styles.actionSheetText}>Take from camera</Text>
-              </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setShowActions(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </View>
+    </ScrollView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "rgba(255,106,0,0.4)",
-    position: "relative",
-  },
-  headerSection: {
-    height: "36%",
-    position: "relative",
-  },
-  backgroundImage: {
-    width: "100%",
-    height: "100%",
-  },
-  gradientOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  backButton: {
-    position: "absolute",
-    top: 50,
-    left: 16,
-    zIndex: 30,
-  },
-  blurButton: {
-    borderRadius: 20,
-    padding: 12,
-  },
-  editImageButton: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  editImageContainer: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 25,
-  },
-  editImageText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  contentSection: {
-    flex: 1,
-    backgroundColor: "#000",
-    paddingHorizontal: 20,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  communityName: {
-    fontSize: 17,
-    fontWeight: "bold",
-    color: "white",
-    marginTop: 9,
-    marginBottom: 9,
-  },
-  bioSection: {
-    marginBottom: 32,
-    marginTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-    color: "white",
-  },
-  textInputContainer: {
-    backgroundColor: "#1C1C1CB2",
-    borderRadius: 16,
-    padding: 20,
-  },
-  textInput: {
-    color: "white",
-    fontSize: 16,
-    lineHeight: 24,
-    minHeight: 100,
-    textAlignVertical: "top",
-  },
-  wordCounterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 12,
-  },
-  wordCounterText: {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontSize: 14,
-    marginRight: 12,
-  },
-  progressCircleContainer: {
-    position: "relative",
-    width: 20,
-    height: 20,
-  },
-  progressCircleBackground: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "rgba(255, 255, 255, 0.3)",
-  },
-  progressCircle: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "transparent",
-    borderTopWidth: 2,
-  },
-  linksSection: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.1)",
-  },
-  chevronContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  spacer: {
-    height: 80,
-  },
-  bottomSection: {
-    paddingBottom: 10,
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
-  continueButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 28,
-    paddingVertical: 18,
-    alignItems: "center",
-  },
-  continueButtonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  actionSheetOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  actionSheetContainer: {
-    width: 280,
-    backgroundColor: "rgba(60, 60, 60, 0.95)",
-    borderRadius: 16,
-    overflow: "hidden",
-    marginBottom: 20,
-  },
-  actionSheetButtonHighlight: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  actionSheetTextHighlight: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  actionSheetButton: {
-    backgroundColor: "rgba(60, 60, 60, 0.95)",
-    paddingVertical: 16,
-    alignItems: "center",
-  },
-  actionSheetText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "400",
-  },
-  actionSheetSeparator: {
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-  },
-  cancelButton: {
-    marginTop: 16,
-  },
-  cancelButtonText: {
-    color: "white",
-    fontSize: 16,
-  },
-});
 
 export default CommunityEdit;

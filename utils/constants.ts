@@ -3,7 +3,6 @@ export const STEPS = {
   VERIFY_OTP: "verify_otp",
   PASSWORD: "password",
   PERSONAL_INFO: "personal_info",
-  USERNAME: "username",
 } as const;
 
 export type StepType = (typeof STEPS)[keyof typeof STEPS];

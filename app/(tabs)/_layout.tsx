@@ -2,9 +2,41 @@ import { icons } from "@/constants/icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { useEffect, useRef } from "react";
-import { Animated, Image } from "react-native";
+import { Animated, Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+const tabsConfig = [
+  {
+    name: "home",
+    title: "Home",
+    icon: icons.home,
+    isProfile: false,
+  },
+  {
+    name: "search",
+    title: "Search",
+    icon: icons.search,
+    isProfile: false,
+  },
+  {
+    name: "community",
+    title: "Community",
+    icon: icons.asana,
+    isProfile: false,
+  },
+  {
+    name: "group",
+    title: "Groups",
+    icon: icons.star,
+    isProfile: false,
+  },
+  {
+    name: "profile",
+    title: "Profile",
+    icon: icons.user,
+    isProfile: true,
+  },
+];
 function TabIcon({ focused, icon, title, isProfile }: any) {
   const scaleValue = useRef(new Animated.Value(focused ? 1.05 : 1)).current;
   const opacityValue = useRef(new Animated.Value(focused ? 1 : 0.7)).current;
@@ -33,45 +65,58 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   if (isProfile) {
     return (
-      <Animated.View
-        style={{
-          transform: [{ scale: scaleValue }],
-          opacity: opacityValue,
-          // ...shadowStyle,
-        }}
-        className="w-14 h-14 rounded-full overflow-hidden"
-      >
-        <Image source={icon} className="w-full h-full" resizeMode="cover" />
-      </Animated.View>
+      <View className="w-14 h-14 overflow-hidden rounded-full">
+        <BlurView
+          intensity={70} // Change for more/less blur
+          tint={focused ? "extraLight" : "dark"}
+          className=" w-full h-full  "
+          // style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
+        >
+          <Animated.View
+            style={{
+              transform: [{ scale: scaleValue }],
+              opacity: opacityValue,
+              // ...shadowStyle,
+            }}
+            className="w-14 h-14 rounded-full overflow-hidden"
+          >
+            <Image source={icon} className="w-full h-full" resizeMode="cover" />
+          </Animated.View>
+        </BlurView>
+      </View>
     );
   }
 
   // Regular tabs - icon in circle
   return (
-    <Animated.View
-      style={{
-        transform: [{ scale: scaleValue }],
-        opacity: opacityValue,
-        // ...shadowStyle,
-      }}
-      className={`w-16 h-16 rounded-full  justify-center items-center border ${
-        focused
-          ? "bg-white border-white"
-          : "bg-[#808080]/50 border-[#FFFFFF]/50"
-      }`}
-    >
+    <View className="w-16 h-16 overflow-hidden rounded-full">
       <BlurView
-        intensity={100} // Change for more/less blur
-        tint={focused ? "light" : "dark"}
+        intensity={70} // Change for more/less blur
+        tint={focused ? "extraLight" : "dark"}
+        className=" w-full h-full  "
         // style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
-      />
-      <Image
-        source={icon}
-        style={{ tintColor: focused ? "#151312" : "#ffffff" }} // <-- Use style prop for tintColor!
-        className="w-[50%] h-fit"
-        resizeMode="contain"
-      />
-    </Animated.View>
+      >
+        <Animated.View
+          style={{
+            transform: [{ scale: scaleValue }],
+            opacity: opacityValue,
+            // ...shadowStyle,
+          }}
+          className={`w-full h-full rounded-full justify-center items-center border ${
+            focused
+              ? "bg-white border-white"
+              : "bg-[#808080]/10 border-[#FFFFFF]/50"
+          }`}
+        >
+          <Image
+            source={icon}
+            style={{ tintColor: focused ? "#151312" : "#ffffff" }} // <-- Use style prop for tintColor!
+            className="w-[50%] h-fit"
+            resizeMode="contain"
+          />
+        </Animated.View>
+      </BlurView>
+    </View>
   );
 }
 
@@ -104,81 +149,24 @@ export default function TabsLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="home"
-        options={{
-          title: "home",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.home}
-              title="Home"
-              isProfile={false}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.search}
-              title="Search"
-              isProfile={false}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="community"
-        options={{
-          title: "Community",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.asana}
-              title="Community"
-              isProfile={false}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="group"
-        options={{
-          title: "Group",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.star}
-              title="Groups"
-              isProfile={false}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          headerShown: false,
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={icons.user}
-              title="Profile"
-              isProfile={true}
-            />
-          ),
-        }}
-      />
+      {tabsConfig.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            headerShown: false,
+            tabBarIcon: ({ focused }) => (
+              <TabIcon
+                focused={focused}
+                icon={tab.icon}
+                title={tab.title}
+                isProfile={tab.isProfile}
+              />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }

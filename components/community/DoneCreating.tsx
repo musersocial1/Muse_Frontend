@@ -78,7 +78,7 @@ const DoneCreating: React.FC = () => {
       <View className="flex-1 justify-center items-center px-8">
         <Image source={icons.person_morph} />
 
-        <Text className="text-white text-2xl font-semibold text-center">
+        <Text className="text-white text-2xl font-neutral-medium tracking-wider text-center">
           Creating community
         </Text>
 

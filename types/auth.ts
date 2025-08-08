@@ -46,10 +46,10 @@ export interface RegisterRequest {
   password: string;
   phoneNumber: string;
   username: string;
-  firstName: string;
-  lastName: string;
+
   confirmPassword: string;
   dateOfBirth: string;
+  fullName: string;
   accountType: string;
   gender: string;
   interests: string[];

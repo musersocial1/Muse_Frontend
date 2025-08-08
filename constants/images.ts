@@ -1,3 +1,4 @@
+import Comedy from "@/assets/images/Comedy.png";
 import createCommunity from "@/assets/images/create.png";
 import ent from "@/assets/images/ent.png";
 import female from "@/assets/images/female.png";
@@ -64,4 +65,5 @@ export const images = {
   img19,
   img20,
   logo_white,
+  Comedy,
 };

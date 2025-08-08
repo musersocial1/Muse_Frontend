@@ -19,6 +19,7 @@ import ExpoImagePicker
 import ExpoKeepAwake
 import ExpoLinearGradient
 import ExpoLinking
+import ExpoLocalization
 import ExpoHead
 import ExpoSecureStore
 import ExpoSplashScreen
@@ -51,6 +52,7 @@ public class ExpoModulesProvider: ModulesProvider {
       KeepAwakeModule.self,
       LinearGradientModule.self,
       ExpoLinkingModule.self,
+      LocalizationModule.self,
       ExpoHeadModule.self,
       SecureStoreModule.self,
       SplashScreenModule.self,
@@ -83,6 +85,7 @@ public class ExpoModulesProvider: ModulesProvider {
       KeepAwakeModule.self,
       LinearGradientModule.self,
       ExpoLinkingModule.self,
+      LocalizationModule.self,
       ExpoHeadModule.self,
       SecureStoreModule.self,
       SplashScreenModule.self,

@@ -3,5 +3,6 @@
 @tailwind utilities;
 
 .border2 {
-  border: 2px solid yellow;
+  border-width: 1px;
+  border-color: white;
 }

@@ -11,6 +11,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  Modal,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -63,13 +64,21 @@ const featuredPodcasts: Podcast[] = [
   },
 ];
 
+const podcastImages = [
+  images.img2,
+  images.img1,
+  images.img2,
+  images.img3,
+  images.img4,
+];
+
 const podcastList: PodcastItem[] = Array(16)
   .fill(null)
   .map((_, index) => ({
     id: index + 1,
     title: "The spot",
     creator: "Alleydavies",
-    image: images.img4,
+    image: podcastImages[Math.floor(Math.random() * podcastImages.length)],
   }));
 
 const PodcastListItem: React.FC<PodcastListItemProps> = ({
@@ -100,9 +109,9 @@ const PodcastListItem: React.FC<PodcastListItemProps> = ({
   return (
     <Animated.View
       style={{ transform: [{ translateX }], opacity }}
-      className="mb-1"
+      className=""
     >
-      <TouchableOpacity className="flex-row items-center p-4">
+      <TouchableOpacity className="flex-row  border-b border-b-white/10 items-center p-4">
         <Image
           source={podcast.image}
           className="w-16 h-16 rounded-2xl mr-4"
@@ -110,10 +119,10 @@ const PodcastListItem: React.FC<PodcastListItemProps> = ({
         />
 
         <View className="flex-1">
-          <Text className="text-[#FFFFFF] text-[17px] font-semibold mb-1">
+          <Text className="text-[#FFFFFF] text-[17px] font-bold mb-1">
             {podcast.title}
           </Text>
-          <Text className="text-[#AEAEAE] text-[13px] font-medium">
+          <Text className="text-[#AEAEAE] text-[13px] font-sfpro-medium tracking-wider">
             {podcast.creator}
           </Text>
         </View>
@@ -151,7 +160,7 @@ const FilterDropdown: React.FC<{
     <View className="relative">
       <TouchableOpacity
         onPress={onToggle}
-        className="bg-white rounded-full px-6 py-3 flex-row items-center"
+        className="bg-white rounded-[15px] px-3 py-3 flex-row items-center"
       >
         <Text className="text-black text-[13px] font-bold mr-2">
           {selectedFilter}
@@ -207,7 +216,12 @@ const FilterDropdown: React.FC<{
   );
 };
 
-const Podcasts: React.FC = () => {
+interface PodcastsProps {
+  onClose?: () => void;
+  modalVisible: any;
+}
+
+const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
   const [currentCarouselIndex, setCurrentCarouselIndex] = useState<number>(0);
   const [selectedFilter, setSelectedFilter] = useState<string>("All podcasts");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -273,73 +287,86 @@ const Podcasts: React.FC = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      {/* Header */}
-      <Animated.View
-        style={{ opacity: headerAnimated }}
-        className="px-5 py-4 my-5"
-      >
-        <View className="flex-row items-center justify-center relative">
-          <TouchableOpacity
-            onPress={navigateBack}
-            className="absolute left-0 w-10 h-10  rounded-full items-center justify-center"
-          >
-            <Image source={icons.back} className="h-14 w-14" />
-          </TouchableOpacity>
+    <Modal
+      animationType="slide"
+      visible={modalVisible}
+      onRequestClose={onClose}
+      presentationStyle="formSheet" // or "pageSheet", or remove for default
+      statusBarTranslucent
+    >
+      <SafeAreaView className="flex-1 bg-black">
+        {/* Header */}
+        <Animated.View
+          style={{ opacity: headerAnimated }}
+          className="px-5 py-4 my-5"
+        >
+          <View className="flex-row items-center justify-center relative">
+            <TouchableOpacity
+              onPress={onClose}
+              className="absolute left-0 w-10 h-10  rounded-full items-center justify-center"
+            >
+              <Image source={icons.back} className="h-14 w-14" />
+            </TouchableOpacity>
 
-          <Text className="text-[#FFFFFF] text-[24px] font-bold">Podcasts</Text>
-        </View>
-      </Animated.View>
-
-      <ScrollView
-        className="flex-1"
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      >
-        <Animated.View style={{ opacity: carouselAnimated }} className="mt-4">
-          <FlatList
-            data={featuredPodcasts}
-            renderItem={renderCarouselItem}
-            keyExtractor={(item) => item.id.toString()}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={onCarouselScroll}
-            snapToInterval={width}
-            decelerationRate="fast"
-            contentContainerStyle={{ alignItems: "center" }}
-          />
-
-          {renderPaginationDots()}
-        </Animated.View>
-
-        <Animated.View style={{ opacity: contentAnimated }} className="px-5">
-          <View className="flex-row justify-between items-center mb-6">
-            <Text className="text-[#FFFFFF] text-[22px] font-bold">
-              All podcast
+            <Text className="text-[#FFFFFF] text-[24px] font-bold">
+              Podcasts
             </Text>
-
-            <FilterDropdown
-              selectedFilter={selectedFilter}
-              onFilterChange={setSelectedFilter}
-              isOpen={isDropdownOpen}
-              onToggle={() => setIsDropdownOpen(!isDropdownOpen)}
-            />
-          </View>
-
-          {/* Podcast List */}
-          <View className="space-y-2">
-            {podcastList.map((podcast, index) => (
-              <PodcastListItem
-                key={podcast.id}
-                podcast={podcast}
-                index={index}
-              />
-            ))}
           </View>
         </Animated.View>
-      </ScrollView>
-    </SafeAreaView>
+
+        <ScrollView
+          className="flex-1"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
+        >
+          <Animated.View
+            style={{ opacity: carouselAnimated }}
+            className="mt-4 "
+          >
+            <FlatList
+              data={featuredPodcasts}
+              renderItem={renderCarouselItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={onCarouselScroll}
+              snapToInterval={width}
+              decelerationRate="fast"
+              contentContainerStyle={{ alignItems: "center" }}
+            />
+
+            {renderPaginationDots()}
+          </Animated.View>
+
+          <Animated.View style={{ opacity: contentAnimated }} className="">
+            <View className="flex-row px-5 justify-between items-center mb-6">
+              <Text className="text-[#FFFFFF] text-[22px] font-bold">
+                All podcast
+              </Text>
+
+              <FilterDropdown
+                selectedFilter={selectedFilter}
+                onFilterChange={setSelectedFilter}
+                isOpen={isDropdownOpen}
+                onToggle={() => setIsDropdownOpen(!isDropdownOpen)}
+              />
+            </View>
+
+            {/* Podcast List */}
+            <View className=" w-full">
+              {podcastList.map((podcast, index) => (
+                <PodcastListItem
+                  key={podcast.id}
+                  podcast={podcast}
+                  index={index}
+                />
+              ))}
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </SafeAreaView>
+    </Modal>
   );
 };
 

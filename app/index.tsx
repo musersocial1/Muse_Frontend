@@ -22,7 +22,8 @@ export default function Index() {
 
         try {
           await authAPI.getUserProfile();
-          router.replace(RouterConstantUtil.tabs.home as any);
+          // router.replace(RouterConstantUtil.tabs.home as any);
+          router.replace(RouterConstantUtil.community.create as any);
         } catch (err) {
           await tokenManager.removeTokens();
           router.replace(RouterConstantUtil.auth.login as any);

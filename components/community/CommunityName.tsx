@@ -1,88 +1,49 @@
-import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
-import { CommunityData } from "@/types/community";
-import { LinearGradient } from "expo-linear-gradient";
+import { Feather } from "@expo/vector-icons";
 import React from "react";
+import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import {
-  Image,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import ProgressBar from "./ProgressBar";
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
-const CommunityNameScreen: React.FC<{
-  data: CommunityData;
-  onUpdate: (data: Partial<CommunityData>) => void;
-  onNext: () => void;
-}> = ({ data, onUpdate, onNext }) => {
+const CommunityNameScreen = ({ data, onUpdate, onNext }: any) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View className="flex-1">
-      <LinearGradient
-        colors={["#0368FF", "#703636", "#000000"]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.background}
-      />
-
+    <View style={{ paddingTop: insets.top }} className="flex-1 ">
       <TouchableOpacity
-        className="absolute top-3 left-2 h-14 w-14 z-20"
         onPress={() => RouterConstantUtil.community.start}
+        activeOpacity={0.7}
+        className="ml-5 h-14 w-14 border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
+        // bg-white/10 = white at 10% opacity, matches that soft look in your image
       >
-        <Image source={icons.back_2} className="h-14 w-14 opacity-50" />
+        <Feather
+          name="chevron-left"
+          size={20}
+          color="#fff"
+          style={{ opacity: 0.7 }}
+        />
       </TouchableOpacity>
 
       <SafeAreaView className="flex-1" edges={["top", "left", "right"]}>
-        <KeyboardAvoidingView
-          className="flex-1 px-6"
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
-        >
-          {/* Main Content */}
-          <View className="flex-1 justify-center items-center">
-            <View className="w-full">
-              <TextInput
-                autoFocus
-                editable={true}
-                value={data.name}
-                onChangeText={(text) => onUpdate({ name: text })}
-                placeholder="Enter community name"
-                placeholderTextColor="rgba(255, 255, 255, 0.7)"
-                className="bg-transparent border-none px-6 py-8 text-white text-[28px] font-bold text-center"
-                cursorColor="#FFFFFF"
-                style={styles.textInput}
-                multiline={false}
-                textAlign="center"
-              />
-            </View>
+        {/* Main Content */}
+        <View className="flex-1 justify-center items-center">
+          <View className="w-full">
+            <TextInput
+              editable={true}
+              value={data.name}
+              onChangeText={(text) => onUpdate({ name: text })}
+              placeholder="Enter community name"
+              placeholderTextColor="rgba(255, 255, 255, 1)"
+              className="bg-transparent border-none px-6 py-8 text-white text-[28px] font-bold text-center"
+              cursorColor="#FFFFFF"
+              style={styles.textInput}
+              multiline={false}
+              textAlign="center"
+            />
           </View>
-
-          {/* Bottom Section */}
-          <View className="pb-8">
-            <ProgressBar currentStep={1} totalSteps={7} />
-
-            <TouchableOpacity
-              onPress={onNext}
-              className="rounded-full py-4 mt-6"
-              disabled={!data.name.trim()}
-              style={[
-                styles.continueButton,
-                {
-                  opacity: data.name.trim() ? 1 : 0.5,
-                },
-              ]}
-            >
-              <Text className="text-white text-lg font-semibold text-center">
-                Save & Continue
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
+        </View>
       </SafeAreaView>
     </View>
   );

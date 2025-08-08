@@ -2,7 +2,7 @@ import { authAPI } from "@/lib/api/auth";
 import { ValidationItem } from "@/lib/validation/ValidateItem";
 import { STEPS, StepType } from "@/utils/constants";
 import { Feather } from "@expo/vector-icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   ActivityIndicator,
@@ -19,7 +19,6 @@ import {
   View,
 } from "react-native";
 import CountryPicker from "react-native-country-picker-modal";
-
 const { width, height } = Dimensions.get("window");
 
 interface OnboardingModalProps {
@@ -46,6 +45,10 @@ interface OnboardingModalProps {
   username: string;
   setUsername: (username: string) => void;
   onComplete: (formData: any) => void;
+  detectedCountryCode: string;
+  detectedCallingCode: string;
+  fullName: any;
+  setFullName: any;
 }
 
 const OnboardingModal: React.FC<OnboardingModalProps> = ({
@@ -72,6 +75,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   username,
   setUsername,
   onComplete,
+  fullName,
+  setFullName,
+  detectedCallingCode,
+  detectedCountryCode,
 }) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -82,6 +89,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const otpRefs = useRef<TextInput[]>([]);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+
   const [usernameAvailable, setUsernameAvailable] = useState(false);
 
   const [isUsernameChecking, setIsUsernameChecking] = useState(false);
@@ -104,8 +112,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   const enterAnim = useRef(new Animated.Value(width)).current; // incoming card
   const exitAnim = useRef(new Animated.Value(0)).current; // outgoing card
-  const [countryCode, setCountryCode] = useState<any>("NG"); // default to Nigeria
-  const [callingCode, setCallingCode] = useState("234");
+  const [countryCode, setCountryCode] = useState<any>(detectedCountryCode);
+  const [callingCode, setCallingCode] = useState(detectedCallingCode);
+
   const [showCountryPicker, setShowCountryPicker] = useState(false);
 
   React.useEffect(() => {
@@ -135,7 +144,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       });
     }
   }, [currentStep]);
+  // This effect runs whenever the detected code from parent changes!
+  useEffect(() => {
+    setCountryCode(detectedCountryCode);
+  }, [detectedCountryCode]);
 
+  useEffect(() => {
+    setCallingCode(detectedCallingCode);
+  }, [detectedCallingCode]);
   const usernameCheckTimeout = useRef<any>(null);
 
   const checkUsernameAvailability = (username: string) => {
@@ -185,7 +201,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     [STEPS.VERIFY_OTP]: "Verify Code",
     [STEPS.PASSWORD]: "Create Password",
     [STEPS.PERSONAL_INFO]: "Personal Information",
-    [STEPS.USERNAME]: "Choose Username",
   };
 
   React.useEffect(() => {
@@ -275,11 +290,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           firstNameRef.current?.focus();
           break;
         case STEPS.PASSWORD:
-          passwordRef.current?.focus();
-          break;
-        case STEPS.USERNAME:
           usernameRef.current?.focus();
           break;
+
         default:
           break;
       }
@@ -326,6 +339,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   //   }
   //   return "";
   // };
+
   const validatePassword = (password: string) => {
     const hasMinLength = password.length >= 8;
     const hasUppercase = /[A-Z]/.test(password);
@@ -362,7 +376,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const passwordValidation = validatePassword(password);
-  const passwordsMatch = !!password && password === confirmPassword;
+  const isPasswordValid =
+    passwordValidation.hasMinLength &&
+    passwordValidation.hasUppercase &&
+    passwordValidation.hasSpecialChar;
+
+  const isUsernameValid =
+    !!username && username.length >= 3 && usernameAvailable && !usernameError;
+
+  const canContinue = isPasswordValid && isUsernameValid && !isLoading;
 
   const validateName = (name: string) => {
     if (!name.trim()) return "This field is required";
@@ -520,31 +542,34 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     switch (currentStep) {
       case STEPS.PHONE:
         return validatePhoneNumber(phoneNumber);
+
       case STEPS.VERIFY_OTP:
         return validateOTP();
+
       case STEPS.PASSWORD: {
+        // Validate username
+        if (!username.trim()) return "Username is required";
+        if (username.length < 3)
+          return "Username must be at least 3 characters";
+        if (usernameError) return usernameError;
+        if (!usernameAvailable) return "Username is not available";
+
+        // Validate password
         const passwordResult = validatePassword(password);
         if (passwordResult.error) return passwordResult.error;
-        if (password !== confirmPassword) return "Passwords don't match";
-        return "";
+
+        return ""; // All good!
       }
+
       case STEPS.PERSONAL_INFO:
-        return (
-          validateName(firstName) ||
-          validateName(lastName) ||
-          validateEmail(email)
-        );
-      case STEPS.USERNAME:
-        // Prefer dynamic error, fall back to required
-        return usernameError || validateName(username);
+        return validateName(fullName) || validateEmail(email);
+
       default:
         return "";
     }
   };
 
   const handleContinue = async () => {
-    // DAVIS HERE
-
     if (isLoading) return;
 
     const error = getCurrentValidation();
@@ -553,54 +578,58 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       return;
     }
 
-    switch (currentStep) {
-      case STEPS.PHONE:
-        try {
+    try {
+      switch (currentStep) {
+        case STEPS.PHONE: {
           setIsLoading(true);
           setInputError("");
-          // 1. Check if phone exists first!
           const { exists, message } = await authAPI.checkPhoneNumberExists(
             phoneNumber
           );
           if (exists) {
             setInputError(message || "Phone number already exists.");
-            setIsLoading(false);
-            return; // Stop flow if taken
+            return;
           }
-          // 2. If phone is available, continue as normal
           const result = await sendVerificationCode(phoneNumber);
-          if (result.success) {
+          if (result.success) onContinue();
+          break;
+        }
+
+        case STEPS.VERIFY_OTP: {
+          if (!isPhoneVerified) {
+            const otpString = otpValues.join("");
+            const result = await verifyCode(otpString);
+            if (result.success) onContinue();
+          } else {
             onContinue();
           }
-        } catch (err: any) {
-          setInputError(
-            err?.message || "Something went wrong. Please try again."
+          break;
+        }
+
+        // PASSWORD & USERNAME (combined step)
+        case STEPS.PASSWORD: {
+          // Both password and username are entered in this step.
+          // Username is validated live, password checked via checks.
+          // If you need to do a final username availability check, do it here:
+          setIsLoading(true);
+          setInputError("");
+          if (!usernameAvailable) {
+            setInputError("Username is not available.");
+            return;
+          }
+          // If you want to also do a final backend check (optional):
+          const { exists, message } = await authAPI.checkUsernameExists(
+            username
           );
-        } finally {
-          setIsLoading(false);
-        }
-        break;
-
-      case STEPS.VERIFY_OTP:
-        // Verify code
-        if (!isPhoneVerified) {
-          const otpString = otpValues.join("");
-          const result = await verifyCode(otpString);
-          if (result.success) {
-            onContinue();
+          if (exists) {
+            setInputError(message || "Username is already taken.");
+            return;
           }
-        } else {
           onContinue();
+          break;
         }
-        break;
 
-      case STEPS.PASSWORD:
-        console.log("Password step completed, moving to personal info");
-        onContinue();
-        break;
-
-      case STEPS.PERSONAL_INFO:
-        try {
+        case STEPS.PERSONAL_INFO: {
           setIsLoading(true);
           setInputError("");
           const { exists, message } = await authAPI.checkEmailExists(email);
@@ -608,39 +637,32 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             setInputError(message || "Email already exists.");
             setFocusedField("email");
             setTimeout(() => emailRef.current?.focus(), 100);
-            setIsLoading(false);
             return;
           }
-          onContinue();
-        } catch (err: any) {
-          setInputError(
-            err?.message || "Something went wrong. Please try again."
-          );
-          setFocusedField("email");
-          setTimeout(() => emailRef.current?.focus(), 100);
-        } finally {
-          setIsLoading(false);
+          const formData = {
+            phoneNumber: formatPhoneNumber(phoneNumber),
+            verificationCode: otpValues.join(""),
+            fullName,
+            email,
+            password,
+            username: username.toLowerCase().replace(/\s/g, ""),
+          };
+          console.log("Form submission data:", formData);
+          onComplete(formData);
+          break;
         }
-        break;
 
-      case STEPS.USERNAME:
-        const formData = {
-          phoneNumber: formatPhoneNumber(phoneNumber),
-          verificationCode: otpValues.join(""),
-          firstName,
-          lastName,
-          email,
-          password,
-          username: username.toLowerCase().replace(/\s/g, ""), // force again, just in case
-        };
-
-        console.log("Form submission data:", formData);
-        onComplete(formData);
-        break;
-
-      default:
-        console.warn("Unknown step:", currentStep);
-        break;
+        default:
+          console.warn("Unknown step:", currentStep);
+      }
+    } catch (err: any) {
+      setInputError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Something went wrong. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -649,20 +671,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case "phone":
         setPhoneNumber(formatPhoneNumber(value));
         break;
-      case "firstName":
-        setFirstName(value);
+      case "fullName":
+        setFullName(value);
         break;
-      case "lastName":
-        setLastName(value);
-        break;
+
       case "email":
         setEmail(value);
-        break;
-      case "password":
-        setPassword(value);
-        break;
-      case "confirmPassword":
-        setConfirmPassword(value);
         break;
       case "username":
         // Convert to lowercase and trim spaces
@@ -670,6 +684,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         setUsername(usernameValue);
         setUsernameError("");
         checkUsernameAvailability(usernameValue);
+        break;
+      case "password":
+        setPassword(value);
         break;
     }
 
@@ -698,6 +715,25 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const passwordRef = useRef<TextInput>(null);
   const confirmPasswordRef = useRef<TextInput>(null);
   const usernameRef = useRef<TextInput>(null);
+
+  const formatPhoneForDisplay = (phone: any) => {
+    const cleaned = phone.replace(/[^\d]/g, "");
+
+    if (cleaned.length <= 3) {
+      return cleaned;
+    } else if (cleaned.length <= 6) {
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+    } else if (cleaned.length <= 10) {
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(
+        6
+      )}`;
+    } else {
+      return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(
+        6,
+        10
+      )} ${cleaned.slice(10)}`;
+    }
+  };
 
   const isValidInput = !getCurrentValidation();
 
@@ -749,49 +785,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </TouchableOpacity>
               </View>
 
-              {/* <View className="">
-                <TextInput
-                  value={phoneNumber}
-                  ref={phoneInputRef}
-                  onChangeText={(text) => handleInputChange(text, "phone")}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
-                  placeholder="Enter phone number (+1234567890)"
-                  placeholderTextColor="#9CA3AF"
-                  className={baseInputStyle(
-                    !!inputError,
-                    isInputFocused,
-                    isValidInput && !isLoading
-                  )}
-                  keyboardType="phone-pad"
-                  returnKeyType="done"
-                  onSubmitEditing={handleContinue}
-                  maxLength={14}
-                  editable={!isLoading}
-                />
-                {inputError ? (
-                  <Text className="text-red-500 text-sm mt-2 px-2">
-                    {inputError}
-                  </Text>
-                ) : null}
-              </View> */}
-              <View className="flex-row mb-2 items-center rounded-[17px] overflow-hidden  ">
+              <View
+                // className="flex-row mb-2 p-2 relative items-center rounded-[17px] overflow-hidden  "
+                className={`${baseInputStyle(
+                  !!inputError,
+                  isInputFocused,
+                  isValidInput && !isLoading
+                )} flex flex-row pl-3 items-center`}
+              >
                 {/* Country Picker Button */}
                 <TouchableOpacity
-                  className="flex-row  items-center h-full pr-2 bg-white rounded-[8px] "
+                  className="flex-row   z-[100] items-center h-full pr-2  rounded-[8px] "
                   onPress={() => setShowCountryPicker(true)}
                   activeOpacity={0.9}
                 >
-                    <View
-    style={{
-      height: screenHeight * 0.7,
-      marginTop: screenHeight * 0.3,
-      backgroundColor: "#fff",
-      borderTopLeftRadius: 16,
-      borderTopRightRadius: 16,
-      overflow: "hidden",
-    }}
-  >
                   <CountryPicker
                     countryCode={countryCode}
                     withFlag
@@ -821,20 +828,22 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       onBackgroundTextColor: "#333333",
                       filterPlaceholderTextColor: "#aaa",
                       activeOpacity: 0.7,
-                      itemHeight: 48,
                     }}
                   />
-                  </View>
                   <Text className=" text-base text-black">+{callingCode}</Text>
                 </TouchableOpacity>
 
                 {/* Phone number input (only local part, no +234) */}
                 <TextInput
-                  value={phoneNumber.replace(`+${callingCode}`, "")} // Remove any accidental country code
+                  value={formatPhoneForDisplay(
+                    phoneNumber.replace(`+${callingCode}`, "")
+                  )}
                   ref={phoneInputRef}
                   onChangeText={(text) => {
-                    // Always store as full international phone number!
-                    setPhoneNumber(`+${callingCode}${text.replace(/\D/g, "")}`);
+                    // Extract only digits and store as international format
+                    const cleaned = text.replace(/\D/g, "");
+                    const fullNumber = `+${callingCode}${cleaned}`;
+                    setPhoneNumber(fullNumber);
                   }}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setIsInputFocused(false)}
@@ -843,11 +852,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   keyboardType="phone-pad"
                   returnKeyType="done"
                   style={{ flex: 1, height: 64 }}
-                  className={baseInputStyle(
-                    !!inputError,
-                    isInputFocused,
-                    isValidInput && !isLoading
-                  )}
+                  // className={baseInputStyle(
+                  //   !!inputError,
+                  //   isInputFocused,
+                  //   isValidInput && !isLoading
+                  // )}
                   maxLength={15}
                   editable={!isLoading}
                 />
@@ -1015,8 +1024,33 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </TouchableOpacity>
               </View>
 
-              {/* Add gap-3 here to space out each child */}
               <View className="mb-2 gap-3">
+                {/* Username */}
+                <View className="relative">
+                  <TextInput
+                    value={username}
+                    onChangeText={(text) => handleInputChange(text, "username")}
+                    onFocus={() => setFocusedField("username")}
+                    onBlur={() => setFocusedField(null)}
+                    ref={usernameRef}
+                    placeholder="Choose a username"
+                    placeholderTextColor="#9CA3AF"
+                    className={baseInputStyle(
+                      !!usernameError || !!inputError,
+                      isInputFocused,
+                      !!username.trim() && usernameAvailable && !usernameError
+                    )}
+                    returnKeyType="next"
+                    autoCapitalize="none"
+                  />
+                  {isUsernameChecking && (
+                    <View style={{ position: "absolute", right: 16, top: 18 }}>
+                      <ActivityIndicator size="small" color="blue" />
+                    </View>
+                  )}
+                </View>
+
+                {/* Password */}
                 <View className="relative">
                   <TextInput
                     value={password}
@@ -1048,38 +1082,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     )}
                   </TouchableOpacity>
                 </View>
-                <View className="relative">
-                  <TextInput
-                    value={confirmPassword}
-                    onChangeText={(text) =>
-                      handleInputChange(text, "confirmPassword")
-                    }
-                    onFocus={() => setFocusedField("confirmPassword")}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Confirm password"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!inputError,
-                      focusedField === "confirmPassword",
-                      isValidInput
-                    )}
-                    secureTextEntry={!showPassword}
-                    returnKeyType="done"
-                    onSubmitEditing={handleContinue}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-4"
-                  >
-                    {showPassword ? (
-                      <Feather name="eye-off" size={20} color="#666" />
-                    ) : (
-                      <Feather name="eye" size={20} color="#666" />
-                    )}
-                  </TouchableOpacity>
-                </View>
               </View>
-              <View className=" mb-2  w-full p-2">
+
+              {/* Password validation items */}
+              <View className=" w-full p-2">
                 <ValidationItem
                   label="At least 1 uppercase letter"
                   passed={passwordValidation.hasUppercase}
@@ -1092,37 +1098,37 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   label="Minimum 8 characters"
                   passed={passwordValidation.hasMinLength}
                 />
-                <ValidationItem
-                  label="Passwords must match"
-                  passed={passwordsMatch}
-                />
               </View>
-              {inputError ? (
-                <Text className="text-red-500 text-sm mt-2 px-2">
-                  {inputError}
+
+              {usernameError || inputError ? (
+                <Text className="text-red-500 text-sm px-2 mt-2">
+                  {usernameError || inputError}
+                </Text>
+              ) : usernameAvailable && username.length >= 3 ? (
+                <Text className="text-green-600 text-sm px-2 mt-2">
+                  Username is available
                 </Text>
               ) : null}
 
-              {/* <Text className="text-gray-500 text-sm text-center mb-4 leading-5">
-                Password must be at least 8 characters with{"\n"}uppercase,
-                lowercase, and numbers
-              </Text> */}
-
               <TouchableOpacity
                 onPress={handleContinue}
-                disabled={!isValidInput}
-                className={`rounded-full p-4 ${
-                  isValidInput ? "bg-secondary" : "bg-disabled"
+                disabled={!canContinue || isLoading}
+                className={`rounded-full mt-4 p-4 ${
+                  canContinue ? "bg-secondary" : "bg-disabled"
                 }`}
                 activeOpacity={0.8}
               >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput ? "text-white" : "text-gray-400"
-                  }`}
-                >
-                  Continue
-                </Text>
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#0368FF" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      canContinue ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Continue
+                  </Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -1156,36 +1162,17 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               <View className="space-y-4 gap-3 mb-6">
                 <View>
                   <TextInput
-                    value={firstName}
-                    ref={firstNameRef}
-                    onChangeText={(text) =>
-                      handleInputChange(text, "firstName")
-                    }
-                    onFocus={() => setFocusedField("firstName")}
+                    value={fullName}
+                    ref={firstNameRef} // Or rename to fullNameRef for clarity
+                    onChangeText={(text) => handleInputChange(text, "fullName")}
+                    onFocus={() => setFocusedField("fullName")}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="First name"
+                    placeholder="Full name"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
-                      !!inputError && !firstName.trim(),
-                      focusedField === "firstName",
-                      !!firstName.trim()
-                    )}
-                    returnKeyType="next"
-                  />
-                </View>
-
-                <View>
-                  <TextInput
-                    value={lastName}
-                    onChangeText={(text) => handleInputChange(text, "lastName")}
-                    onFocus={() => setFocusedField("lastName")}
-                    onBlur={() => setFocusedField(null)}
-                    placeholder="Last name"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!inputError && !lastName.trim(),
-                      focusedField === "lastName",
-                      !!lastName.trim()
+                      !!inputError && !fullName.trim(),
+                      focusedField === "fullName",
+                      !!fullName.trim()
                     )}
                     returnKeyType="next"
                   />
@@ -1201,7 +1188,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     placeholder="Email address"
                     placeholderTextColor="#9CA3AF"
                     className={baseInputStyle(
-                      // Only show error/red if the error is for email!
                       (!!inputError && focusedField === "email") ||
                         (!!inputError &&
                           inputError.toLowerCase().includes("email")),
@@ -1251,96 +1237,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </View>
         );
 
-      case STEPS.USERNAME:
-        return (
-          <View
-            className="bg-white rounded-3xl shadow-2xl"
-            // style={{ minHeight: isKeyboardVisible ? 550 : 260 }}
-          >
-            <View className="px-6 pt-6 pb-8">
-              <View className="flex-row justify-between items-center mb-6">
-                <TouchableOpacity
-                  onPress={onBack}
-                  className="p-2 bg-gray-100 rounded-full"
-                >
-                  <Feather name="arrow-left" size={20} color="#666" />
-                </TouchableOpacity>
-                <Text className="text-xl font-semibold text-gray-900">
-                  {stepTitles[step]}
-                </Text>
-                <TouchableOpacity
-                  onPress={handleModalClose}
-                  className="p-2 bg-gray-100 rounded-full"
-                >
-                  <Feather name="x" size={20} color="#666" />
-                </TouchableOpacity>
-              </View>
-
-              <View className="space-y-4 gap-3 mb-6">
-                <View>
-                  <TextInput
-                    value={username}
-                    onChangeText={(text) => handleInputChange(text, "username")}
-                    onFocus={() => setIsInputFocused(true)}
-                    onBlur={() => setIsInputFocused(false)}
-                    ref={usernameRef}
-                    placeholder="Enter username"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!usernameError || !!inputError, // error triggers red
-                      isInputFocused,
-                      !!username.trim() && usernameAvailable && !usernameError // valid triggers green
-                    )}
-                    returnKeyType="next"
-                    autoCapitalize="none"
-                  />
-                  {isUsernameChecking && (
-                    <View style={{ position: "absolute", right: 16, top: 18 }}>
-                      <ActivityIndicator size="small" color="blue" />
-                    </View>
-                  )}
-                </View>
-                {/* {usernameError || inputError ? (
-                  <Text className="text-red-500 text-sm px-2">
-                    {usernameError || inputError}
-                  </Text>
-                ) : null} */}
-                {usernameError || inputError ? (
-                  <Text className="text-red-500 text-sm px-2">
-                    {usernameError || inputError}
-                  </Text>
-                ) : usernameAvailable && username.length >= 3 ? (
-                  <Text className="text-green-600 text-sm px-2">
-                    Username is available
-                  </Text>
-                ) : null}
-              </View>
-
-              <View className="flex-1" />
-
-              <TouchableOpacity
-                onPress={handleContinue}
-                disabled={!isValidInput || isUsernameChecking}
-                className={`rounded-full p-4 ${
-                  isValidInput && !isUsernameChecking
-                    ? "bg-secondary"
-                    : "bg-disabled"
-                }`}
-                activeOpacity={0.8}
-              >
-                <Text
-                  className={`text-center font-semibold text-base ${
-                    isValidInput && !isUsernameChecking
-                      ? "text-white"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {isUsernameChecking ? "Checking..." : "Continue"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        );
       default:
         return null;
     }
