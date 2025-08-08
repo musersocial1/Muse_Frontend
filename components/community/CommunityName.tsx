@@ -1,5 +1,6 @@
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import {
@@ -9,11 +10,12 @@ import {
 
 const CommunityNameScreen = ({ data, onUpdate, onNext }: any) => {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <View style={{ paddingTop: insets.top }} className="flex-1 ">
       <TouchableOpacity
-        onPress={() => RouterConstantUtil.community.start}
+        onPress={() => router.replace(RouterConstantUtil.tabs.profile as any)}
         activeOpacity={0.7}
         className="ml-5 h-14 w-14 border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
         // bg-white/10 = white at 10% opacity, matches that soft look in your image
@@ -26,17 +28,20 @@ const CommunityNameScreen = ({ data, onUpdate, onNext }: any) => {
         />
       </TouchableOpacity>
 
-      <SafeAreaView className="flex-1" edges={["top", "left", "right"]}>
+      <SafeAreaView
+        className="flex-1 justify-center items-center "
+        // edges={["top", "left", "right"]}
+      >
         {/* Main Content */}
-        <View className="flex-1 justify-center items-center">
-          <View className="w-full">
+        <View className=" flex-1  justify-center items-center">
+          <View className="w-full flex-1 justify-center items-center">
             <TextInput
               editable={true}
               value={data.name}
               onChangeText={(text) => onUpdate({ name: text })}
               placeholder="Enter community name"
               placeholderTextColor="rgba(255, 255, 255, 1)"
-              className="bg-transparent border-none px-6 py-8 text-white text-[28px] font-bold text-center"
+              className="bg-transparent border-none px-6 py-8 text-white text-[28px]  font-bold text-center"
               cursorColor="#FFFFFF"
               style={styles.textInput}
               multiline={false}
