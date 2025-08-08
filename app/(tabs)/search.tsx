@@ -485,6 +485,8 @@ const Search: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
   const handleSelectRecentSearch = (text: string) => {
+    // Keyboard.dismiss(); // force keyboard down, regardless of focus
+
     // Blur the search input (closes keyboard)
     searchInputRef.current?.blur();
 
