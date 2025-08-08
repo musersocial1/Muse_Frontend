@@ -421,6 +421,12 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index }) => {
 const Search: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const contentAnimated = useRef(new Animated.Value(0)).current;
+  const [recentSearches, setRecentSearches] = useState([
+    "Art House",
+    "Comedy Spot",
+    "Eats of Lagos",
+    "Coding with Coffee",
+  ]);
 
   const headerAnimated = useRef(new Animated.Value(0)).current;
   const fabAnimated = useRef(new Animated.Value(0)).current;
@@ -448,7 +454,7 @@ const Search: React.FC = () => {
     setSearchQuery(text);
     console.log("Searching for:", text);
   };
-
+  const [showdiscover, setshowdiscover] = useState(true);
   useEffect(() => {
     Animated.timing(headerAnimated, {
       toValue: 1,
@@ -478,6 +484,17 @@ const Search: React.FC = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
+  const handleSelectRecentSearch = (text: string) => {
+    // Blur the search input (closes keyboard)
+    searchInputRef.current?.blur();
+
+    // Give keyboard a tiny moment to close before setting value
+    setTimeout(() => {
+      setSearchQuery(text);
+      // ...add any other navigation or search logic you want
+      // setshowdiscover(false) if needed
+    }, 50); // 50ms is enough
+  };
 
   return (
     <>
@@ -494,12 +511,13 @@ const Search: React.FC = () => {
         >
           <View className="flex-row items-center gap-3">
             <View className="flex-1 flex-row items-center bg-[#363636B2]/[75%] border border-[#575757] rounded-full px-4 py-3.5 relative">
-              {searchFocused || searchQuery.length > 0 ? (
+              {!showdiscover || searchQuery.length > 0 ? (
                 <TouchableOpacity
                   onPress={() => {
                     searchInputRef.current?.blur();
                     setSearchFocused(false);
                     setSearchQuery("");
+                    setshowdiscover(true);
                     // navigateBack();
                   }}
                   className="mr-3"
@@ -518,7 +536,10 @@ const Search: React.FC = () => {
               <TextInput
                 value={searchQuery}
                 onChangeText={setSearchQuery}
-                onFocus={() => setSearchFocused(true)}
+                onFocus={() => {
+                  setSearchFocused(true);
+                  setshowdiscover(false);
+                }}
                 onBlur={() => setSearchFocused(false)}
                 ref={searchInputRef}
                 placeholder="Find communities or creators"
@@ -541,9 +562,50 @@ const Search: React.FC = () => {
           </View>
         </Animated.View>
 
-        {/* Search Results */}
         <Animated.View style={{ opacity: contentAnimated }} className="flex-1">
-          {searchFocused || searchQuery.length > 0 ? (
+          {searchQuery.length === 0 && !showdiscover ? (
+            // Show Recent Searches when focused but empty
+            <ScrollView
+              className="flex-1 px-1"
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingBottom: 100 }}
+            >
+              <View className="mt-6 px-2">
+                <Text className="text-[#FFFFFF] text-[16px] font-semibold mb-4">
+                  Recent Searches
+                </Text>
+                {recentSearches.length === 0 ? (
+                  <Text className="text-[#AEAEAE] text-[15px]">
+                    No recent searches
+                  </Text>
+                ) : (
+                  recentSearches.map((text, idx) => (
+                    <TouchableOpacity
+                      key={idx}
+                      className="flex-row items-center py-5 border-b border-[#282828]"
+                      onPress={() => handleSelectRecentSearch(text)}
+                    >
+                      <Feather
+                        name="clock"
+                        size={18}
+                        color="#9CA3AF"
+                        className="mr-4"
+                      />
+                      <Text className="text-white text-[16px]">{text}</Text>
+
+                      <Feather
+                        name="x"
+                        size={18}
+                        color="#9CA3AF"
+                        className="mr-2 absolute right-0"
+                      />
+                    </TouchableOpacity>
+                  ))
+                )}
+              </View>
+            </ScrollView>
+          ) : !showdiscover && searchQuery.length > 0 ? (
+            // Show Search Results when typing
             <ScrollView
               className="flex-1 px-1"
               showsVerticalScrollIndicator={false}
@@ -605,23 +667,9 @@ const Search: React.FC = () => {
               </ScrollView>
             </>
           )}
-          <Animated.View
-            style={{
-              transform: [{ scale: fabScale }],
-              position: "absolute",
-              bottom: 70,
-              right: 10,
-              zIndex: 1000,
-            }}
-          >
-            <TouchableOpacity
-              className="w-24 h-24  rounded-full items-center justify-center shadow-lg"
-              onPress={() => console.log("Create muse pressed")}
-            >
-              <Image source={images.muse} className="h-full w-full" />
-            </TouchableOpacity>
-          </Animated.View>
         </Animated.View>
+
+        {/* Search Results */}
       </SafeAreaView>
     </>
   );
