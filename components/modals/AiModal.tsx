@@ -2,7 +2,10 @@ import { icons } from "@/constants/icons";
 import { aiAPI } from "@/lib/api/ai";
 import { showError, showSuccess } from "@/lib/toast";
 import { Feather } from "@expo/vector-icons";
+import { Audio } from "expo-av";
 import * as Clipboard from "expo-clipboard";
+import Constants from "expo-constants";
+import * as FileSystem from "expo-file-system";
 import { LinearGradient } from "expo-linear-gradient";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -42,38 +45,20 @@ interface Props {
 
 const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
   const [showHistory, setShowHistory] = useState(false);
-  const [isVoiceMode, setIsVoiceMode] = useState(true);
   const [aiInput, setAiInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
-  const [isListening, setIsListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const [inputHeight, setInputHeight] = useState<number>(0);
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    if (isVoiceMode && !showHistory) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(scaleAnim, {
-            toValue: 1.1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scaleAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    } else {
-      scaleAnim.setValue(1);
-    }
-  }, [isVoiceMode, showHistory]);
+  const { extra } = Constants.expoConfig || {};
 
+  // Animation for the pulsing AI avatar
   const pulseAnim = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.loop(
@@ -92,6 +77,29 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
     ).start();
   }, []);
 
+  // Animation for recording state
+  const recordingAnim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (isRecording) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(recordingAnim, {
+            toValue: 1.3,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(recordingAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      recordingAnim.setValue(1);
+    }
+  }, [isRecording]);
+
   const historyItems: HistoryItem[] = [
     { id: "1", title: "Make a funny post...", preview: "Spending habits" },
     { id: "2", title: "Kanye's history", preview: "Background info" },
@@ -100,10 +108,144 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
   ];
 
   const getModalHeight = () => {
-    if (isVoiceMode) {
-      return 400;
-    }
     return screenHeight * 0.7;
+  };
+
+  // Audio recording setup
+  const setupAudio = async () => {
+    try {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== "granted") {
+        showError(
+          "Permission Required",
+          "Microphone permission is required for voice input"
+        );
+        return false;
+      }
+
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      return true;
+    } catch (error) {
+      console.error("Audio setup error:", error);
+      showError("Audio Error", "Failed to setup audio recording");
+      return false;
+    }
+  };
+
+  // Start recording
+  const startRecording = async () => {
+    try {
+      const hasPermission = await setupAudio();
+      if (!hasPermission) return;
+
+      const recordingInstance = new Audio.Recording();
+      await recordingInstance.prepareToRecordAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+
+      await recordingInstance.startAsync();
+      setRecording(recordingInstance);
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      showError("Recording Error", "Failed to start recording");
+    }
+  };
+
+  // Stop recording and transcribe
+  const stopRecording = async () => {
+    try {
+      if (!recording) return;
+
+      setIsRecording(false);
+      await recording.stopAndUnloadAsync();
+
+      const uri = recording.getURI();
+      if (!uri) {
+        showError("Recording Error", "No audio recorded");
+        return;
+      }
+
+      setIsTranscribing(true);
+
+      // Transcribe using OpenAI Whisper API
+      const transcription = await transcribeAudio(uri);
+      if (transcription) {
+        setAiInput(transcription);
+      }
+    } catch (error) {
+      console.error("Failed to stop recording:", error);
+      showError("Recording Error", "Failed to process recording");
+    } finally {
+      setRecording(null);
+      setIsTranscribing(false);
+    }
+  };
+
+  // TranscriPTION  using OpenAI Whisper API
+  const transcribeAudio = async (audioUri: string): Promise<string | null> => {
+    try {
+      const fileInfo = await FileSystem.getInfoAsync(audioUri);
+      if (!fileInfo.exists) {
+        throw new Error("Audio file does not exist");
+      }
+
+      const formData = new FormData();
+
+      const audioFile = {
+        uri: audioUri,
+        type: "audio/m4a",
+        name: "recording.m4a",
+      } as any;
+
+      formData.append("file", audioFile);
+      formData.append("model", "whisper-1");
+      formData.append("response_format", "json");
+
+      const OPENAI_API_KEY = extra?.EXPO_PUBLIC_OPENAI_KEY;
+
+      console.log("Sending request to OpenAI...");
+
+      const response = await fetch(
+        "https://api.openai.com/v1/audio/transcriptions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error:", errorText);
+        throw new Error(
+          `Transcription failed: ${response.status} - ${errorText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("Transcription result:", result);
+
+      return result.text || null;
+    } catch (error) {
+      console.error("Transcription error:", error);
+      showError("Transcription Error", `Failed to transcribe audio: ${error}`);
+      return null;
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      await stopRecording();
+    } else {
+      await startRecording();
+    }
   };
 
   const sendTextMessage = async () => {
@@ -167,10 +309,6 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
     }
   };
 
-  const toggleVoiceRecording = () => {
-    setIsListening(!isListening);
-  };
-
   const regenerateResponse = async () => {
     if (messages.length === 0 || isLoading) return;
 
@@ -231,8 +369,12 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
       setMessages([]);
       setConversationId(undefined);
       setAiInput("");
-      setIsListening(false);
-      setIsVoiceMode(true);
+      setIsRecording(false);
+      setIsTranscribing(false);
+      if (recording) {
+        recording.stopAndUnloadAsync();
+        setRecording(null);
+      }
     }
   }, [showAIModal]);
 
@@ -287,19 +429,10 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
               </>
             ) : (
               <>
-                <TouchableOpacity
-                  onPress={() => setIsVoiceMode((prev) => !prev)}
-                  className="w-12 h-12 bg-white/10 rounded-full items-center justify-center"
-                >
-                  {isVoiceMode ? (
-                    <Feather name="message-circle" size={22} color="white" />
-                  ) : (
-                    <Feather name="mic" size={22} color="white" />
-                  )}
-                </TouchableOpacity>
+                <View className="w-12 h-12" />
 
                 <Text className="text-white text-xl font-semibold">
-                  {isVoiceMode ? "Voice Chat" : "Merlin"}
+                  Merlin AI
                 </Text>
 
                 <TouchableOpacity
@@ -334,25 +467,6 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                   </TouchableOpacity>
                 ))}
               </ScrollView>
-            ) : isVoiceMode ? (
-              <View className="flex-1 items-center justify-center">
-                <TouchableOpacity
-                  onPress={toggleVoiceRecording}
-                  disabled={isLoading}
-                >
-                  <Animated.View
-                    style={{ transform: [{ scale: scaleAnim }] }}
-                    className={`w-24 h-24 rounded-full items-center justify-center ${
-                      isListening ? "bg-red-600" : "bg-neutral-800"
-                    }`}
-                  >
-                    <Feather name="mic" size={40} color="white" />
-                  </Animated.View>
-                </TouchableOpacity>
-                <Text className="text-white/80 text-base mt-4">
-                  {isListening ? "Listening..." : "Tap to speak"}
-                </Text>
-              </View>
             ) : (
               <ScrollView
                 ref={scrollViewRef}
@@ -468,7 +582,16 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                       </LinearGradient>
                     </Animated.View>
                     <Text className="text-[#FFFFFF]/50 mr-2 pt-2 pl-3 fnt-medium">
-                      Comming right up..
+                      Coming right up..
+                    </Text>
+                  </View>
+                )}
+
+                {isTranscribing && (
+                  <View className="mb-6 flex-row items-center justify-center">
+                    <Feather name="mic" size={20} color="#9CA3AF" />
+                    <Text className="text-[#FFFFFF]/50 ml-2 font-medium">
+                      Transcribing...
                     </Text>
                   </View>
                 )}
@@ -476,7 +599,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
             )}
           </View>
 
-          {!showHistory && !isVoiceMode && (
+          {!showHistory && (
             <View className="px-6 pb-8 pt-4">
               <View
                 className={`flex-row ${
@@ -489,17 +612,17 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                   name="plus"
                   size={20}
                   color="white"
-                  style={{ marginRight: 12, marginBottom: isMultiLine ? 8 : 0 }}
+                  style={{ marginRight: 10, marginBottom: isMultiLine ? 8 : 0 }}
                 />
 
                 <TextInput
-                  className="flex-1 text-white text-base ml-4"
-                  placeholder="Ask Merlin AI"
+                  className="flex-1 text-white text-base ml-0"
+                  placeholder="Type or tap mic to speak"
                   placeholderTextColor="#9CA3AF"
                   value={aiInput}
                   onChangeText={setAiInput}
                   multiline
-                  maxLength={50}
+                  maxLength={500}
                   onContentSizeChange={onInputContentSizeChange}
                   style={{
                     marginBottom: isMultiLine ? 6 : 0,
@@ -508,28 +631,47 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                   }}
                 />
 
+                {/* Mic Button */}
                 <TouchableOpacity
-                  onPress={() => {
-                    if (aiInput.trim()) {
-                      sendTextMessage();
-                    } else {
-                      setIsVoiceMode(true);
-                    }
-                  }}
-                  disabled={isLoading}
-                  className={`rounded-full ${
-                    aiInput.trim() && !isLoading ? "bg-white p-3" : "p-0"
+                  onPress={toggleRecording}
+                  disabled={isTranscribing}
+                  className="mr-2"
+                >
+                  <Animated.View
+                    style={{
+                      transform: [{ scale: recordingAnim }],
+                    }}
+                    className={`p-2 rounded-full ${
+                      isRecording
+                        ? "bg-red-500"
+                        : isTranscribing
+                        ? "bg-gray-500"
+                        : "bg-white/20"
+                    }`}
+                  >
+                    <Feather
+                      name="mic"
+                      size={20}
+                      color={isTranscribing ? "#666" : "white"}
+                    />
+                  </Animated.View>
+                </TouchableOpacity>
+
+                {/* Send Button */}
+                <TouchableOpacity
+                  onPress={sendTextMessage}
+                  disabled={isLoading || !aiInput.trim()}
+                  className={`rounded-full p-2 bg-secondary  items-center justify-center ${
+                    aiInput.trim() && !isLoading
+                      ? "bg-secondary "
+                      : " bg-white/20"
                   }`}
                 >
-                  {aiInput.trim() ? (
-                    <Feather
-                      name="arrow-up"
-                      size={20}
-                      color={isLoading ? "#666" : "black"}
-                    />
-                  ) : (
-                    <Image source={icons.voice} className="h-12 w-12" />
-                  )}
+                  <Feather
+                    name="arrow-up"
+                    size={20}
+                    color={aiInput.trim() && !isLoading ? "white" : "white"}
+                  />
                 </TouchableOpacity>
               </View>
             </View>

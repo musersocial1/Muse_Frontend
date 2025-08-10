@@ -305,7 +305,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     const hasMinLength = password.length >= 8;
     const hasUppercase = /[A-Z]/.test(password);
     // const hasLowercase = /[a-z]/.test(password);
-    // const hasNumber = /\d/.test(password);
+    const hasNumber = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     let error = "";
@@ -319,10 +319,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     // else if (!hasLowercase) {
     //   error = "Password must contain at least one lowercase letter";
     // }
-    // else if (!hasNumber) {
-    //   error = "Password must contain at least one number";
-    // }
-    else if (!hasSpecialChar) {
+    else if (!hasNumber) {
+      error = "Password must contain at least one number";
+    } else if (!hasSpecialChar) {
       error = "Password must contain at least one special character";
     }
 
@@ -330,7 +329,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       hasMinLength,
       hasUppercase,
       // hasLowercase,
-      // hasNumber,
+      hasNumber,
       hasSpecialChar,
       error, // empty string if all valid
     };
@@ -593,6 +592,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     isOtpComplete &&
     resetPasswordValidation.hasUppercase &&
     resetPasswordValidation.hasSpecialChar &&
+    resetPasswordValidation.hasNumber &&
     resetPasswordValidation.hasMinLength &&
     passwordsMatch &&
     !isLoading;

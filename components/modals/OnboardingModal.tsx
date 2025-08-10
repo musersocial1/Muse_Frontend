@@ -330,10 +330,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     const hasMinLength = password.length >= 8;
     const hasUppercase = /[A-Z]/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasNumber = /\d/.test(password);
 
     let error = "";
     if (!password.trim()) {
       error = "Password is required";
+    } else if (!hasNumber) {
+      error = "Password must have atleast one digit";
     } else if (!hasMinLength) {
       error = "Password must be at least 8 characters";
     } else if (!hasUppercase) {
@@ -346,7 +349,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       hasMinLength,
       hasUppercase,
       // hasLowercase,
-      // hasNumber,
+      hasNumber,
       hasSpecialChar,
       error, // empty string if all valid
     };
@@ -356,6 +359,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const isPasswordValid =
     passwordValidation.hasMinLength &&
     passwordValidation.hasUppercase &&
+    passwordValidation.hasNumber &&
     passwordValidation.hasSpecialChar;
 
   const isUsernameValid =
