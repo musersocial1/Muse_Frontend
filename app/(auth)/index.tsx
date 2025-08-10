@@ -229,7 +229,7 @@ export default function Index() {
         phoneNumber,
         username,
         fullName,
-        confirmPassword,
+        // confirmPassword,
         dateOfBirth,
         accountType: moreInfoData.accountType,
         gender: moreInfoData.gender,
@@ -279,7 +279,6 @@ export default function Index() {
 
         // Remove "+" from calling code
         const dialCode = data?.country_calling_code?.replace("+", "") || "234";
-        console.log(data);
         setDetectedCountryCode(userCountry);
         setDetectedCallingCode(dialCode);
       } catch (err) {
@@ -351,9 +350,6 @@ export default function Index() {
                     className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                     activeOpacity={0.8}
                     onPress={() => setShowLogin(true)}
-                    // onPress={() =>
-                    //   router.replace(RouterConstantUtil.tabs.home as any)
-                    // }
                   >
                     <Text className="text-white text-center font-sfpro-bold text-lg">
                       Already have an account

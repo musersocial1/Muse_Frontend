@@ -8,6 +8,8 @@ import Guidelines from "@/components/community/GuildeLines";
 import PricingScreen from "@/components/community/Pricing";
 import ProgressBar from "@/components/community/ProgressBar";
 import ProgressiveBlur from "@/components/ui/progressiveBlur";
+import { communityAPI } from "@/lib/api/community";
+import { showError, showSuccess } from "@/lib/toast";
 import { CommunityData } from "@/types/community";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
@@ -24,13 +26,10 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { View } from "react-native-animatable";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
 const TOTAL_STEPS = 8;
-
-// ... imports above unchanged
 
 const CreateCommunity: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -39,23 +38,25 @@ const CreateCommunity: React.FC = () => {
   const [nextStep, setNextStep] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [communityData, setCommunityData] = useState<CommunityData>({
     name: "",
     coverImage: "",
-    location: "",
-    categories: [""],
+    bio: "",
+    categories: [],
+    coverImageUploadUrl: "",
+    coverImageKey: "",
     price: "",
     isPrivate: false,
     isPaidCommunity: false,
     guidelines: "",
+    links: [],
   });
 
-  // Animation values
   const enterAnim = useRef(new Animated.Value(width)).current;
   const exitAnim = useRef(new Animated.Value(0)).current;
 
-  // Update community data
   const updateData = (data: Partial<CommunityData>) => {
     setCommunityData((prev) => ({ ...prev, ...data }));
   };
@@ -95,15 +96,11 @@ const CreateCommunity: React.FC = () => {
       setNextStep(null);
       setIsAnimating(false);
 
-      // Reset for next time
       opacityAnim.setValue(1);
     });
   };
   const [lastStep, setLastStep] = useState(1);
 
-  // ...your communityData etc
-
-  // Animated values
   const bgAnim = useRef(
     new Animated.Value(currentStep >= 3 ? 0 : width)
   ).current;
@@ -115,10 +112,8 @@ const CreateCommunity: React.FC = () => {
     new Animated.Value(currentStep < 3 ? 1 : 0)
   ).current;
 
-  // Animate both background and gradient
   useEffect(() => {
     if (currentStep >= 3 && lastStep < 3) {
-      // Going FORWARD: gradient fades OUT, image fades IN
       Animated.parallel([
         Animated.timing(gradientOpacity, {
           toValue: 0,
@@ -142,7 +137,6 @@ const CreateCommunity: React.FC = () => {
         }),
       ]).start();
     } else if (currentStep < 3 && lastStep >= 3) {
-      // Going BACK: gradient fades IN, image fades OUT
       Animated.parallel([
         Animated.timing(gradientOpacity, {
           toValue: 1,
@@ -169,18 +163,52 @@ const CreateCommunity: React.FC = () => {
     setLastStep(currentStep);
   }, [currentStep]);
 
-  // 👇 Rename handlers to avoid conflict
   const goNextStep = () => {
-    if (currentStep < TOTAL_STEPS) goToStep(currentStep + 1);
+    if (currentStep < TOTAL_STEPS) {
+      if (currentStep === 7) {
+        handleSubmit();
+      } else {
+        goToStep(currentStep + 1);
+      }
+    }
   };
 
   const goPrevStep = () => {
     if (currentStep > 1) goToStep(currentStep - 1);
   };
 
-  const handleSubmit = () => {
-    console.log("Community Created:", communityData);
-    goNextStep();
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const payload = {
+        name: communityData.name,
+        coverImage: {
+          url: communityData.coverImage,
+          key: communityData.coverImageKey,
+        },
+        bio: communityData.bio,
+        links: communityData.links,
+        price: communityData.isPaidCommunity
+          ? parseFloat(communityData.price) || 0
+          : 0,
+        type: communityData.isPrivate ? "private" : "public",
+        guideline: communityData.guidelines,
+        category: communityData.categories[1],
+      };
+
+      await communityAPI.createCommunity(payload);
+      showSuccess("Community created successfully");
+      goToStep(8);
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Failed to create community";
+      showError("Failed", errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderScreen = (step: number) => {
@@ -215,14 +243,12 @@ const CreateCommunity: React.FC = () => {
     }
   };
 
-  const insets = useSafeAreaInsets();
   return (
     <View
       className={`${
         [1, 2].includes(currentStep) ? "bg-black" : "bg-primary"
       } flex-1`}
     >
-      {/* Animated Linear Gradient (always mounted) */}
       <Animated.View
         pointerEvents="none"
         style={[
@@ -242,7 +268,6 @@ const CreateCommunity: React.FC = () => {
         />
       </Animated.View>
 
-      {/* Animated Cover Image (always mounted, but only loads image if available) */}
       <Animated.View
         pointerEvents="none"
         style={[
@@ -269,7 +294,6 @@ const CreateCommunity: React.FC = () => {
       </Animated.View>
 
       <View className="flex-1 z-[100] justify-between">
-        {/* Card transition animation */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "padding"}
@@ -277,7 +301,6 @@ const CreateCommunity: React.FC = () => {
             style={{ flex: 1 }}
           >
             <View className="flex-1   justify-between">
-              {/* Outgoing card */}
               {isAnimating && prevStep !== null && (
                 <Animated.View
                   style={{
@@ -297,7 +320,6 @@ const CreateCommunity: React.FC = () => {
                   {renderScreen(prevStep)}
                 </Animated.View>
               )}
-              {/* Incoming/current card */}
               <Animated.View
                 style={{
                   width: "100%",
@@ -325,7 +347,6 @@ const CreateCommunity: React.FC = () => {
                 )}
               </Animated.View>
             </View>
-            {/* Progress & Actions */}
 
             {currentStep < 8 && (
               <View className="pb-8 px-4">

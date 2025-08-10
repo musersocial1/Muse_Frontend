@@ -25,6 +25,7 @@ import terms from "@/assets/icons/terms.png";
 import user_icon from "@/assets/icons/user-icon.png";
 import user from "@/assets/icons/user.png";
 import users from "@/assets/icons/users.png";
+import voice from "@/assets/icons/voice.png";
 import warn from "@/assets/icons/warn.png";
 
 export const icons = {
@@ -56,4 +57,5 @@ export const icons = {
   back_3,
   warn,
   person_morph,
+  voice,
 };

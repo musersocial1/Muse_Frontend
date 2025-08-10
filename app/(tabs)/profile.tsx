@@ -2,10 +2,11 @@ import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useProfileActions } from "@/hooks/useProfile";
+import { communityAPI } from "@/lib/api/community";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -73,19 +74,21 @@ interface ProfileStatsProps {
   router: any;
   email?: string;
   username?: string;
+  communityCount: number;
 }
 
 const ProfileStats: React.FC<ProfileStatsProps> = ({
   router,
   email,
   username,
+  communityCount,
 }) => {
   const statItems = [
     {
       label: "Communities",
       icon: icons.users,
       route: RouterConstantUtil.profile.communities,
-      rightText: "3",
+      rightText: communityCount || 0,
     },
     {
       label: "Your email",
@@ -188,9 +191,20 @@ const SavedPostsSection = () => (
 const Profile = () => {
   const router = useRouter();
   const { user, isLoading, error, clearError } = useAuthState();
+  const [community, setCommunity] = useState<any[]>([]);
 
   const { username, lastName, firstName, email } = user || {};
   const { refetchProfile } = useProfileActions();
+
+  const fetchCommunities = async () => {
+    try {
+      const res = await communityAPI.getMyCommunity();
+      console.log(res, "tyyy re");
+      setCommunity(res.community);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -202,18 +216,11 @@ const Profile = () => {
     };
 
     fetchProfile();
+    fetchCommunities();
   }, []);
 
-  console.log(user, "the user object");
   return (
     <SafeAreaView className="flex-1 bg-[#121212]">
-      {/* <StatusBar
-        barStyle="light-content"
-        backgroundColor="#121212"
-        showHideTransition="fade"
-      /> */}
-
-      {/* Header */}
       <View
         className="flex-row items-center justify-between pb-4"
         style={{ paddingHorizontal: width * 0.05 }}
@@ -244,7 +251,12 @@ const Profile = () => {
           lastName={lastName}
           username={username}
         />
-        <ProfileStats router={router} email={email} username={username} />
+        <ProfileStats
+          router={router}
+          email={email}
+          username={username}
+          communityCount={community?.length}
+        />
         <SavedPostsSection />
       </ScrollView>
     </SafeAreaView>

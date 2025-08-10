@@ -227,7 +227,7 @@ const Home: React.FC = () => {
         style={{
           transform: [{ scale: fabScale }],
           position: "absolute",
-          bottom: 55,
+          bottom: 80,
           right: 10,
           zIndex: 1000,
         }}

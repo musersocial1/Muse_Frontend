@@ -1,9 +1,8 @@
-import BottomNav from "@/components/navigations/Tab";
 import { Stack } from "expo-router";
 import React from "react";
 import { StatusBar, View } from "react-native";
 
-const CommunityLayout = () => {
+const MuseaiLayout = () => {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar
@@ -18,15 +17,10 @@ const CommunityLayout = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen
-          name="create-community-startup"
-          options={{ headerShown: false }}
-        />
+        <Stack.Screen name="community-chat" options={{ headerShown: false }} />
       </Stack>
-
-      <BottomNav />
     </View>
   );
 };
 
-export default CommunityLayout;
+export default MuseaiLayout;

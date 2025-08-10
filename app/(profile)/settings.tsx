@@ -68,6 +68,12 @@ const SETTINGS_ITEMS = [
     type: "normal",
   },
   {
+    label: "Muse Ai",
+    icon: icons.communities,
+    route: RouterConstantUtil.museai.communitychat,
+    type: "normal",
+  },
+  {
     label: "Log out",
     icon: null,
     route: "/",

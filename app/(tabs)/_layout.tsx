@@ -110,7 +110,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
         >
           <Image
             source={icon}
-            style={{ tintColor: focused ? "#151312" : "#ffffff" }} // <-- Use style prop for tintColor!
+            style={{ tintColor: focused ? "#151312" : "#ffffff" }}
             className="w-[50%] h-fit"
             resizeMode="contain"
           />

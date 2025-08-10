@@ -15,6 +15,9 @@ interface ServiceConfig {
 interface ServicesConfig {
   readonly user: ServiceConfig;
   readonly posts: ServiceConfig;
+  readonly community: ServiceConfig;
+  readonly discover: ServiceConfig;
+  readonly ai: ServiceConfig;
 }
 
 interface EnvConfig {
@@ -121,11 +124,28 @@ const createServicesConfig = (): ServicesConfig => {
 
   return {
     user: {
-      baseURL: getEnvVar("EXPO_PUBLIC_USER_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_USER_API_URL", ""),
+      baseURL: "https://user.muuse.app",
       timeout: defaultTimeout,
     },
     posts: {
-      baseURL: getEnvVar("EXPO_PUBLIC_POST_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_POST_API_URL", ""),
+      baseURL: "https://post.muuse.app",
+      timeout: defaultTimeout,
+    },
+    community: {
+      // baseURL: getEnvVar("EXPO_PUBLIC_COMMUNITY_API_URL", ""),
+      baseURL: " https://community.muuse.app",
+      timeout: defaultTimeout,
+    },
+    discover: {
+      // baseURL: getEnvVar("EXPO_PUBLIC_DISCOVER_API_URL", ""),
+      baseURL: "https://discover.muuse.app",
+      timeout: defaultTimeout,
+    },
+    ai: {
+      // baseURL: getEnvVar("EXPO_PUBLIC_AI_API_URL", ""),
+      baseURL: "https://ai.muuse.app",
       timeout: defaultTimeout,
     },
   };
