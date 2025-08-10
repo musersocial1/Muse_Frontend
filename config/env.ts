@@ -157,45 +157,39 @@ const createServicesConfig = (): ServicesConfig => {
  */
 export const env: EnvConfig = {
   // App Info
-  APP_NAME: getEnvVar("EXPO_PUBLIC_APP_NAME", "MUSE"),
-  APP_VERSION: getEnvVar("EXPO_PUBLIC_APP_VERSION", "1.0.0"),
+  APP_NAME: "MUSE",
+  APP_VERSION: "1.0.6",
   APP_ENV,
-  APP_SCHEME: getEnvVar("EXPO_PUBLIC_APP_SCHEME", "muse"),
-  BUNDLE_ID: getEnvVar("EXPO_PUBLIC_BUNDLE_ID", "com.moseleydev.muse"),
+  APP_SCHEME: "MUSE",
+  BUNDLE_ID: "com.moseleydev.muse",
 
   // API Configuration
-  API_VERSION: getEnvVar("EXPO_PUBLIC_API_VERSION", "v1"),
-  API_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_API_TIMEOUT", 20000),
+  API_VERSION: "v1",
+  API_TIMEOUT: 20000,
 
   // Services Configuration
   SERVICES: createServicesConfig(),
 
   // Authentication
-  AUTH_TOKEN_KEY: getEnvVar("EXPO_PUBLIC_AUTH_TOKEN_KEY", "auth_token"),
-  REFRESH_TOKEN_KEY: getEnvVar(
-    "EXPO_PUBLIC_REFRESH_TOKEN_KEY",
-    "refresh_token"
-  ),
-  AUTH_REDIRECT_URL: getEnvVar("EXPO_PUBLIC_AUTH_REDIRECT_URL", "muse://auth"),
+  AUTH_TOKEN_KEY: "auth_token",
+  REFRESH_TOKEN_KEY: "refresh_token",
+  AUTH_REDIRECT_URL: "muse://auth",
 
   // Storage
-  STORAGE_PREFIX: getEnvVar("EXPO_PUBLIC_STORAGE_PREFIX", "muse_"),
+  STORAGE_PREFIX: "muse_",
 
   // Feature Flags
-  ENABLE_CRASH_REPORTING: getBooleanEnvVar(
-    "EXPO_PUBLIC_ENABLE_CRASH_REPORTING",
-    false
-  ),
+  ENABLE_CRASH_REPORTING: false,
   ENABLE_DEBUG_MODE: getBooleanEnvVar("EXPO_PUBLIC_ENABLE_DEBUG_MODE", true),
 
   // Development flags
-  IS_DEV: getBooleanEnvVar("EXPO_PUBLIC_IS_DEV", IS_DEV),
-  IS_STAGING: getBooleanEnvVar("EXPO_PUBLIC_IS_STAGING", IS_STAGING),
-  IS_PROD: getBooleanEnvVar("EXPO_PUBLIC_IS_PROD", IS_PROD),
+  IS_DEV: false,
+  IS_STAGING: false,
+  IS_PROD: true,
 
   // Networking
-  MAX_RETRY_ATTEMPTS: getNumberEnvVar("EXPO_PUBLIC_MAX_RETRY_ATTEMPTS", 5),
-  REQUEST_TIMEOUT: getNumberEnvVar("EXPO_PUBLIC_REQUEST_TIMEOUT", 10000),
+  MAX_RETRY_ATTEMPTS: 5,
+  REQUEST_TIMEOUT: 20000,
 } as const;
 
 // Export services config
