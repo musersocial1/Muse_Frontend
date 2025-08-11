@@ -15,7 +15,7 @@
       "distribution": "store",
       "autoIncrement": true,
       "ios": {
-        // "buildType": "release"
+        "buildType": "release"
       }
     }
   },
@@ -23,7 +23,7 @@
     "production": {
       "ios": {
         "appleId": "dev@muuse.app",
-        "ascAppId": "6748816132" // optional but recommended
+        "ascAppId": "6748816132"
       }
     }
   }

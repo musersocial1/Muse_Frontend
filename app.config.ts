@@ -44,6 +44,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         backgroundColor: "#ffffff",
       },
     ],
+    [
+      "expo-av",
+      {
+        microphonePermission:
+          "Allow Muse to access your microphone for voice input and AI transcription.",
+      },
+    ],
     "expo-font",
   ],
   experiments: {
@@ -82,5 +89,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     EXPO_PUBLIC_IS_STAGING: process.env.EXPO_PUBLIC_IS_STAGING === "true",
 
     EXPO_PUBLIC_EMAIL_LINK: process.env.EXPO_PUBLIC_EMAIL_LINK,
+    EXPO_PUBLIC_OPENAI_KEY: process.env.EXPO_PUBLIC_OPENAI_KEY,
   },
 });

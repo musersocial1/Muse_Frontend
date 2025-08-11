@@ -69,6 +69,7 @@ const ResetPassword = () => {
       hasUppercase: /[A-Z]/.test(password),
       hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
       hasMinLength: password.length >= 8,
+      hasNumber: /\d/.test(password),
     };
   };
 
@@ -291,6 +292,10 @@ const ResetPassword = () => {
               <ValidationItem
                 label="Minimum 8 characters"
                 passed={passwordValidation.hasMinLength}
+              />
+              <ValidationItem
+                label="Atleast 1 digit"
+                passed={passwordValidation.hasNumber}
               />
             </View>
           </View>

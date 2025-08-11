@@ -14,7 +14,6 @@ export interface User {
   usernameChangeCount: number;
 }
 
-// Add this interface at the top if you don't already have it
 export interface SendOtpRequest {
   email: string;
   otp: string;
@@ -26,8 +25,8 @@ export interface AuthResponse {
   jwtToken: string;
   user: User | null;
   error: any | null;
-  email: string; // <--- add this!
-  code: string; // <--- add this!
+  email: string;
+  code: string;
 }
 
 export interface AuthTokens {
@@ -47,7 +46,7 @@ export interface RegisterRequest {
   phoneNumber: string;
   username: string;
 
-  confirmPassword: string;
+  confirmPassword?: string;
   dateOfBirth: string;
   fullName: string;
   accountType: string;

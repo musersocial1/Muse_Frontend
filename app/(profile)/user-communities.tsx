@@ -1,12 +1,13 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { communityAPI } from "@/lib/api/community";
 import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -14,20 +15,24 @@ import {
 import * as Animatable from "react-native-animatable";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const communities = [
-  { name: "Beatrix", members: "$36" },
-  { name: "Valorant", members: "$59" },
-  { name: "Guardians", members: "$84" },
-];
+interface Community {
+  _id: string;
+  name: string;
+  price: number;
+  members: string[];
+  coverImage?: string;
+}
 
 const AnimatedCommunityItem = ({
   name,
-  members,
+  price,
   index,
+  coverImage,
 }: {
   name: string;
-  members: number | string;
+  price: number;
   index: number;
+  coverImage?: string;
 }) => (
   <Animatable.View
     animation="fadeInUp"
@@ -40,9 +45,9 @@ const AnimatedCommunityItem = ({
       href={RouterConstantUtil.profile.subscriptioninfo as any}
     >
       <View className="flex-row items-center p-3 bg-[#1C1C1C] rounded-full w-full">
-        <View className="w-12 h-12 rounded-full  items-center justify-center mr-4 overflow-hidden">
+        <View className="w-12 h-12 rounded-full items-center justify-center mr-4 overflow-hidden">
           <Image
-            source={icons.dp}
+            source={coverImage || icons.dp}
             className="w-full h-full"
             resizeMode="cover"
           />
@@ -56,9 +61,8 @@ const AnimatedCommunityItem = ({
             numberOfLines={1}
             className="text-white text-[16px] font-bold mr-2"
           >
-            {members}
+            ${price.toLocaleString()}
           </Text>
-          {/* <ChevronRight color={"gray"} opacity={30} size={20} /> */}
           <Feather
             name="chevron-right"
             size={20}
@@ -73,10 +77,64 @@ const AnimatedCommunityItem = ({
 
 const UserCommunities = () => {
   const router = useRouter();
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCommunities = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await communityAPI.getMyCommunity();
+
+      const formattedCommunities = res.community.map((community: any) => ({
+        _id: community._id,
+        name: community.name,
+        price: community.price || 0,
+        members: community.members || [],
+        coverImage: community.coverImage?.url || community.coverImage,
+      }));
+
+      setCommunities(formattedCommunities);
+    } catch (error) {
+      console.log("Error fetching communities:", error);
+      setError("Failed to load communities");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCommunities();
+  }, []);
+
+  if (loading) {
+    return (
+      <View className="flex-1 bg-[#121212] justify-center items-center">
+        <ActivityIndicator size="large" color="#ffffff" />
+        <Text className="text-white mt-4">Loading communities...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-[#121212] justify-center items-center px-6">
+        <Text className="text-red-400 text-center mb-4">{error}</Text>
+        <TouchableOpacity
+          onPress={fetchCommunities}
+          className="bg-blue-500 px-6 py-3 rounded-full"
+        >
+          <Text className="text-white font-bold">Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-[#121212]">
       <SafeAreaView className="flex-1 gap-7">
-        <View className="flex-row  items-center justify-between px-6 ">
+        <View className="flex-row items-center justify-between px-6">
           <TouchableOpacity
             onPress={() =>
               router.replace(RouterConstantUtil.tabs.profile as any)
@@ -111,16 +169,28 @@ const UserCommunities = () => {
         <View className="w-full border-b border-b-[#565656]/10 mb-2"></View>
 
         <ScrollView className="px-4">
-          <View className="space-y-4 gap-4">
-            {communities.map((item, idx) => (
-              <AnimatedCommunityItem
-                key={item.name}
-                name={item.name}
-                members={item.members}
-                index={idx}
-              />
-            ))}
-          </View>
+          {communities.length === 0 ? (
+            <View className="flex-1 justify-center items-center py-20">
+              <Text className="text-white/60 text-center">
+                No communities found
+              </Text>
+              <Text className="text-white/40 text-center mt-2">
+                Create your first community to get started
+              </Text>
+            </View>
+          ) : (
+            <View className="space-y-4 gap-4">
+              {communities.map((item, idx) => (
+                <AnimatedCommunityItem
+                  key={item._id}
+                  name={item.name}
+                  price={item.price}
+                  index={idx}
+                  coverImage={item.coverImage}
+                />
+              ))}
+            </View>
+          )}
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -128,5 +198,3 @@ const UserCommunities = () => {
 };
 
 export default UserCommunities;
-
-const styles = StyleSheet.create({});

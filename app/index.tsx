@@ -2,50 +2,33 @@ import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { tokenManager } from "@/lib/api/apiClient";
 import { authAPI } from "@/lib/api/auth";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { useEffect } from "react";
 
 export default function Index() {
   const router = useRouter();
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    const checkAuthAndRedirect = async () => {
-      setIsCheckingAuth(true);
+    const checkProfileInBackground = async () => {
       try {
         const token = await tokenManager.getToken();
 
         if (!token) {
+          console.log("no token found");
           router.replace(RouterConstantUtil.auth.login as any);
           return;
         }
 
-        try {
-          await authAPI.getUserProfile();
-          // router.replace(RouterConstantUtil.tabs.home as any);
-          router.replace(RouterConstantUtil.tabs.home as any);
-        } catch (err) {
-          await tokenManager.removeTokens();
-          router.replace(RouterConstantUtil.auth.login as any);
-        }
+        await authAPI.getUserProfile();
       } catch (error) {
-        console.error("Auth check error:", error);
+        await tokenManager.removeTokens();
         router.replace(RouterConstantUtil.auth.login as any);
-      } finally {
-        setIsCheckingAuth(false);
       }
     };
 
-    checkAuthAndRedirect();
-  }, [router]);
+    router.replace(RouterConstantUtil.tabs.home as any);
 
-  if (isCheckingAuth) {
-    return (
-      <View className="flex-1 bg-[#121212] items-center justify-center">
-        <ActivityIndicator size="large" color="blue" />
-      </View>
-    );
-  }
+    checkProfileInBackground();
+  }, [router]);
 
   return null;
 }

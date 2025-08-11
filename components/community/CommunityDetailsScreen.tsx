@@ -1,12 +1,8 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import * as ImagePicker from "expo-image-picker";
 import React, { useRef, useState } from "react";
 
 import {
-  ActionSheetIOS,
-  Alert,
-  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
@@ -22,6 +18,7 @@ interface CommunityData {
   name: string;
   coverImage?: string;
   bio?: string;
+  links: string[];
 }
 
 const CommunityEdit: React.FC<{
@@ -31,99 +28,11 @@ const CommunityEdit: React.FC<{
   onBack: () => void;
 }> = ({ data, onUpdate, onNext, onBack }) => {
   const [bioText, setBioText] = useState(data.bio || "");
-  const [showActions, setShowActions] = useState(false);
+  const [linkInput, setLinkInput] = useState("");
 
-  // Instead of wordCount and remainingWords
   const MAX_CHARS = 150;
   const charCount = bioText.length;
   const remainingChars = Math.max(0, MAX_CHARS - charCount);
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Required",
-        "We need access to your photo library"
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      onUpdate({ coverImage: result.assets[0].uri });
-      setShowActions(false);
-    }
-  };
-
-  const takePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Required", "We need access to your camera");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      onUpdate({ coverImage: result.assets[0].uri });
-      setShowActions(false);
-    }
-  };
-
-  const deleteImage = () => {
-    onUpdate({ coverImage: undefined });
-    setShowActions(false);
-  };
-
-  const showImageOptions = () => {
-    if (Platform.OS === "ios") {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: [
-            "Edit image",
-            "Delete image",
-            "Upload from gallery",
-            "Take from camera",
-            "Cancel",
-          ],
-          destructiveButtonIndex: 1,
-          cancelButtonIndex: 4,
-        },
-        (buttonIndex) => {
-          switch (buttonIndex) {
-            case 0:
-              pickImage();
-              break;
-            case 1:
-              deleteImage();
-              break;
-            case 2:
-              pickImage();
-              break;
-            case 3:
-              takePhoto();
-              break;
-          }
-        }
-      );
-    } else {
-      setShowActions(true);
-    }
-  };
-
-  const dismissKeyboard = () => {
-    Keyboard.dismiss();
-  };
 
   const insets = useSafeAreaInsets();
 
@@ -135,24 +44,40 @@ const CommunityEdit: React.FC<{
         badRef.current?.scrollTo({ y: 10000, animated: true });
       },
       Platform.OS === "ios" ? 250 : 350
-    ); // adjust as needed
+    );
+  };
+
+  const addLink = () => {
+    const trimmed = linkInput.trim();
+    if (trimmed && !data.links.includes(trimmed)) {
+      onUpdate({
+        ...data,
+        links: [...data.links, trimmed],
+      });
+      setLinkInput("");
+    }
+  };
+
+  const removeLink = (index: number) => {
+    onUpdate({
+      ...data,
+      links: data.links.filter((_, i) => i !== index),
+    });
   };
 
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      // className="flex-1"
       ref={badRef}
       keyboardShouldPersistTaps="handled"
+      nestedScrollEnabled
     >
-      <View style={{ paddingTop: insets.top }} className="   relative">
-        {/* Header Section */}
-        <View className=" aspect-[1/0.6] justify-center items-center w-full relative">
+      <View style={{ paddingTop: insets.top }} className="relative">
+        <View className="aspect-[1/0.6] justify-center items-center w-full relative">
           <TouchableOpacity
             onPress={onBack}
             activeOpacity={0.7}
-            className="ml-5 h-14 left-0 w-14 absolute top-0  overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
-            // bg-white/10 = white at 10% opacity, matches that soft look in your image
+            className="ml-5 h-14 left-0 w-14 absolute top-0 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
           >
             <BlurView style={[StyleSheet.absoluteFill]} />
             <Feather
@@ -164,7 +89,7 @@ const CommunityEdit: React.FC<{
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="justify-center items-center "
+            className="justify-center items-center"
             onPress={onBack}
           >
             <View className="bg-[rgba(255,255,255,0.9)] px-6 py-3 rounded-[25px]">
@@ -176,8 +101,8 @@ const CommunityEdit: React.FC<{
         </View>
 
         {/* Content Section */}
-        <View className="flex-1  px-5">
-          <View className=" px-6 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-2">
+        <View className="flex-1 px-5">
+          <View className="px-6 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-2">
             <BlurView
               intensity={30}
               tint="light"
@@ -191,7 +116,7 @@ const CommunityEdit: React.FC<{
 
           {/* Bio Section */}
           <View className="mt-2 mb-8">
-            <View className=" overflow-hidden rounded-[20px] px-6 py-8">
+            <View className="overflow-hidden rounded-[20px] px-6 py-8">
               <BlurView
                 intensity={30}
                 tint="light"
@@ -207,7 +132,6 @@ const CommunityEdit: React.FC<{
                   onUpdate({ bio: text });
                 }}
                 onFocus={handleBioFocus}
-                // placeholder="Tell people what this community is about..."
                 placeholderTextColor="rgba(255, 255, 255, 0.4)"
                 className="text-white/60 text-[16px] font-neutral-regular tracking-widest leading-6 min-h-[100px] text-top"
                 multiline
@@ -217,9 +141,69 @@ const CommunityEdit: React.FC<{
                 <Text className="text-[13px] font-neutral-regular mr-3 text-white/40">
                   {remainingChars} characters remaining
                 </Text>
-                {/* CircleProgress, pass charCount/MAX_CHARS */}
+
                 <CircleProgress progress={Math.min(charCount / MAX_CHARS, 1)} />
               </View>
+            </View>
+
+            <View className="mt-4">
+              <View className="px-0 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-2">
+                <BlurView
+                  intensity={30}
+                  tint="light"
+                  style={StyleSheet.absoluteFill}
+                />
+
+                <TextInput
+                  value={linkInput}
+                  onChangeText={setLinkInput}
+                  placeholder="Enter a links"
+                  placeholderTextColor="rgba(255,255,255,0.5)"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="url"
+                  style={{
+                    flex: 1,
+                    fontSize: 18,
+                    color: "white",
+                    fontWeight: "600",
+                    paddingHorizontal: 12,
+                  }}
+                  onSubmitEditing={addLink}
+                />
+
+                <TouchableOpacity
+                  onPress={addLink}
+                  style={{ paddingHorizontal: 12 }}
+                >
+                  <Ionicons name="add-circle-outline" size={25} color="white" />
+                </TouchableOpacity>
+              </View>
+
+              {data.links.map((item, index) => (
+                <View
+                  key={`${item}-${index}`}
+                  className="flex-row items-center justify-between px-3.5 py-5 mb-2 rounded-[12px]"
+                  style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+                >
+                  <Text
+                    style={{
+                      color: "rgba(255,255,255,0.5)",
+                      fontSize: 16,
+                      flex: 1,
+                    }}
+                  >
+                    {item}
+                  </Text>
+                  <TouchableOpacity onPress={() => removeLink(index)}>
+                    <Ionicons
+                      name="close-circle-outline"
+                      size={22}
+                      color="red"
+                    />
+                  </TouchableOpacity>
+                </View>
+              ))}
             </View>
           </View>
         </View>

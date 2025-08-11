@@ -99,16 +99,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [isPhoneVerified, setIsPhoneVerified] = useState(false);
   const [canResendCode, setCanResendCode] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
-  // const [displayedStep, setDisplayedStep] = useState(currentStep);
-  // const [direction, setDirection] = useState(1); // 1=forward, -1=back
   const slideX = useRef(new Animated.Value(0)).current;
   const [nextStep, setNextStep] = useState<string | null>(null);
 
   const [displayedStep, setDisplayedStep] = useState(currentStep);
   const [prevStep, setPrevStep] = useState<string | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [pendingStep, setPendingStep] = useState<string | null>(null);
-  const [pendingDirection, setPendingDirection] = useState<number>(1);
 
   const enterAnim = useRef(new Animated.Value(width)).current; // incoming card
   const exitAnim = useRef(new Animated.Value(0)).current; // outgoing card
@@ -139,12 +135,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       ]).start(() => {
         setDisplayedStep(currentStep);
         setPrevStep(null);
-        setNextStep(null); // <-- clear next step after animation
+        setNextStep(null);
         setIsAnimating(false);
       });
     }
   }, [currentStep]);
-  // This effect runs whenever the detected code from parent changes!
   useEffect(() => {
     setCountryCode(detectedCountryCode);
   }, [detectedCountryCode]);
@@ -296,7 +291,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         default:
           break;
       }
-    }, 600); // If you have an animation duration, set timeout to match (400ms is good for yours)
+    }, 600);
   }, [currentStep, visible]);
 
   const validatePhoneNumber = (phone: string): string => {
@@ -331,37 +326,22 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     return "";
   };
 
-  // const validatePassword = (password: string) => {
-  //   if (!password.trim()) return "Password is required";
-  //   if (password.length < 8) return "Password must be at least 8 characters";
-  //   if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-  //     return "Password must contain uppercase, lowercase, and number";
-  //   }
-  //   return "";
-  // };
-
   const validatePassword = (password: string) => {
     const hasMinLength = password.length >= 8;
     const hasUppercase = /[A-Z]/.test(password);
-    // const hasLowercase = /[a-z]/.test(password);
-    // const hasNumber = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasNumber = /\d/.test(password);
 
     let error = "";
     if (!password.trim()) {
       error = "Password is required";
+    } else if (!hasNumber) {
+      error = "Password must have atleast one digit";
     } else if (!hasMinLength) {
       error = "Password must be at least 8 characters";
     } else if (!hasUppercase) {
       error = "Password must contain at least one uppercase letter";
-    }
-    // else if (!hasLowercase) {
-    //   error = "Password must contain at least one lowercase letter";
-    // }
-    // else if (!hasNumber) {
-    //   error = "Password must contain at least one number";
-    // }
-    else if (!hasSpecialChar) {
+    } else if (!hasSpecialChar) {
       error = "Password must contain at least one special character";
     }
 
@@ -369,7 +349,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       hasMinLength,
       hasUppercase,
       // hasLowercase,
-      // hasNumber,
+      hasNumber,
       hasSpecialChar,
       error, // empty string if all valid
     };
@@ -379,6 +359,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const isPasswordValid =
     passwordValidation.hasMinLength &&
     passwordValidation.hasUppercase &&
+    passwordValidation.hasNumber &&
     passwordValidation.hasSpecialChar;
 
   const isUsernameValid =
@@ -427,7 +408,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         phoneNumber: cleanedPhone,
       });
 
-      // Starting resend timer on here
       setCanResendCode(false);
       setResendTimer(60);
 
@@ -508,7 +488,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const handleOTPChange = (text: string, index: number) => {
     const cleaned = text.replace(/\D/g, "");
 
-    // Always use the last digit typed, so if user types again in last box, it updates!
     const digit = cleaned.slice(-1) || "";
 
     // Set the value
@@ -519,11 +498,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     if (cleaned && index < 5) {
       otpRefs.current[index + 1]?.focus();
     }
-
-    // If on last input, blur it
-    // if (index === 5 && cleaned) {
-    //   setTimeout(() => otpRefs.current[5]?.blur(), 10);
-    // }
 
     if (inputError) setInputError("");
   };
@@ -547,14 +521,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         return validateOTP();
 
       case STEPS.PASSWORD: {
-        // Validate username
         if (!username.trim()) return "Username is required";
         if (username.length < 3)
           return "Username must be at least 3 characters";
         if (usernameError) return usernameError;
         if (!usernameAvailable) return "Username is not available";
 
-        // Validate password
         const passwordResult = validatePassword(password);
         if (passwordResult.error) return passwordResult.error;
 
@@ -606,18 +578,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           break;
         }
 
-        // PASSWORD & USERNAME (combined step)
         case STEPS.PASSWORD: {
-          // Both password and username are entered in this step.
-          // Username is validated live, password checked via checks.
-          // If you need to do a final username availability check, do it here:
           setIsLoading(true);
           setInputError("");
           if (!usernameAvailable) {
             setInputError("Username is not available.");
             return;
           }
-          // If you want to also do a final backend check (optional):
           const { exists, message } = await authAPI.checkUsernameExists(
             username
           );
@@ -679,7 +646,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         setEmail(value);
         break;
       case "username":
-        // Convert to lowercase and trim spaces
         const usernameValue = value.toLowerCase().replace(/\s/g, "");
         setUsername(usernameValue);
         setUsernameError("");
@@ -786,7 +752,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </View>
 
               <View
-                // className="flex-row mb-2 p-2 relative items-center rounded-[17px] overflow-hidden  "
                 className={`${baseInputStyle(
                   !!inputError,
                   isInputFocused,
@@ -833,14 +798,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <Text className=" text-base text-black">+{callingCode}</Text>
                 </TouchableOpacity>
 
-                {/* Phone number input (only local part, no +234) */}
                 <TextInput
                   value={formatPhoneForDisplay(
                     phoneNumber.replace(`+${callingCode}`, "")
                   )}
                   ref={phoneInputRef}
                   onChangeText={(text) => {
-                    // Extract only digits and store as international format
                     const cleaned = text.replace(/\D/g, "");
                     const fullNumber = `+${callingCode}${cleaned}`;
                     setPhoneNumber(fullNumber);
@@ -852,11 +815,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   keyboardType="phone-pad"
                   returnKeyType="done"
                   style={{ flex: 1, height: 64 }}
-                  // className={baseInputStyle(
-                  //   !!inputError,
-                  //   isInputFocused,
-                  //   isValidInput && !isLoading
-                  // )}
                   maxLength={15}
                   editable={!isLoading}
                 />

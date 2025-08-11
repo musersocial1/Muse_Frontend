@@ -1,10 +1,11 @@
+import BottomNav from "@/components/navigations/Tab";
 import { Stack } from "expo-router";
 import React from "react";
-import { StatusBar, StyleSheet } from "react-native";
+import { StatusBar, View } from "react-native";
 
 const CommunityLayout = () => {
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <StatusBar
         hidden={false}
         barStyle="light-content"
@@ -22,10 +23,10 @@ const CommunityLayout = () => {
           options={{ headerShown: false }}
         />
       </Stack>
-    </>
+
+      <BottomNav />
+    </View>
   );
 };
 
 export default CommunityLayout;
-
-const styles = StyleSheet.create({});

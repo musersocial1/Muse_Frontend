@@ -160,3 +160,6 @@ export class ServiceApiClient {
 
 export const userApiClient = new ServiceApiClient("user");
 export const postsApiClient = new ServiceApiClient("posts");
+export const communityApiClient = new ServiceApiClient("community");
+export const discoverApiClient = new ServiceApiClient("discover");
+export const aiApiClient = new ServiceApiClient("ai");
