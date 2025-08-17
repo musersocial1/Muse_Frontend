@@ -13,10 +13,10 @@
     },
     "production": {
       "distribution": "store",
-      "autoIncrement": true,
-      "ios": {
-        "buildType": "release"
-      }
+      "autoIncrement": true
+      // "ios": {
+      //   "buildType": "release"
+      // }
     }
   },
   "submit": {
