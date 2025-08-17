@@ -124,28 +124,37 @@ const createServicesConfig = (): ServicesConfig => {
 
   return {
     user: {
-      baseURL: getEnvVar("EXPO_PUBLIC_USER_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_USER_API_URL", ""),
       // baseURL: "https://user.muuse.app",
+      baseURL:
+        "http://muse-user-env.eba-bhi9vaxq.us-east-1.elasticbeanstalk.com",
       timeout: defaultTimeout,
     },
     posts: {
-      baseURL: getEnvVar("EXPO_PUBLIC_POST_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_POST_API_URL", ""),
       // baseURL: "https://post.muuse.app",
+      baseURL:
+        "http://muse-post-env.eba-xq7rpcia.us-east-1.elasticbeanstalk.com",
       timeout: defaultTimeout,
     },
     community: {
-      baseURL: getEnvVar("EXPO_PUBLIC_COMMUNITY_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_COMMUNITY_API_URL", ""),
       // baseURL: " https://community.muuse.app",
+      baseURL:
+        "http://muse-community-env.eba-2233emrd.us-east-1.elasticbeanstalk.com",
       timeout: defaultTimeout,
     },
     discover: {
-      baseURL: getEnvVar("EXPO_PUBLIC_DISCOVER_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_DISCOVER_API_URL", ""),
       // baseURL: "https://discover.muuse.app",
+      baseURL:
+        "http://muse-discover-env.eba-cs9wiefg.us-east-1.elasticbeanstalk.com",
       timeout: defaultTimeout,
     },
     ai: {
-      baseURL: getEnvVar("EXPO_PUBLIC_AI_API_URL", ""),
+      // baseURL: getEnvVar("EXPO_PUBLIC_AI_API_URL", ""),
       // baseURL: "https://ai.muuse.app",
+      baseURL: "http://muse-ai-env.eba-tt7y3tjd.us-east-1.elasticbeanstalk.com",
       timeout: defaultTimeout,
     },
   };
