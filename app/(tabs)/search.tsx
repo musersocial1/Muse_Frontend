@@ -1,13 +1,14 @@
 import Podcasts from "@/components/discover/podcasts";
 import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { discoverAPI } from "@/lib/api/discover";
 import { Category, Story } from "@/types/discover";
 import { Feather } from "@expo/vector-icons";
 import { router, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
-  Dimensions,
   Image,
   ScrollView,
   Text,
@@ -17,8 +18,6 @@ import {
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const { width } = Dimensions.get("window");
 
 interface SearchResult {
   id: number;
@@ -32,37 +31,6 @@ interface SearchResultCardProps {
   result: SearchResult;
   index: number;
 }
-
-const searchResults: SearchResult[] = [
-  {
-    id: 1,
-    title: "Art House",
-    creator: "Amara Okafor",
-    avatar: images.img3,
-    verified: true,
-  },
-  {
-    id: 2,
-    title: "Foodies Lounge",
-    creator: "Chika Eze",
-    avatar: images.img2,
-    verified: false,
-  },
-  {
-    id: 3,
-    title: "Comedy Spot",
-    creator: "Tunde Bello",
-    avatar: images.img3,
-    verified: true,
-  },
-  {
-    id: 4,
-    title: "Music World",
-    creator: "Lola George",
-    avatar: images.img2,
-    verified: true,
-  },
-];
 
 const SearchResultCard: React.FC<SearchResultCardProps> = ({
   result,
@@ -102,7 +70,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
       >
         <View className="relative mr-4">
           <Image
-            source={result.avatar}
+            source={result.avatar || images.img1}
             className="w-16 h-16 rounded-full"
             resizeMode="cover"
           />
@@ -131,7 +99,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
 interface CategoryCardProps {
   category: Category;
   index: number;
-  setModalVisible: any;
+  setModalVisible: (visible: boolean) => void;
 }
 
 interface StoryCardProps {
@@ -160,114 +128,11 @@ const categories: Category[] = [
   },
 ];
 
-const stories: Story[] = [
-  {
-    id: 1,
-    title: "The fashion get together",
-    category: "Fashion",
-    categoryLabel: "Trending",
-    creator: "Anda Adams",
-    creatorType: "Creator",
-    muses: "239K",
-    image: images.img1,
-  },
-  {
-    id: 2,
-    title: "F1 driver challenge",
-    category: "Sports",
-    categoryLabel: "Trending",
-    creator: "Anda Adams",
-    creatorType: "Creator",
-    muses: "134.6K",
-    image: images.img2,
-  },
-  {
-    id: 3,
-    title: "Recreating Picasso",
-    category: "Creativity",
-    categoryLabel: "Trending",
-    creator: "Anda Adams",
-    creatorType: "Creator",
-    muses: "70.5K",
-    image: images.img3,
-  },
-  {
-    id: 4,
-    title: "#30days abs challenge",
-    category: "Health",
-    categoryLabel: "Trending",
-    creator: "Anda Adams",
-    creatorType: "Creator",
-    muses: "45.2K",
-    image: images.img1,
-  },
-  {
-    id: 5,
-    title: "Eats of Lagos",
-    category: "Food",
-    categoryLabel: "Hot",
-    creator: "Chika Eze",
-    creatorType: "Foodie",
-    muses: "18.7K",
-    image: images.img2,
-  },
-  {
-    id: 6,
-    title: "Nollywood on the Rise",
-    category: "Entertainment",
-    categoryLabel: "Trending",
-    creator: "Emeka Uzoma",
-    creatorType: "Director",
-    muses: "56.2K",
-    image: images.img3,
-  },
-  {
-    id: 7,
-    title: "Late Night Sketches",
-    category: "Art",
-    categoryLabel: "New",
-    creator: "Tolu Adebayo",
-    creatorType: "Artist",
-    muses: "24.9K",
-    image: images.img1,
-  },
-  {
-    id: 8,
-    title: "Coding with Coffee",
-    category: "Tech",
-    categoryLabel: "Trending",
-    creator: "Lola George",
-    creatorType: "Developer",
-    muses: "31.5K",
-    image: images.img2,
-  },
-  {
-    id: 9,
-    title: "Travel Diaries: Kenya",
-    category: "Travel",
-    categoryLabel: "Hot",
-    creator: "Bisi Johnson",
-    creatorType: "Traveler",
-    muses: "12.8K",
-    image: images.img3,
-  },
-  {
-    id: 10,
-    title: "The Big Debate",
-    category: "Politics",
-    categoryLabel: "Controversial",
-    creator: "Musa Danjuma",
-    creatorType: "Host",
-    muses: "43.1K",
-    image: images.img1,
-  },
-];
-
-const CategoryCard = ({
+const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   index,
   setModalVisible,
-}: CategoryCardProps) => {
+}) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -296,19 +161,18 @@ const CategoryCard = ({
         opacity,
         marginRight: 12,
       }}
-      className="w-[180px] aspect-square rounded-[24px] bg-white overflow-hidden relative" // w-52 is 208px, adjust as needed
+      className="w-[180px] aspect-square rounded-[24px] bg-white overflow-hidden relative"
     >
       <Image
         source={category.img}
         className="absolute w-full h-full"
         style={{
-          opacity: 1, // fade image so circles are visible, adjust as needed!
+          opacity: 1,
           zIndex: 2,
         }}
         resizeMode="cover"
       />
 
-      {/* Touchable content on top */}
       <TouchableOpacity
         className=""
         activeOpacity={0.85}
@@ -359,7 +223,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index }) => {
   return (
     <Animated.View
       style={{
-        transform: [{ translateX }], // <-- Animation props stay inline!
+        transform: [{ translateX }],
         opacity,
       }}
       className=" px-2   rounded-2xl"
@@ -368,10 +232,8 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index }) => {
         className="flex-row bg-transparent rounded-[22px] items-center"
         activeOpacity={0.85}
       >
-        {/* Remove the "s" Text here if not needed */}
-        {/* <Text>s </Text> */}
         <Image
-          source={story.image}
+          source={story.image || images.img1}
           className="w-[30%] aspect-[1/0.9] rounded-[20px] mr-[14px] bg-neutral-900"
           resizeMode="contain"
         />
@@ -395,7 +257,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index }) => {
           </Text>
           <View className="flex-row  items-center mb-[2px]">
             <Image
-              source={story.image}
+              source={story.image || images.img1}
               className="w-[22px] h-[22px] rounded-full mr-[7px] bg-neutral-800"
             />
             <Text
@@ -418,19 +280,67 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index }) => {
   );
 };
 
+const EmptyState: React.FC<{
+  title: string;
+  subtitle: string;
+  icon?: string;
+}> = ({ title, subtitle, icon = "search" }) => (
+  <View className="flex-1 justify-center items-center py-20">
+    <Feather name={icon as any} size={48} color="#9CA3AF" />
+    <Text className="text-white text-xl font-semibold mt-4 mb-2">{title}</Text>
+    <Text className="text-[#AEAEAE] text-center px-8">{subtitle}</Text>
+  </View>
+);
+
+const ErrorState: React.FC<{
+  title: string;
+  subtitle: string;
+  onRetry?: () => void;
+}> = ({ title, subtitle, onRetry }) => (
+  <View className="flex-1 justify-center items-center py-20">
+    <Feather name="alert-circle" size={48} color="#EF4444" />
+    <Text className="text-white text-xl font-semibold mt-4 mb-2">{title}</Text>
+    <Text className="text-[#AEAEAE] text-center px-8 mb-6">{subtitle}</Text>
+    {onRetry && (
+      <TouchableOpacity
+        onPress={onRetry}
+        className="bg-white/10 px-6 py-3 rounded-full"
+      >
+        <Text className="text-white font-semibold">Try Again</Text>
+      </TouchableOpacity>
+    )}
+  </View>
+);
+
 const Search: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const contentAnimated = useRef(new Animated.Value(0)).current;
-  const [recentSearches, setRecentSearches] = useState([
+  const [recentSearches, setRecentSearches] = useState<string[]>([
     "Art House",
     "Comedy Spot",
     "Eats of Lagos",
     "Coding with Coffee",
   ]);
 
+  // API state
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [feedStories, setFeedStories] = useState<Story[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingFeed, setIsLoadingFeed] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [feedError, setFeedError] = useState<string | null>(null);
+  const [feedPagination, setFeedPagination] = useState({
+    from: 0,
+    total: 0,
+    hasMore: true,
+  });
+
   const headerAnimated = useRef(new Animated.Value(0)).current;
   const fabAnimated = useRef(new Animated.Value(0)).current;
   const router = useRouter();
+  const searchTimeoutRef = useRef<any>(null);
+
   useEffect(() => {
     Animated.timing(headerAnimated, {
       toValue: 1,
@@ -444,17 +354,133 @@ const Search: React.FC = () => {
       delay: 200,
       useNativeDriver: true,
     }).start();
-  }, [headerAnimated, contentAnimated]);
 
-  // const navigateBack = () => {
-  //   router.replace(RouterConstantUtil.tabs.home as any);
-  // };
+    loadFeed();
+  }, []);
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
-    console.log("Searching for:", text);
+  const transformToStory = (item: any, index: number): Story => ({
+    id: item.id || index + 1,
+    title: item.title || item.name || "Untitled",
+    category: item.category || "General",
+    categoryLabel: item.categoryLabel || item.label || "New",
+    creator: item.creator || item.author || "Unknown Creator",
+    creatorType: item.creatorType || item.type || "Creator",
+    muses: item.muses || item.views || item.likes || "0",
+    image: item.image ? { uri: item.image } : images.img1,
+  });
+
+  const transformToSearchResult = (item: any, index: number): SearchResult => ({
+    id: item.id || index + 1,
+    title: item.name || "Untitled",
+    creator: item.creatorUsername || "Unknown Creator",
+    avatar: item.overImage || images.img1,
+    verified: Boolean(item.verified),
+  });
+
+  const loadFeed = async (loadMore = false) => {
+    try {
+      if (loadMore) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoadingFeed(true);
+        setFeedError(null);
+      }
+
+      const from = loadMore ? feedPagination.from : 0;
+      const response = await discoverAPI.getFeed(10, from);
+
+      console.log(response, "looaded feed");
+
+      if (!response || !Array.isArray(response.results)) {
+        throw new Error("Invalid response format");
+      }
+
+      const transformedStories = response.results.map(transformToStory);
+
+      if (loadMore) {
+        setFeedStories((prev) => [...prev, ...transformedStories]);
+      } else {
+        setFeedStories(transformedStories);
+      }
+
+      setFeedPagination({
+        from: from + transformedStories.length,
+        total: response.total || 0,
+        hasMore:
+          transformedStories.length > 0 &&
+          from + transformedStories.length < (response.total || 0),
+      });
+    } catch (error) {
+      console.error("Failed to load feed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to load feed";
+
+      if (!loadMore) {
+        setFeedError(errorMessage);
+        setFeedStories([]);
+      }
+    } finally {
+      setIsLoadingFeed(false);
+      setIsLoadingMore(false);
+    }
   };
+
+  const performSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setSearchError(null);
+      return;
+    }
+
+    try {
+      setIsSearching(true);
+      setSearchError(null);
+
+      const response = await discoverAPI.search(query, 10, 0);
+
+      console.log("result from search", response);
+
+      if (!response || !Array.isArray(response.results)) {
+        throw new Error("Invalid search response format");
+      }
+
+      const transformedResults = response.results.map(transformToSearchResult);
+      setSearchResults(transformedResults);
+    } catch (error) {
+      console.error("Search failed:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Search failed";
+      setSearchError(errorMessage);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.length > 0) {
+      searchTimeoutRef.current = setTimeout(() => {
+        performSearch(searchQuery);
+      }, 300);
+    } else {
+      setSearchResults([]);
+      setSearchError(null);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery]);
+
   const [showdiscover, setshowdiscover] = useState(true);
+
   useEffect(() => {
     Animated.timing(headerAnimated, {
       toValue: 1,
@@ -462,7 +488,6 @@ const Search: React.FC = () => {
       useNativeDriver: true,
     }).start();
 
-    // Animate FAB with delay
     Animated.timing(fabAnimated, {
       toValue: 1,
       duration: 600,
@@ -476,26 +501,118 @@ const Search: React.FC = () => {
     outputRange: [0, 1],
   });
 
-  const navigateToSearch = () => {
-    router.replace(RouterConstantUtil.tabs.search as any);
-  };
-
   const [searchFocused, setSearchFocused] = useState(false);
-
   const [modalVisible, setModalVisible] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
+
   const handleSelectRecentSearch = (text: string) => {
-    // Keyboard.dismiss(); // force keyboard down, regardless of focus
-
-    // Blur the search input (closes keyboard)
     searchInputRef.current?.blur();
-
-    // Give keyboard a tiny moment to close before setting value
     setTimeout(() => {
       setSearchQuery(text);
-      // ...add any other navigation or search logic you want
-      // setshowdiscover(false) if needed
-    }, 50); // 50ms is enough
+    }, 50);
+  };
+
+  // Handle scroll to load more feed items
+  const handleFeedScroll = useCallback(
+    (event: any) => {
+      const { layoutMeasurement, contentOffset, contentSize } =
+        event.nativeEvent;
+      const paddingToBottom = 20;
+
+      if (
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height - paddingToBottom
+      ) {
+        if (feedPagination.hasMore && !isLoadingMore && !isLoadingFeed) {
+          loadFeed(true);
+        }
+      }
+    },
+    [feedPagination.hasMore, isLoadingMore, isLoadingFeed]
+  );
+
+  const renderSearchContent = () => {
+    if (isSearching) {
+      return (
+        <View className="flex-1 justify-center items-center py-10">
+          <ActivityIndicator size="large" color="white" />
+          <Text className="text-white/50 mt-2">Searching...</Text>
+        </View>
+      );
+    }
+
+    if (searchError) {
+      return (
+        <ErrorState
+          title="Search Error"
+          subtitle={searchError}
+          onRetry={() => performSearch(searchQuery)}
+        />
+      );
+    }
+
+    if (searchResults.length === 0 && searchQuery.length > 0) {
+      return (
+        <EmptyState
+          title="No Results Found"
+          subtitle={`No results found for "${searchQuery}". Try a different search term.`}
+          icon="search"
+        />
+      );
+    }
+
+    return (
+      <View className="mt-4">
+        {searchResults.map((result, index) => (
+          <SearchResultCard key={result.id} result={result} index={index} />
+        ))}
+      </View>
+    );
+  };
+
+  const renderFeedContent = () => {
+    if (isLoadingFeed) {
+      return (
+        <View className="flex-1 justify-center items-center py-10">
+          <ActivityIndicator size="large" color="white" />
+          <Text className="text-white/50 mt-2">Loading feed...</Text>
+        </View>
+      );
+    }
+
+    if (feedError) {
+      return (
+        <ErrorState
+          title="Failed to Load Feed"
+          subtitle={feedError}
+          onRetry={() => loadFeed()}
+        />
+      );
+    }
+
+    if (feedStories.length === 0) {
+      return (
+        <EmptyState
+          title="No Stories Available"
+          subtitle="There are no stories to display at the moment."
+          icon="file-text"
+        />
+      );
+    }
+
+    return (
+      <View className="px-2 gap-6">
+        {feedStories.map((story, index) => (
+          <StoryCard key={story.id} story={story} index={index} />
+        ))}
+
+        {isLoadingMore && (
+          <View className="py-4 items-center">
+            <ActivityIndicator size="small" color="white" />
+          </View>
+        )}
+      </View>
+    );
   };
 
   return (
@@ -520,7 +637,6 @@ const Search: React.FC = () => {
                     setSearchFocused(false);
                     setSearchQuery("");
                     setshowdiscover(true);
-                    // navigateBack();
                   }}
                   className="mr-3"
                   hitSlop={10}
@@ -560,7 +676,6 @@ const Search: React.FC = () => {
                 </TouchableOpacity>
               )}
             </View>
-            {/* settings button... */}
           </View>
         </Animated.View>
 
@@ -594,7 +709,6 @@ const Search: React.FC = () => {
                         className="mr-4"
                       />
                       <Text className="text-white text-[16px]">{text}</Text>
-
                       <Feather
                         name="x"
                         size={18}
@@ -613,15 +727,7 @@ const Search: React.FC = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: 100 }}
             >
-              <View className="mt-4">
-                {searchResults.map((result, index) => (
-                  <SearchResultCard
-                    key={result.id}
-                    result={result}
-                    index={index}
-                  />
-                ))}
-              </View>
+              {renderSearchContent()}
             </ScrollView>
           ) : (
             <>
@@ -629,6 +735,8 @@ const Search: React.FC = () => {
                 className="flex-1"
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 90 }}
+                onScroll={handleFeedScroll}
+                scrollEventThrottle={16}
               >
                 <View className="mt-6 pb-1 ">
                   <Text className="text-white text-[18px] tracking-wider font-sfpro-bold px-3 mb-6">
@@ -660,18 +768,12 @@ const Search: React.FC = () => {
                     </TouchableOpacity>
                   </View>
 
-                  <View className="px-2 gap-6">
-                    {stories.map((story, index) => (
-                      <StoryCard key={story.id} story={story} index={index} />
-                    ))}
-                  </View>
+                  {renderFeedContent()}
                 </View>
               </ScrollView>
             </>
           )}
         </Animated.View>
-
-        {/* Search Results */}
       </SafeAreaView>
     </>
   );

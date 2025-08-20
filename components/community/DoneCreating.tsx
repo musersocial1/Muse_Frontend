@@ -64,7 +64,7 @@ const DoneCreating: React.FC = () => {
     rotationAnimation.start();
 
     const timeout = setTimeout(() => {
-      router.replace(RouterConstantUtil.tabs.home as any);
+      router.replace(RouterConstantUtil.community.manage as any);
     }, 5000);
 
     return () => {

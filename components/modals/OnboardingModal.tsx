@@ -1,3 +1,4 @@
+import { images } from "@/constants/images";
 import { authAPI } from "@/lib/api/auth";
 import { ValidationItem } from "@/lib/validation/ValidateItem";
 import { STEPS, StepType } from "@/utils/constants";
@@ -8,6 +9,7 @@ import {
   ActivityIndicator,
   Animated,
   Dimensions,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -192,6 +194,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const stepTitles: Record<StepType, string> = {
+    [STEPS.INTO]: "Get started",
     [STEPS.PHONE]: "Enter Phone Number",
     [STEPS.VERIFY_OTP]: "Verify Code",
     [STEPS.PASSWORD]: "Create Password",
@@ -735,6 +738,76 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       }`;
 
     switch (step) {
+      case STEPS.INTO:
+        return (
+          <View className="bg-white rounded-3xl py-[8%] shadow-2xl w-full max-w-sm">
+            <View className="px-6">
+              <TouchableOpacity
+                onPress={onClose}
+                className="absolute top-5 right-5 p-2 bg-gray-100 rounded-full z-10"
+              >
+                <Feather name="x" size={20} color="#666" />
+              </TouchableOpacity>
+
+              <View className="items-center mb-8 mt-5">
+                <Image source={images.logo} />
+              </View>
+
+              {/* Header */}
+              <View className="items-center mb-8">
+                <Text className="text-2xl font-semibold text-gray-900 mb-3">
+                  Lets get started
+                </Text>
+                <Text className="text-gray-500 text-sm text-center leading-5">
+                  Create your account and fill in your personal details so{"\n"}
+                  you can get access to top communities
+                </Text>
+              </View>
+
+              {/* Google Sign In Button */}
+              <View className="items-center mb-8">
+                <TouchableOpacity className="w-14 h-14 bg-gray-50 border border-gray-200 rounded-full justify-center items-center">
+                  <Text className="text-2xl font-bold text-blue-500">G</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Action Buttons */}
+              <View className="space-y-3 mb-8">
+                <TouchableOpacity
+                  onPress={() => console.log("")}
+                  className="bg-blue-600 rounded-full py-4 px-6"
+                  activeOpacity={0.8}
+                >
+                  <Text className="text-white text-center font-semibold text-base">
+                    Continue with email
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => console.log("")}
+                  className="bg-gray-100 rounded-full py-4 px-6"
+                  activeOpacity={0.8}
+                >
+                  <Text className="text-gray-700 text-center font-medium text-base">
+                    Continue with phone
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Footer */}
+              <View className="flex-row justify-center items-center">
+                <Text className="text-gray-400 text-sm mr-2">
+                  Already have an account?
+                </Text>
+                <TouchableOpacity onPress={() => console.log("")}>
+                  <Text className="text-gray-900 text-sm font-medium underline">
+                    Log in
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        );
       case STEPS.PHONE:
         return (
           <View className="bg-white  rounded-3xl py-[8%] shadow-2xl">

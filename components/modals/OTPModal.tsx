@@ -23,7 +23,7 @@ interface OTPModalProps {
   email?: string;
   resendTimer?: number;
   canResend?: boolean;
-  isLoading?: boolean; // 👈 NEW
+  isLoading?: boolean;
 }
 
 const OTPModal: React.FC<OTPModalProps> = ({

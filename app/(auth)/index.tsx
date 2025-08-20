@@ -31,7 +31,7 @@ const stepOrder: StepType[] = [
 
 export default function Index() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.PHONE);
+  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.INTO);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpValues, setOtpValues] = useState<string[]>([
     "",
@@ -160,7 +160,7 @@ export default function Index() {
 
   const handleGetStarted = () => {
     setModalVisible(true);
-    setCurrentStep(STEPS.PHONE);
+    setCurrentStep(STEPS.INTO);
     setPhoneNumber("");
     Animated.timing(blurAnim, {
       toValue: 100,
@@ -199,7 +199,7 @@ export default function Index() {
 
   // Reset all onboarding form fields
   const resetForm = () => {
-    setCurrentStep(STEPS.PHONE);
+    setCurrentStep(STEPS.INTO);
     setPhoneNumber("");
     setOtpValues(["", "", "", "", "", ""]);
     setFirstName("");

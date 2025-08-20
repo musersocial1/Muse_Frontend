@@ -712,6 +712,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   label="Minimum 8 characters"
                   passed={passwordValidation.hasMinLength}
                 />
+                <ValidationItem
+                  label="Atleast 1 digit"
+                  passed={passwordValidation.hasNumber}
+                />
               </View>
 
               {inputError ? (

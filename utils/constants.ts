@@ -1,4 +1,5 @@
 export const STEPS = {
+  INTO: "intro",
   PHONE: "phone",
   VERIFY_OTP: "verify_otp",
   PASSWORD: "password",
