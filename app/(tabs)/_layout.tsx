@@ -1,3 +1,4 @@
+import ShrinkAnimation from "@/components/ui/ShrinkAnimation";
 import { icons } from "@/constants/icons";
 import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
@@ -37,7 +38,7 @@ const tabsConfig = [
     isProfile: true,
   },
 ];
-function TabIcon({ focused, icon, title, isProfile }: any) {
+function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
   const scaleValue = useRef(new Animated.Value(focused ? 1.05 : 1)).current;
   const opacityValue = useRef(new Animated.Value(focused ? 1 : 0.7)).current;
 
@@ -65,7 +66,10 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   if (isProfile) {
     return (
-      <View className="w-14 h-14 overflow-hidden rounded-full">
+      <View
+        {...panHandlers} // 👈 swipe gestures on the icon
+        className="w-14 h-14 overflow-hidden rounded-full"
+      >
         <BlurView
           intensity={70} // Change for more/less blur
           tint={focused ? "extraLight" : "dark"}
@@ -89,7 +93,10 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   // Regular tabs - icon in circle
   return (
-    <View className="w-16 h-16 overflow-hidden rounded-full">
+    <View
+      {...panHandlers} // 👈 swipe gestures on the icon
+      className="w-16 h-16 overflow-hidden rounded-full"
+    >
       <BlurView
         intensity={70} // Change for more/less blur
         tint={focused ? "extraLight" : "dark"}
@@ -124,49 +131,51 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarShowLabel: false,
-        tabBarItemStyle: {
-          justifyContent: "center",
-          alignItems: "center",
-          height: 60,
-          flex: 1,
-        },
-        tabBarStyle: {
-          backgroundColor: "transparent",
-          borderTopWidth: 0,
-          borderRadius: 30,
-          marginHorizontal: 34,
-          gap: 0,
-          marginBottom: insets.bottom,
-          height: 60,
-          position: "absolute",
-          borderWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
-          paddingHorizontal: 0,
-        },
-      }}
-    >
-      {tabsConfig.map((tab) => (
-        <Tabs.Screen
-          key={tab.name}
-          name={tab.name}
-          options={{
-            title: tab.title,
-            headerShown: false,
-            tabBarIcon: ({ focused }) => (
-              <TabIcon
-                focused={focused}
-                icon={tab.icon}
-                title={tab.title}
-                isProfile={tab.isProfile}
-              />
-            ),
-          }}
-        />
-      ))}
-    </Tabs>
+    <ShrinkAnimation onSwitch={() => console.log("Open community switcher")}>
+      <Tabs
+        screenOptions={{
+          tabBarShowLabel: false,
+          tabBarItemStyle: {
+            justifyContent: "center",
+            alignItems: "center",
+            height: 60,
+            flex: 1,
+          },
+          tabBarStyle: {
+            backgroundColor: "transparent",
+            borderTopWidth: 0,
+            borderRadius: 30,
+            marginHorizontal: 34,
+            gap: 0,
+            marginBottom: insets.bottom,
+            height: 60,
+            position: "absolute",
+            borderWidth: 0,
+            elevation: 0,
+            shadowOpacity: 0,
+            paddingHorizontal: 0,
+          },
+        }}
+      >
+        {tabsConfig.map((tab) => (
+          <Tabs.Screen
+            key={tab.name}
+            name={tab.name}
+            options={{
+              title: tab.title,
+              headerShown: false,
+              tabBarIcon: ({ focused }) => (
+                <TabIcon
+                  focused={focused}
+                  icon={tab.icon}
+                  title={tab.title}
+                  isProfile={tab.isProfile}
+                />
+              ),
+            }}
+          />
+        ))}
+      </Tabs>
+    </ShrinkAnimation>
   );
 }
