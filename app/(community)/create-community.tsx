@@ -1,11 +1,7 @@
-import CommunityCategoryScreen from "@/components/community/CommunityCategory";
-import CommunityEdit from "@/components/community/CommunityDetailsScreen";
-import CommunityImageScreen from "@/components/community/CommunityImageScreen";
+import CommunityImageScreen from "@/components/community/CommunityImage";
 import CommunityNameScreen from "@/components/community/CommunityName";
-import CommunityTypeScreen from "@/components/community/CommunityType";
 import DoneCreating from "@/components/community/DoneCreating";
-import Guidelines from "@/components/community/GuildeLines";
-import PricingScreen from "@/components/community/Pricing";
+import Preview from "@/components/community/Preview";
 import ProgressBar from "@/components/community/ProgressBar";
 import ProgressiveBlur from "@/components/ui/progressiveBlur";
 import { communityAPI } from "@/lib/api/community";
@@ -29,7 +25,7 @@ import { View } from "react-native-animatable";
 
 const { width } = Dimensions.get("window");
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 4;
 
 const CreateCommunity: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -165,7 +161,7 @@ const CreateCommunity: React.FC = () => {
 
   const goNextStep = () => {
     if (currentStep < TOTAL_STEPS) {
-      if (currentStep === 7) {
+      if (currentStep === 4) {
         handleSubmit();
       } else {
         goToStep(currentStep + 1);
@@ -225,18 +221,8 @@ const CreateCommunity: React.FC = () => {
       case 2:
         return <CommunityImageScreen {...screenProps} />;
       case 3:
-        return <CommunityEdit {...screenProps} />;
+        return <Preview {...screenProps} />;
       case 4:
-        return <PricingScreen {...screenProps} />;
-      case 5:
-        return <CommunityTypeScreen {...screenProps} />;
-      case 6:
-        return <Guidelines {...screenProps} />;
-      case 7:
-        return (
-          <CommunityCategoryScreen {...screenProps} onSubmit={handleSubmit} />
-        );
-      case 8:
         return <DoneCreating />;
       default:
         return <CommunityNameScreen {...screenProps} />;
@@ -348,18 +334,18 @@ const CreateCommunity: React.FC = () => {
               </Animated.View>
             </View>
 
-            {currentStep < 8 && (
+            {currentStep < 4 && (
               <View className="pb-8 px-4">
                 <ProgressBar
-                  currentStep={Math.min(currentStep, 7)}
-                  totalSteps={7}
+                  currentStep={Math.min(currentStep, 4)}
+                  totalSteps={4}
                 />
                 <TouchableOpacity
                   onPress={goNextStep}
                   className="rounded-full bg-[#0368FF] py-4 mt-6"
                 >
                   <Text className="text-white text-xl font-sfpro-bold text-center">
-                    {currentStep === 7 ? "Create Community" : "Save & Continue"}
+                    {currentStep === 4 ? "Create Community" : "Save & Continue"}
                   </Text>
                 </TouchableOpacity>
               </View>

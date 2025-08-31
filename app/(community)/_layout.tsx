@@ -1,4 +1,3 @@
-import BottomNav from "@/components/navigations/Tab";
 import { Stack } from "expo-router";
 import React from "react";
 import { StatusBar, View } from "react-native";
@@ -22,9 +21,13 @@ const CommunityLayout = () => {
           name="create-community-startup"
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="manage-community"
+          options={{ headerShown: false }}
+        />
       </Stack>
 
-      <BottomNav />
+      {/* <BottomNav /> */}
     </View>
   );
 };

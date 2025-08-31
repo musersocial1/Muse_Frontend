@@ -1,5 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
 import { authAPI } from "@/lib/api/auth";
@@ -10,6 +12,7 @@ import {
   ActivityIndicator,
   Animated,
   Dimensions,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -22,6 +25,17 @@ import {
 } from "react-native";
 
 const { width, height } = Dimensions.get("window");
+
+const STEPS = {
+  AUTH_METHOD: "AUTH_METHOD",
+  LOGIN: "LOGIN",
+  VERIFY_OTP: "VERIFY_OTP",
+  FORGOT_PASSWORD: "FORGOT_PASSWORD",
+  RESET_OTP: "RESET_OTP",
+  RESET_PASSWORD: "RESET_PASSWORD",
+} as const;
+
+type StepType = (typeof STEPS)[keyof typeof STEPS];
 
 interface LoginModalProps {
   visible: boolean;
@@ -36,7 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   // Form states
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.AUTH_METHOD);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [otpValues, setOtpValues] = useState<string[]>(Array(6).fill(""));
@@ -49,9 +63,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const [canResendCode, setCanResendCode] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const { login, error, clearError, verifyLogin } = useAuthState();
-  const [displayedStep, setDisplayedStep] = useState(currentStep);
-  const [prevStep, setPrevStep] = useState<number | null>(null);
-  const [nextStep, setNextStep] = useState<number | null>(null);
+  const [displayedStep, setDisplayedStep] = useState<StepType>(
+    STEPS.AUTH_METHOD
+  );
+  const [prevStep, setPrevStep] = useState<StepType | null>(null);
+  const [nextStep, setNextStep] = useState<StepType | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [direction, setDirection] = useState(1); // 1: right, -1: left
   const [resetResendTimer, setResetResendTimer] = useState(60);
@@ -69,12 +85,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   const resetPasswordRef = useRef<TextInput>(null); // Only if you want for step 4
 
   const otpRefs = useRef<TextInput[]>([]);
-  const stepTitles = [
-    "Enter details", // 0
-    "Enter verification code", // 1
-    "Forgot password", // 2
-    "Reset password", // 3
-  ];
+  const stepTitles = {
+    [STEPS.LOGIN]: "Enter details",
+    [STEPS.VERIFY_OTP]: "Enter verification code",
+    [STEPS.FORGOT_PASSWORD]: "Forgot password",
+    [STEPS.RESET_OTP]: "Reset password",
+    [STEPS.RESET_PASSWORD]: "Reset password",
+  };
 
   const [resetOtpValues, setResetOtpValues] = useState(Array(6).fill(""));
   const [resetPassword, setResetPassword] = useState("");
@@ -145,7 +162,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
   // Reset all states when modal closes
   const resetStates = () => {
-    setCurrentStep(0);
+    setCurrentStep(STEPS.AUTH_METHOD);
     setEmail("");
     setPassword("");
     setOtpValues(Array(6).fill(""));
@@ -166,7 +183,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       await authAPI.forgotPassword(forgotPasswordEmail);
       // If success, move to next step, show toast, etc.
       setDirection(1);
-      setCurrentStep(3);
+      setCurrentStep(STEPS.VERIFY_OTP);
       setEmail(forgotPasswordEmail);
     } catch (err: any) {
       // Here you can set your error state!
@@ -195,7 +212,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       // If successful:
       setInputError("");
       setDirection(1);
-      setCurrentStep(0); // Go to login
+      setCurrentStep(STEPS.AUTH_METHOD); // Go to login
       setPassword("");
       setResetPassword("");
       setEmail("");
@@ -210,9 +227,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
         errMsg.includes("Invalid or expired reset token") ||
         errMsg.includes("Invalid or expired code") // in case your backend changes msg slightly
       ) {
-        // Go back to OTP step (step 3), direction 1 (forward)
+        // Go back to OTP step
         setDirection(1);
-        setCurrentStep(3);
+        setCurrentStep(STEPS.VERIFY_OTP);
         setInputError("Invalid or expired reset code. Please try again.");
         setResetOtpValues(Array(6).fill(""));
       } else {
@@ -258,15 +275,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
   React.useEffect(() => {
     if (!visible) return;
     const timer = setTimeout(() => {
-      if (currentStep === 0) {
+      if (currentStep === STEPS.LOGIN) {
         emailRef.current?.focus();
-      } else if (currentStep === 1) {
+      } else if (currentStep === STEPS.VERIFY_OTP) {
         otpRefs.current[0]?.focus();
-      } else if (currentStep === 2) {
+      } else if (currentStep === STEPS.FORGOT_PASSWORD) {
         forgotEmailRef.current?.focus();
-      } else if (currentStep === 3) {
+      } else if (currentStep === STEPS.RESET_OTP) {
         resetOtpRefs.current[0]?.focus();
-      } else if (currentStep === 4) {
+      } else if (currentStep === STEPS.RESET_PASSWORD) {
         resetPasswordRef.current?.focus();
       }
     }, 700);
@@ -467,11 +484,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
   const getCurrentValidation = () => {
     switch (currentStep) {
-      case 0:
+      case STEPS.LOGIN:
         const passwordResult = validatePassword(password);
         if (passwordResult.error) return passwordResult.error;
         return "";
-      case 1:
+      case STEPS.VERIFY_OTP:
         return validateOTP();
       default:
         return "";
@@ -487,45 +504,30 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       return;
     }
 
-    // Step 0: Login (forward to OTP)
-    if (currentStep === 0) {
-      setDirection(1); // Animate forward
-      const result = await handleLogin(email);
-      if (result.success) {
-        setCurrentStep(1);
-      }
-      return;
-    }
+    switch (currentStep) {
+      case STEPS.LOGIN:
+        setDirection(2);
+        setCurrentStep(STEPS.VERIFY_OTP);
+        return;
 
-    // Step 1: OTP Verification (login finish)
-    if (currentStep === 1) {
-      // You probably want to remain on this page if verify fails.
-      const otpString = otpValues.join("");
-      await verifyCode(otpString);
-      return;
-    }
+      case STEPS.VERIFY_OTP:
+        const otpString = otpValues.join("");
+        await verifyCode(otpString);
+        return;
 
-    // Step 2: Forgot password email (go to reset password)
-    if (currentStep === 2) {
-      setDirection(1); // Animate forward
-      await handleForgotPassword();
-      // handleForgotPassword sets step to 3 internally
-      return;
-    }
+      case STEPS.FORGOT_PASSWORD:
+        setDirection(1);
+        await handleForgotPassword();
+        return;
 
-    // Step 3: Reset password
-    if (currentStep === 3) {
-      // Don't set direction, since you already set -1 on successful reset
+      case STEPS.RESET_OTP:
+        setDirection(1);
+        setCurrentStep(STEPS.RESET_PASSWORD);
+        return;
 
-      setDirection(1);
-      await setCurrentStep(4);
-      return;
-    }
-    // Step 3: Reset password
-    if (currentStep === 4) {
-      // Don't set direction, since you already set -1 on successful reset
-      await handleResetPassword();
-      return;
+      case STEPS.RESET_PASSWORD:
+        await handleResetPassword();
+        return;
     }
   };
   const handleResetOTPChange = (text: string, index: number) => {
@@ -552,12 +554,29 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
     if (inputError) setInputError("");
   };
 
-  const handleBack = (toStep?: number) => {
-    setDirection(-1); // Left-to-right (backwards) animation
-    if (typeof toStep === "number") {
+  const handleBack = (toStep: StepType) => {
+    setDirection(-1);
+    if (toStep) {
       setCurrentStep(toStep);
-    } else if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    } else {
+      // Define your back navigation logic
+      switch (currentStep) {
+        case STEPS.LOGIN:
+          setCurrentStep(STEPS.AUTH_METHOD);
+          break;
+        case STEPS.VERIFY_OTP:
+          setCurrentStep(STEPS.LOGIN);
+          break;
+        case STEPS.FORGOT_PASSWORD:
+          setCurrentStep(STEPS.AUTH_METHOD);
+          break;
+        case STEPS.RESET_OTP:
+          setCurrentStep(STEPS.FORGOT_PASSWORD);
+          break;
+        case STEPS.RESET_PASSWORD:
+          setCurrentStep(STEPS.RESET_OTP);
+          break;
+      }
     }
     setInputError("");
   };
@@ -599,7 +618,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
   const isValidInput = !getCurrentValidation();
 
-  const renderModalContent = (step: number) => {
+  const renderModalContent = (step: string) => {
     const baseInputStyle = (
       hasError: boolean,
       isFocused: boolean,
@@ -631,13 +650,80 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
       }`;
 
     switch (step) {
-      case 0:
+      case STEPS.AUTH_METHOD:
+        return (
+          <View className="bg-white rounded-3xl py-[8%] shadow-2xl">
+            <View className="px-6">
+              <View className="flex-row items-center justify-between mb-6">
+                {/* Center logo */}
+                <View className="absolute left-0 right-0 items-center mt-5">
+                  <Image
+                    source={images.logo}
+                    className="w-36 h-20"
+                    resizeMode="contain"
+                  />
+                </View>
+
+                {/* Close button aligned right */}
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full ml-auto"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="items-center mb-8 mt-4">
+                <Text className="text-[24px] font-neutral-bold  text-[#000000] mb-3">
+                  Welcome Back!
+                </Text>
+              </View>
+              <View className="items-center mb-3">
+                <TouchableOpacity
+                  className="bg-[#F3F3F3]/[10%] w-full items-center rounded-full py-3 px-6 border border-[#0000000F]/[5%]"
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    router.replace(RouterConstantUtil.tabs.home as any)
+                  }
+                >
+                  <Image
+                    source={icons.google}
+                    className="w-10 h-10"
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
+              <View className="mb-[30%]">
+                <TouchableOpacity
+                  onPress={() => {
+                    setDirection(1); //  Set direction to -1 for right-to-left animation
+                    setCurrentStep(STEPS.LOGIN);
+                  }}
+                  className="bg-[#0368FF] rounded-full py-6 px-6"
+                  activeOpacity={0.8}
+                >
+                  <Text className="text-[#FFFFFF] text-center font-semibold text-[16px]">
+                    Continue with email
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        );
+      case STEPS.LOGIN:
         return (
           <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={() => handleBack(STEPS.AUTH_METHOD)}
+                  className="p-2 bg-gray-100 rounded-full"
+                  disabled={isLoading}
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
-                  {stepTitles[currentStep]}
+                  {stepTitles[step]}
                 </Text>
                 <TouchableOpacity
                   onPress={handleModalClose}
@@ -712,6 +798,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   label="Minimum 8 characters"
                   passed={passwordValidation.hasMinLength}
                 />
+                <ValidationItem
+                  label="Atleast 1 digit"
+                  passed={passwordValidation.hasNumber}
+                />
               </View>
 
               {inputError ? (
@@ -727,8 +817,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
 
               <TouchableOpacity
                 onPress={() => {
-                  setDirection(1); // 👈 Set direction to -1 for right-to-left animation
-                  setCurrentStep(2);
+                  setDirection(1); //  Set direction to -1 for right-to-left animation
+                  setCurrentStep(STEPS.FORGOT_PASSWORD);
                 }}
                 className="w-full mb-3"
                 activeOpacity={0.8}
@@ -764,20 +854,20 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
           </View>
         );
 
-      case 1:
+      case STEPS.VERIFY_OTP:
         return (
           <View className="bg-white py-[8%] rounded-t-3xl shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={() => handleBack()}
+                  onPress={() => handleBack(STEPS.LOGIN)}
                   className="p-2 bg-gray-100 rounded-full"
                   disabled={isLoading}
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
                 <Text className="text-xl font-semibold text-gray-900">
-                  {stepTitles[currentStep]}
+                  {stepTitles[step]}
                 </Text>
                 <TouchableOpacity
                   onPress={handleModalClose}
@@ -862,14 +952,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
           </View>
         );
 
-      // Step 2: Forgot Password (input email)
-      case 2:
+      //  Forgot Password (input email)
+      case STEPS.FORGOT_PASSWORD:
         return (
           <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={() => handleBack(0)}
+                  onPress={() => handleBack(STEPS.VERIFY_OTP)}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
@@ -939,13 +1029,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
           </View>
         );
 
-      case 3:
+      case STEPS.RESET_OTP:
         return (
           <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={() => handleBack(2)}
+                  onPress={() => handleBack(STEPS.FORGOT_PASSWORD)}
                   className="p-2 bg-gray-100 rounded-full"
                   disabled={isLoading}
                 >
@@ -1044,14 +1134,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
           </View>
         );
 
-      // Step 3: Reset Password (OTP + New Passwords)
-      case 4:
+      // : Reset Password (OTP + New Passwords)
+      case STEPS.RESET_PASSWORD:
         return (
           <View className="bg-white rounded-t-3xl py-6 shadow-2xl">
             <View className="px-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={() => handleBack(3)}
+                  onPress={() => handleBack(STEPS.RESET_OTP)}
                   className="p-2 bg-gray-100 rounded-full"
                   disabled={isLoading}
                 >

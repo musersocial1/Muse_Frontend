@@ -3,6 +3,7 @@ import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useProfileActions } from "@/hooks/useProfile";
 import { communityAPI } from "@/lib/api/community";
+import { showError } from "@/lib/toast";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -212,6 +213,7 @@ const Profile = () => {
         await refetchProfile();
       } catch (error) {
         console.error("Error fetching profile:", error);
+        showError("Error", "Error fetching profile");
       }
     };
 

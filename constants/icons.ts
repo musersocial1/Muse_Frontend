@@ -1,3 +1,4 @@
+import apps from "@/assets/icons/apps.png";
 import asana from "@/assets/icons/asana.png";
 import back from "@/assets/icons/back.png";
 import back_2 from "@/assets/icons/back_2.png";
@@ -9,12 +10,15 @@ import dollar from "@/assets/icons/dollar.png";
 import dp from "@/assets/icons/dp.png";
 import email from "@/assets/icons/email.png";
 import eyeclose from "@/assets/icons/eyeclose.png";
+import google from "@/assets/icons/google.png";
 import helpdesk from "@/assets/icons/helpdesk.png";
 import home from "@/assets/icons/home.png";
 import lock from "@/assets/icons/lock.png";
+import lock_2 from "@/assets/icons/lock_2.png";
 import notification from "@/assets/icons/not.png";
 import notifications from "@/assets/icons/notification.png";
 import person_morph from "@/assets/icons/people-morph.png";
+import posts from "@/assets/icons/posts.png";
 import ring from "@/assets/icons/ring.png";
 import search from "@/assets/icons/search.png";
 import settings from "@/assets/icons/settings.png";
@@ -58,4 +62,8 @@ export const icons = {
   warn,
   person_morph,
   voice,
+  apps,
+  lock_2,
+  posts,
+  google,
 };

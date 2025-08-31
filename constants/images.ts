@@ -1,3 +1,4 @@
+import bg_2 from "@/assets/images/bg_2.png";
 import Comedy from "@/assets/images/Comedy.png";
 import createCommunity from "@/assets/images/create.png";
 import ent from "@/assets/images/ent.png";
@@ -70,4 +71,5 @@ export const images = {
   img22,
   logo_white,
   Comedy,
+  bg_2,
 };
