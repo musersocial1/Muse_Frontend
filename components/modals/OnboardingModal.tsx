@@ -1,3 +1,4 @@
+import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { authAPI } from "@/lib/api/auth";
 import { ValidationItem } from "@/lib/validation/ValidateItem";
@@ -28,6 +29,7 @@ interface OnboardingModalProps {
   direction: number; // add this
   onClose: () => void;
   currentStep: string;
+  setCurrentStep: (val: StepType) => void;
   onContinue: () => void;
   onBack: () => void;
   phoneNumber: string;
@@ -58,6 +60,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   direction,
   onClose,
   currentStep,
+  setCurrentStep,
   onContinue,
   onBack,
   phoneNumber,
@@ -114,6 +117,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [callingCode, setCallingCode] = useState(detectedCallingCode);
 
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [isGoogleAuth, setIsGoogleAuth] = useState(false);
 
   React.useEffect(() => {
     if (displayedStep !== currentStep) {
@@ -194,11 +198,12 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const stepTitles: Record<StepType, string> = {
-    [STEPS.INTO]: "Get started",
+    [STEPS.AUTH_METHOD]: "Get started",
     [STEPS.PHONE]: "Enter Phone Number",
     [STEPS.VERIFY_OTP]: "Verify Code",
     [STEPS.PASSWORD]: "Create Password",
     [STEPS.PERSONAL_INFO]: "Personal Information",
+    [STEPS.USERNAME]: "Enter Unique Username",
   };
 
   React.useEffect(() => {
@@ -288,6 +293,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           firstNameRef.current?.focus();
           break;
         case STEPS.PASSWORD:
+          passwordRef.current?.focus();
+          break;
+        case STEPS.USERNAME:
           usernameRef.current?.focus();
           break;
 
@@ -368,7 +376,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const isUsernameValid =
     !!username && username.length >= 3 && usernameAvailable && !usernameError;
 
-  const canContinue = isPasswordValid && isUsernameValid && !isLoading;
+  const canContinue = isPasswordValid && !isLoading;
 
   const validateName = (name: string) => {
     if (!name.trim()) return "This field is required";
@@ -524,12 +532,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         return validateOTP();
 
       case STEPS.PASSWORD: {
-        if (!username.trim()) return "Username is required";
-        if (username.length < 3)
-          return "Username must be at least 3 characters";
-        if (usernameError) return usernameError;
-        if (!usernameAvailable) return "Username is not available";
-
         const passwordResult = validatePassword(password);
         if (passwordResult.error) return passwordResult.error;
 
@@ -538,6 +540,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
       case STEPS.PERSONAL_INFO:
         return validateName(fullName) || validateEmail(email);
+
+      case STEPS.USERNAME:
+        if (!username.trim()) return "Username is required";
+        if (username.length < 3)
+          return "Username must be at least 3 characters";
+        if (usernameError) return usernameError;
+        if (!usernameAvailable) return "Username is not available";
+        return "";
 
       default:
         return "";
@@ -555,6 +565,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
     try {
       switch (currentStep) {
+        case STEPS.AUTH_METHOD: {
+          if (isGoogleAuth) {
+            setCurrentStep(STEPS.USERNAME);
+          } else {
+            onContinue();
+          }
+          break;
+        }
+
         case STEPS.PHONE: {
           setIsLoading(true);
           setInputError("");
@@ -584,16 +603,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         case STEPS.PASSWORD: {
           setIsLoading(true);
           setInputError("");
-          if (!usernameAvailable) {
-            setInputError("Username is not available.");
-            return;
-          }
-          const { exists, message } = await authAPI.checkUsernameExists(
-            username
-          );
-          if (exists) {
-            setInputError(message || "Username is already taken.");
-            return;
+          if (password !== confirmPassword) {
+            setInputError("Passwords don't match");
+            return; // Add return here to prevent continuing
           }
           onContinue();
           break;
@@ -609,14 +621,44 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             setTimeout(() => emailRef.current?.focus(), 100);
             return;
           }
-          const formData = {
-            phoneNumber: formatPhoneNumber(phoneNumber),
-            verificationCode: otpValues.join(""),
-            fullName,
-            email,
-            password,
-            username: username.toLowerCase().replace(/\s/g, ""),
-          };
+          onContinue();
+          break;
+        }
+
+        case STEPS.USERNAME: {
+          setIsLoading(true);
+          setInputError("");
+          if (!usernameAvailable) {
+            setInputError("Username is not available.");
+            return;
+          }
+          const { exists, message } = await authAPI.checkUsernameExists(
+            username
+          );
+          if (exists) {
+            setInputError(message || "Username is already taken.");
+            return;
+          }
+
+          // Different form data based on auth method
+          const formData = isGoogleAuth
+            ? {
+                // Google auth - minimal data needed
+                fullName,
+                username: username.toLowerCase().replace(/\s/g, ""),
+                authMethod: "google",
+              }
+            : {
+                // Email auth - full registration data
+                phoneNumber: formatPhoneNumber(phoneNumber),
+                verificationCode: otpValues.join(""),
+                fullName,
+                email,
+                password,
+                username: username.toLowerCase().replace(/\s/g, ""),
+                authMethod: "email",
+              };
+
           console.log("Form submission data:", formData);
           onComplete(formData);
           break;
@@ -624,6 +666,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
         default:
           console.warn("Unknown step:", currentStep);
+          setCurrentStep(STEPS.PHONE);
       }
     } catch (err: any) {
       setInputError(
@@ -644,7 +687,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       case "fullName":
         setFullName(value);
         break;
-
       case "email":
         setEmail(value);
         break;
@@ -656,6 +698,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         break;
       case "password":
         setPassword(value);
+        break;
+      case "confirmPassword":
+        setConfirmPassword(value);
         break;
     }
 
@@ -738,76 +783,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       }`;
 
     switch (step) {
-      case STEPS.INTO:
-        return (
-          <View className="bg-white rounded-3xl py-[8%] shadow-2xl w-full max-w-sm">
-            <View className="px-6">
-              <TouchableOpacity
-                onPress={onClose}
-                className="absolute top-5 right-5 p-2 bg-gray-100 rounded-full z-10"
-              >
-                <Feather name="x" size={20} color="#666" />
-              </TouchableOpacity>
-
-              <View className="items-center mb-8 mt-5">
-                <Image source={images.logo} />
-              </View>
-
-              {/* Header */}
-              <View className="items-center mb-8">
-                <Text className="text-2xl font-semibold text-gray-900 mb-3">
-                  Lets get started
-                </Text>
-                <Text className="text-gray-500 text-sm text-center leading-5">
-                  Create your account and fill in your personal details so{"\n"}
-                  you can get access to top communities
-                </Text>
-              </View>
-
-              {/* Google Sign In Button */}
-              <View className="items-center mb-8">
-                <TouchableOpacity className="w-14 h-14 bg-gray-50 border border-gray-200 rounded-full justify-center items-center">
-                  <Text className="text-2xl font-bold text-blue-500">G</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Action Buttons */}
-              <View className="space-y-3 mb-8">
-                <TouchableOpacity
-                  onPress={() => console.log("")}
-                  className="bg-blue-600 rounded-full py-4 px-6"
-                  activeOpacity={0.8}
-                >
-                  <Text className="text-white text-center font-semibold text-base">
-                    Continue with email
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => console.log("")}
-                  className="bg-gray-100 rounded-full py-4 px-6"
-                  activeOpacity={0.8}
-                >
-                  <Text className="text-gray-700 text-center font-medium text-base">
-                    Continue with phone
-                  </Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Footer */}
-              <View className="flex-row justify-center items-center">
-                <Text className="text-gray-400 text-sm mr-2">
-                  Already have an account?
-                </Text>
-                <TouchableOpacity onPress={() => console.log("")}>
-                  <Text className="text-gray-900 text-sm font-medium underline">
-                    Log in
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        );
       case STEPS.PHONE:
         return (
           <View className="bg-white  rounded-3xl py-[8%] shadow-2xl">
@@ -1033,6 +1008,70 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           </View>
         );
 
+      case STEPS.AUTH_METHOD:
+        return (
+          <View className="bg-white rounded-3xl py-[8%] shadow-2xl">
+            <View className="px-6">
+              <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={onBack}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
+                <View className="absolute left-0 right-0 items-center mt-5">
+                  <Image
+                    source={images.logo}
+                    className="w-36 h-20"
+                    resizeMode="contain"
+                  />
+                </View>
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="items-center mb-8 mt-4">
+                <Text className="text-[24px] font-neutral-bold  text-[#000000] mb-3">
+                  Lets get started
+                </Text>
+              </View>
+              <View className="items-center mb-3">
+                <TouchableOpacity
+                  className="bg-[#F3F3F3]/[10%] w-full items-center rounded-full py-3 px-6 border border-[#0000000F]/[5%]"
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    setIsGoogleAuth(true);
+                    setCurrentStep(STEPS.USERNAME);
+                  }}
+                >
+                  <Image
+                    source={icons.google}
+                    className="w-10 h-10"
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
+              </View>
+              <View className="mb-[30%]">
+                <TouchableOpacity
+                  onPress={() => {
+                    setIsGoogleAuth(false);
+                    onContinue();
+                  }}
+                  className="bg-[#0368FF] rounded-full py-6 px-6"
+                  activeOpacity={0.8}
+                >
+                  <Text className="text-[#FFFFFF] text-center font-semibold text-[16px]">
+                    Continue with email
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        );
       case STEPS.PASSWORD:
         return (
           <View className="bg-white rounded-3xl shadow-2xl">
@@ -1056,31 +1095,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </View>
 
               <View className="mb-2 gap-3">
-                {/* Username */}
-                <View className="relative">
-                  <TextInput
-                    value={username}
-                    onChangeText={(text) => handleInputChange(text, "username")}
-                    onFocus={() => setFocusedField("username")}
-                    onBlur={() => setFocusedField(null)}
-                    ref={usernameRef}
-                    placeholder="Choose a username"
-                    placeholderTextColor="#9CA3AF"
-                    className={baseInputStyle(
-                      !!usernameError || !!inputError,
-                      isInputFocused,
-                      !!username.trim() && usernameAvailable && !usernameError
-                    )}
-                    returnKeyType="next"
-                    autoCapitalize="none"
-                  />
-                  {isUsernameChecking && (
-                    <View style={{ position: "absolute", right: 16, top: 18 }}>
-                      <ActivityIndicator size="small" color="blue" />
-                    </View>
-                  )}
-                </View>
-
                 {/* Password */}
                 <View className="relative">
                   <TextInput
@@ -1094,6 +1108,39 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className={baseInputStyle(
                       !!inputError,
                       focusedField === "password",
+                      isValidInput
+                    )}
+                    secureTextEntry={!showPassword}
+                    textAlignVertical="center"
+                    style={{ lineHeight: 17 }}
+                    returnKeyType="done"
+                    onSubmitEditing={handleContinue}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-4"
+                  >
+                    {showPassword ? (
+                      <Feather name="eye-off" size={20} color="#666" />
+                    ) : (
+                      <Feather name="eye" size={20} color="#666" />
+                    )}
+                  </TouchableOpacity>
+                </View>
+                <View className="relative">
+                  <TextInput
+                    value={confirmPassword}
+                    ref={confirmPasswordRef}
+                    onChangeText={(text) =>
+                      handleInputChange(text, "confirmPassword")
+                    }
+                    onFocus={() => setFocusedField("confirmPassword")}
+                    onBlur={() => setFocusedField(null)}
+                    placeholder="Confirm password"
+                    placeholderTextColor="#9CA3AF"
+                    className={baseInputStyle(
+                      !!inputError,
+                      focusedField === "confirmPassword",
                       isValidInput
                     )}
                     secureTextEntry={!showPassword}
@@ -1129,15 +1176,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   label="Minimum 8 characters"
                   passed={passwordValidation.hasMinLength}
                 />
+                <ValidationItem
+                  label="At least 1 numeric character"
+                  passed={passwordValidation.hasNumber}
+                />
               </View>
 
-              {usernameError || inputError ? (
+              {inputError ? (
                 <Text className="text-red-500 text-sm px-2 mt-2">
-                  {usernameError || inputError}
-                </Text>
-              ) : usernameAvailable && username.length >= 3 ? (
-                <Text className="text-green-600 text-sm px-2 mt-2">
-                  Username is available
+                  {inputError}
                 </Text>
               ) : null}
 
@@ -1258,6 +1305,90 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <Text
                     className={`text-center font-semibold text-base ${
                       isValidInput ? "text-white" : "text-gray-400"
+                    }`}
+                  >
+                    Continue
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      case STEPS.USERNAME:
+        return (
+          <View
+            className="bg-white  rounded-3xl shadow-2xl"
+            // style={{ minHeight: isKeyboardVisible ? 550 : 400 }}
+          >
+            <View className="px-6 pt-6 pb-6">
+              <View className="flex-row justify-between items-center mb-6">
+                <TouchableOpacity
+                  onPress={onBack}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="arrow-left" size={20} color="#666" />
+                </TouchableOpacity>
+                <Text className="text-xl font-semibold text-gray-900">
+                  {stepTitles[step]}
+                </Text>
+                <TouchableOpacity
+                  onPress={handleModalClose}
+                  className="p-2 bg-gray-100 rounded-full"
+                >
+                  <Feather name="x" size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
+
+              <View className="space-y-4 gap-3 mb-6">
+                <View className="relative">
+                  <TextInput
+                    value={username}
+                    onChangeText={(text) => handleInputChange(text, "username")}
+                    onFocus={() => setFocusedField("username")}
+                    onBlur={() => setFocusedField(null)}
+                    ref={usernameRef}
+                    placeholder="Choose a username"
+                    placeholderTextColor="#9CA3AF"
+                    className={baseInputStyle(
+                      !!usernameError || !!inputError,
+                      isInputFocused,
+                      !!username.trim() && usernameAvailable && !usernameError
+                    )}
+                    returnKeyType="next"
+                    autoCapitalize="none"
+                  />
+                  {isUsernameChecking && (
+                    <View style={{ position: "absolute", right: 16, top: 18 }}>
+                      <ActivityIndicator size="small" color="blue" />
+                    </View>
+                  )}
+                </View>
+
+                {usernameError || inputError ? (
+                  <Text className="text-red-500 text-sm px-2 mt-2">
+                    {usernameError || inputError}
+                  </Text>
+                ) : usernameAvailable && username.length >= 3 ? (
+                  <Text className="text-green-600 text-sm px-2 mt-2">
+                    Username is available
+                  </Text>
+                ) : null}
+              </View>
+
+              <TouchableOpacity
+                onPress={handleContinue}
+                disabled={!isUsernameValid || isLoading}
+                className={`rounded-full mt-4 p-4 ${
+                  isUsernameValid ? "bg-secondary" : "bg-disabled"
+                }`}
+                activeOpacity={0.8}
+              >
+                {isLoading ? (
+                  <ActivityIndicator size="small" color="#0368FF" />
+                ) : (
+                  <Text
+                    className={`text-center font-semibold text-base ${
+                      isUsernameValid ? "text-white" : "text-gray-400"
                     }`}
                   >
                     Continue

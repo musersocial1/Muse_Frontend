@@ -1,6 +1,7 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { communityAPI } from "@/lib/api/community";
+import { showError } from "@/lib/toast";
 import { Feather } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -99,6 +100,7 @@ const UserCommunities = () => {
     } catch (error) {
       console.log("Error fetching communities:", error);
       setError("Failed to load communities");
+      showError("Error", "Failed to load communities");
     } finally {
       setLoading(false);
     }
@@ -122,10 +124,10 @@ const UserCommunities = () => {
       <View className="flex-1 bg-[#121212] justify-center items-center px-6">
         <Text className="text-red-400 text-center mb-4">{error}</Text>
         <TouchableOpacity
-          onPress={fetchCommunities}
-          className="bg-blue-500 px-6 py-3 rounded-full"
+          onPress={() => router.replace(RouterConstantUtil.tabs.profile as any)}
+          className="bg-secondary px-8 py-4 rounded-full"
         >
-          <Text className="text-white font-bold">Retry</Text>
+          <Text className="text-white font-bold">Back</Text>
         </TouchableOpacity>
       </View>
     );

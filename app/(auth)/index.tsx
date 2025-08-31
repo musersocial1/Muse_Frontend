@@ -1,16 +1,15 @@
+import LoginModal from "@/components/modals/LoginModal";
 import MoreInfoModal from "@/components/modals/MoreInfo";
 import OnboardingModal from "@/components/modals/OnboardingModal";
 import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
-import { BlurView } from "expo-blur";
-import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-
-import LoginModal from "@/components/modals/LoginModal";
 import { useAuthState } from "@/hooks/useAuthState";
 import { tokenManager } from "@/lib/api/apiClient";
 import { showError, showSuccess } from "@/lib/toast";
 import { STEPS, StepType } from "@/utils/constants";
+import { BlurView } from "expo-blur";
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   Animated,
@@ -25,13 +24,15 @@ import {
 const stepOrder: StepType[] = [
   STEPS.PHONE,
   STEPS.VERIFY_OTP,
+  STEPS.AUTH_METHOD,
   STEPS.PASSWORD,
   STEPS.PERSONAL_INFO,
+  STEPS.USERNAME,
 ];
 
 export default function Index() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.INTO);
+  const [currentStep, setCurrentStep] = useState<StepType>(STEPS.PHONE);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpValues, setOtpValues] = useState<string[]>([
     "",
@@ -160,7 +161,7 @@ export default function Index() {
 
   const handleGetStarted = () => {
     setModalVisible(true);
-    setCurrentStep(STEPS.INTO);
+    setCurrentStep(STEPS.PHONE);
     setPhoneNumber("");
     Animated.timing(blurAnim, {
       toValue: 100,
@@ -199,7 +200,7 @@ export default function Index() {
 
   // Reset all onboarding form fields
   const resetForm = () => {
-    setCurrentStep(STEPS.INTO);
+    setCurrentStep(STEPS.PHONE);
     setPhoneNumber("");
     setOtpValues(["", "", "", "", "", ""]);
     setFirstName("");
@@ -238,7 +239,7 @@ export default function Index() {
 
       console.log(payload, "yeeee");
 
-      await register(payload);
+      // await register(payload);
       showSuccess("Account created successfully!");
       setMoreInfoVisible(false);
       router.replace(RouterConstantUtil.tabs.home as any);
@@ -376,6 +377,7 @@ export default function Index() {
         visible={modalVisible}
         onClose={handleModalClose}
         currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
         onContinue={handleContinue}
         onBack={handleBack}
         phoneNumber={phoneNumber}

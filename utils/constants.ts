@@ -1,9 +1,10 @@
 export const STEPS = {
-  INTO: "intro",
+  AUTH_METHOD: "auth_method",
   PHONE: "phone",
   VERIFY_OTP: "verify_otp",
   PASSWORD: "password",
   PERSONAL_INFO: "personal_info",
+  USERNAME: "username",
 } as const;
 
 export type StepType = (typeof STEPS)[keyof typeof STEPS];

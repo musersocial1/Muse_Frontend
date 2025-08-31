@@ -116,7 +116,7 @@ const CommunityType: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                       </Text>
                       <Text className="text-gray-300 text-base leading-6">
                         Private communities require you to verify and accept
-                        members to come into your community
+                        members to come INTRO your community
                       </Text>
                     </View>
 
@@ -147,7 +147,7 @@ const CommunityType: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                         Public
                       </Text>
                       <Text className="text-gray-300 text-base leading-6">
-                        Public communities give everyone direct access into the
+                        Public communities give everyone direct access INTRO the
                         community once payment is made
                       </Text>
                     </View>

@@ -10,7 +10,6 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-
 import {
   Animated,
   Dimensions,

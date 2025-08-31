@@ -10,6 +10,7 @@ import dollar from "@/assets/icons/dollar.png";
 import dp from "@/assets/icons/dp.png";
 import email from "@/assets/icons/email.png";
 import eyeclose from "@/assets/icons/eyeclose.png";
+import google from "@/assets/icons/google.png";
 import helpdesk from "@/assets/icons/helpdesk.png";
 import home from "@/assets/icons/home.png";
 import lock from "@/assets/icons/lock.png";
@@ -64,4 +65,5 @@ export const icons = {
   apps,
   lock_2,
   posts,
+  google,
 };
