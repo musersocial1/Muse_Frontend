@@ -8,8 +8,11 @@ import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
+
 import {
   Animated,
   Dimensions,
@@ -58,66 +61,81 @@ const UserViewCommunity: React.FC = () => {
     },
   ];
 
+  // const insets = useSafeAreaInsets()
   return (
     <View className="flex-1 bg-primary">
       <Animated.View
         pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFillObject,
-          {
-            zIndex: 1,
-            height: 1500,
-          },
-        ]}
+        style={[StyleSheet.absoluteFillObject]}
+        className={`h-[300%]`}
       >
         <ProgressiveBlur useAlt={false} />
-        <View className="w-full aspect-[1/1.5]">
-          {/* <Image
-            source={images.img23}
-            className="w-full h-full"
-            resizeMode="cover"
-          /> */}
+        <View className="w-full   aspect-[1/2]">
+          <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+            {/* Base vertical gradient */}
+            <LinearGradient
+              colors={["#c3c9f4", "#d3a6b9", "#0d0b0d"]} // top → mid → bottom
+              locations={[0, 0.48, 1]}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+            />
+
+            {/* Vignette overlay (dark corners / bottom) */}
+            <Svg style={StyleSheet.absoluteFillObject}>
+              <Defs>
+                <RadialGradient id="vignette" cx="50%" cy="-15%" r="100%">
+                  <Stop offset={0.55} stopColor="#000" stopOpacity={0} />
+                  <Stop offset={1} stopColor="#000" stopOpacity={0.85} />
+                </RadialGradient>
+              </Defs>
+              <Rect width="100%" height="100%" fill="url(#vignette)" />
+            </Svg>
+          </View>
         </View>
       </Animated.View>
+      <View
+        style={{ top: insets.top + 10 }}
+        className="absolute  left-0 right-0 flex-row justify-between items-center px-6 z-[100]"
+      >
+        <TouchableOpacity
+          onPress={() => router.back()}
+          activeOpacity={0.7}
+          className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
+        >
+          <BlurView style={[StyleSheet.absoluteFill]} />
+          <Feather
+            name="chevron-left"
+            size={20}
+            color="#fff"
+            style={{ opacity: 0.7 }}
+          />
+        </TouchableOpacity>
+
+        <View className="flex-row space-x-3">
+          <TouchableOpacity
+            onPress={() => console.log("Share pressed")}
+            activeOpacity={0.7}
+            className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
+          >
+            <BlurView
+              intensity={10}
+              style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
+            />
+            <Feather name="share" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <ScrollView
-        className="flex-1 relative z-[100]"
+        className="flex-1 relative z-[90]"
         style={{ paddingTop: insets.top }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="relative h-96 mb-10">
-          <View className="absolute top-4 left-0 right-0 flex-row justify-between items-center px-6 z-10">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              activeOpacity={0.7}
-              className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
-            >
-              <BlurView style={[StyleSheet.absoluteFill]} />
-              <Feather
-                name="chevron-left"
-                size={20}
-                color="#fff"
-                style={{ opacity: 0.7 }}
-              />
-            </TouchableOpacity>
-
-            <View className="flex-row space-x-3">
-              <TouchableOpacity
-                onPress={() => console.log("Share pressed")}
-                activeOpacity={0.7}
-                className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
-              >
-                <BlurView
-                  intensity={10}
-                  style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
-                />
-                <Feather name="share" size={20} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
+        <ProgressiveBlur useAlt={false} />
+        <View className="relative  z-[10]   mt-20">
           {/* Community Info Overlay */}
-          <View className="absolute top-20 bottom-0 left-0 right-0 p-6 items-center ">
+          <View className="  gap-4  items-center ">
             <View className="rounded-full h-32 w-32 ">
               <Image
                 source={images.img11}
@@ -125,86 +143,90 @@ const UserViewCommunity: React.FC = () => {
                 resizeMode="cover"
               />
             </View>
-            <Text className="text-white text-[32px] font-bold mb-3 text-center">
+            <Text className="text-white text-3xl font-bold  text-center">
               Dance Mania - California
             </Text>
 
-            <View className="flex-row items-center mb-4">
-              <View className="w-8 h-8 rounded-full overflow-hidden mr-3">
+            <View className="flex-row   items-center ">
+              <View className="w-10 h-10 rounded-full overflow-hidden mr-3">
                 <Image
                   source={icons.user}
                   className="w-full h-full"
                   style={{ resizeMode: "cover" }}
                 />
               </View>
-              <Text className="text-white font-bold text-[16px]">beyonce</Text>
+              <Text className="text-white font-sfpro-bold text-[17px]">
+                Beyonce
+              </Text>
               <View className="w-4 h-4 bg-secondary rounded-full ml-1 items-center justify-center">
                 <Feather name="check" size={10} color="white" />
               </View>
             </View>
 
-            <Text className="text-gray-300 text-[16px] leading-6 mb-6 text-center">
+            <Text className="text-white/70 text-[16px]  font-sfpro-medium leading-6  text-center">
               We are thriving dance teaching platform{"\n"}that aims to help you
               grow
             </Text>
             <TouchableOpacity
-              className="flex-row items-center justify-center mb-6"
+              className="flex-row items-center justify-center "
               onPress={() => setShowLinksModal(true)}
             >
               <Feather
                 name="link"
-                size={14}
+                size={20}
                 color="white"
-                style={{ marginRight: 6 }}
+                style={{ marginRight: 10 }}
               />
-              <Text className="text-[#FFFFFF] text-[16px] leading-6 font-semibold">
+              <Text className="text-[#FFFFFF] text-[16px] leading-6 font-sfpro-medium">
                 See all community links
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setShowSubscriptionModal(true)}
-              className="bg-[#0368FF] rounded-[20px] py-5 px-8 w-full max-w-sm mx-auto text-center"
+              className="bg-[#0368FF] rounded-[20px] py-[22px] px-8 w-[96%] max-w-lg mx-auto text-center"
               activeOpacity={0.8}
             >
-              <Text className="text-white text-[16px] font-bold text-center">
-                Subscribe $45/
-                <Text className="text-[#FFFFFF80]/[50%]">Monthly</Text>
+              <Text className="text-white  text-[16px] font-sfpro-bold text-center">
+                Subscribe $45 /{" "}
+                <Text className="text-[#FFFFFF80]/[50%] font-sfpro-medium">
+                  Monthly
+                </Text>
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Bottom Navigation */}
-        <View className="px-6 mb-6 mt-[25%]">
-          <View className="flex-row justify-around">
-            {bottomNavItems.map((item) => (
-              <TouchableOpacity
-                key={item.key}
-                onPress={() => setActivePostType(item.key)}
-                className="items-center"
-                activeOpacity={0.8}
-              >
-                <View className="w-12 h-12 rounded-2xl items-center justify-center mb-2">
-                  <Image source={item.icon} className="h-12 w-12" />
-                </View>
-                <Text
-                  className={`text-[13px] ${
-                    item.active ? "text-white" : "text-gray-400"
-                  }`}
+          {/* Bottom Navigation */}
+          <View className="    mb-2 z-[10]  mt-9">
+            <View className="flex-row px-2 gap-10   w-full flex-nowrap justify-between">
+              {bottomNavItems.map((item, index) => (
+                <TouchableOpacity
+                  key={item.key}
+                  onPress={() => setActivePostType(item.key)}
+                  className="items-center  shrink  w-full"
+                  activeOpacity={0.8}
                 >
-                  {item.title}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <View className="w-8 h-8  rounded-2xl items-center justify-center mb-2">
+                    <Image source={item.icon} className="h-full w-full" />
+                  </View>
+                  <Text
+                    className={`text-[13px] font-sfpro-medium ${
+                      item.active ? "text-white" : "text-white/50"
+                    }`}
+                  >
+                    {item.title}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
-        </View>
 
-        {activePostType === "all" && <AllPosts posts={posts} />}
-        {activePostType === "creators" && <AllPosts posts={posts} />}
-        {activePostType === "longform" && (
-          <LongForm content={dummyLongFormContent} />
-        )}
+          {activePostType === "all" && <AllPosts posts={posts} />}
+          {activePostType === "creators" && <AllPosts posts={posts} />}
+          {activePostType === "longform" && (
+            <LongForm content={dummyLongFormContent} />
+          )}
+        </View>
       </ScrollView>
 
       <SubscriptionFlow

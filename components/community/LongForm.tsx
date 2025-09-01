@@ -1,8 +1,16 @@
+import { icons } from "@/constants/icons";
 import { LongFormContent } from "@/types/community";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import PaymentModal from "../modals/PaymentModal";
 
 // const { width, height } = Dimensions.get("window");
@@ -16,17 +24,13 @@ const LongFormCard: React.FC<LongFormCardProps> = ({ content, onPress }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="mx-6 mb-4  "
+      className=" max-w-lg mb-4 mx-1  "
       activeOpacity={0.8}
     >
-      <View className="relative rounded-2xl overflow-hidden">
+      <View className="relative   rounded-[15px] overflow-hidden">
         <Image
           source={{ uri: content.thumbnail }}
-          style={{
-            // width: width - 48,
-            height: 180,
-          }}
-          className="rounded-2xl"
+          className="rounded-[15px] aspect-[1/0.55] w-full "
           resizeMode="cover"
         />
 
@@ -45,29 +49,43 @@ const LongFormCard: React.FC<LongFormCardProps> = ({ content, onPress }) => {
         )}
 
         <View className="absolute inset-0 items-center justify-center">
-          <View className="w-16 h-16 rounded-full bg-[#FFFFFF24]/[14%] items-center justify-center border border-[#FFFFFF4D]/[30%]">
-            <View className="w-12 h-12 rounded-full  items-center justify-center">
-              <Feather name="lock" size={24} color="white" />
+          <View className="w-24 h-24 rounded-full items-center justify-center  overflow-hidden border-white border-2">
+            <BlurView
+              style={StyleSheet.absoluteFill}
+              tint="light"
+              intensity={80}
+              className=" rounded-full"
+            />
+            <View className="w-10  h-10 rounded-full  items-center justify-center">
+              <Image
+                source={icons.lockedContent}
+                alt="icons"
+                className="w-full "
+                resizeMode="contain"
+              />
             </View>
           </View>
         </View>
 
         <View className="absolute bottom-3 right-3 bg-black/80 rounded-2xl p-2">
-          <Text className="text-white text-[12px] font-medium">
+          <Text className="text-white font-sfpro-medium text-[13px]">
             {content.duration}
           </Text>
         </View>
       </View>
-      <View className="flex-row items-center justify-between py-2  mt-2">
-        <Text className="text-white text-[20px] font-medium flex-shrink">
-          {content.title}
-        </Text>
-        <Feather name="more-vertical" size={22} color="white" />
-      </View>
 
-      <Text className="text-gray-500 text-[16px] font-medium">
-        54m views . 5 months ago
-      </Text>
+      <View className="flex-row  items-center justify-between py-2  mt-2">
+        <View className=" w-[80%]">
+          <Text className="text-white text-[20px] font-sfpro-medium ">
+            {content.title}
+          </Text>
+
+          <Text className="text-white/40 text-base font-sfpro-medium">
+            54m views . 5 months ago
+          </Text>
+        </View>
+        <Feather name="more-vertical" size={25} color="white" />
+      </View>
     </TouchableOpacity>
   );
 };
@@ -104,7 +122,7 @@ const LongForm: React.FC<LongFormProps> = ({ content }) => {
   if (!content || content.length === 0) {
     // Empty state
     return (
-      <View className="px-6 pb-20 items-center">
+      <View className="  pb-20 items-center">
         <View className="rounded-xl p-4 mb-4">
           <View className="h-16 w-16 bg-gray-700 rounded-xl items-center justify-center">
             <Feather name="lock" size={32} color="#9CA3AF" />

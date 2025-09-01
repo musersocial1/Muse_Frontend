@@ -18,6 +18,7 @@ import helpdesk from "@/assets/icons/helpdesk.png";
 import home from "@/assets/icons/home.png";
 import lock from "@/assets/icons/lock.png";
 import lock_2 from "@/assets/icons/lock_2.png";
+import lockedContent from "@/assets/icons/lockedContent.png";
 import notification from "@/assets/icons/not.png";
 import notifications from "@/assets/icons/notification.png";
 import person_morph from "@/assets/icons/people-morph.png";
@@ -87,4 +88,5 @@ export const icons = {
   comment,
   done,
   bubbling,
+  lockedContent,
 };
