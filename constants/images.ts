@@ -31,7 +31,7 @@ import joinCommunity from "@/assets/images/join.png";
 import male from "@/assets/images/male.png";
 import logo from "@/assets/images/muse-logo.png";
 import logo_white from "@/assets/images/muse-white-logo.png";
-import muse from "@/assets/images/muse_2.png";
+import muse from "@/assets/images/muse_2.webp";
 import otpmodalbg from "@/assets/images/otpmodalbg.png";
 import splash from "@/assets/images/splash.jpg";
 

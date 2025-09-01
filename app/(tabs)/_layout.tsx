@@ -1,9 +1,17 @@
+import CreatePostStart from "@/components/modals/create-post-startup";
 import ShrinkAnimation from "@/components/ui/ShrinkAnimation";
 import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
-import { useEffect, useRef } from "react";
-import { Animated, Image, View } from "react-native";
+import { Tabs, useRouter } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabsConfig = [
@@ -129,53 +137,94 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { width, height } = Dimensions.get("window");
+  const router = useRouter();
+  const fabAnimated = useRef(new Animated.Value(0)).current;
+
+  const fabScale = fabAnimated.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  useEffect(() => {
+    Animated.timing(fabAnimated, {
+      toValue: 1,
+      duration: 600,
+      delay: 1000,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <ShrinkAnimation onSwitch={() => console.log("Open community switcher")}>
-      <Tabs
-        screenOptions={{
-          tabBarShowLabel: false,
-          tabBarItemStyle: {
-            justifyContent: "center",
-            alignItems: "center",
-            height: 60,
-            flex: 1,
-          },
-          tabBarStyle: {
-            backgroundColor: "transparent",
-            borderTopWidth: 0,
-            borderRadius: 30,
-            marginHorizontal: 34,
-            gap: 0,
-            marginBottom: insets.bottom,
-            height: 60,
+      <View style={{ flex: 1 }}>
+        <Tabs
+          screenOptions={{
+            tabBarShowLabel: false,
+            tabBarItemStyle: {
+              justifyContent: "center",
+              alignItems: "center",
+              height: 60,
+              flex: 1,
+            },
+            tabBarStyle: {
+              backgroundColor: "transparent",
+              borderTopWidth: 0,
+              borderRadius: 30,
+              marginHorizontal: 34,
+              gap: 0,
+              marginBottom: insets.bottom,
+              height: 60,
+              position: "absolute",
+              borderWidth: 0,
+              elevation: 0,
+              shadowOpacity: 0,
+              paddingHorizontal: 0,
+            },
+          }}
+        >
+          {tabsConfig.map((tab) => (
+            <Tabs.Screen
+              key={tab.name}
+              name={tab.name}
+              options={{
+                title: tab.title,
+                headerShown: false,
+                tabBarIcon: ({ focused }) => (
+                  <TabIcon
+                    focused={focused}
+                    icon={tab.icon}
+                    title={tab.title}
+                    isProfile={tab.isProfile}
+                  />
+                ),
+              }}
+            />
+          ))}
+        </Tabs>
+        <CreatePostStart
+          showModal={showModal}
+          onClose={() => setShowModal(false)}
+        />
+        <Animated.View
+          style={{
+            transform: [{ scale: fabScale }],
             position: "absolute",
-            borderWidth: 0,
-            elevation: 0,
-            shadowOpacity: 0,
-            paddingHorizontal: 0,
-          },
-        }}
-      >
-        {tabsConfig.map((tab) => (
-          <Tabs.Screen
-            key={tab.name}
-            name={tab.name}
-            options={{
-              title: tab.title,
-              headerShown: false,
-              tabBarIcon: ({ focused }) => (
-                <TabIcon
-                  focused={focused}
-                  icon={tab.icon}
-                  title={tab.title}
-                  isProfile={tab.isProfile}
-                />
-              ),
-            }}
-          />
-        ))}
-      </Tabs>
+            bottom: insets.bottom + 80,
+            right: 10,
+            zIndex: 1000,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => setShowModal(true)}
+            className="w-16 h-16   rounded-full items-center justify-center shadow-lg"
+          >
+            <Image source={images.muse} className="h-full w-full" />
+          </TouchableOpacity>
+        </Animated.View>
+      </View>
     </ShrinkAnimation>
   );
 }

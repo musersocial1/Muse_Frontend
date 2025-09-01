@@ -22,6 +22,9 @@ export const RouterConstantUtil = {
   discover: {
     podcats: "/(discover)/podcasts",
   },
+  makepost: {
+    start: "/(makepost)/create-post-startup",
+  },
   community: {
     start: "/(community)/create-community-startup",
     create: "/(community)/create-community",

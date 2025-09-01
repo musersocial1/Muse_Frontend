@@ -1010,19 +1010,20 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
       case STEPS.AUTH_METHOD:
         return (
-          <View className="bg-white rounded-3xl py-[8%] shadow-2xl">
-            <View className="px-6">
-              <View className="flex-row justify-between items-center mb-6">
+          <View className="bg-white rounded-3xl p-[8%] shadow-2xl">
+            <View className="">
+              <View className="flex-row justify-between items-center ">
                 <TouchableOpacity
                   onPress={onBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
                 </TouchableOpacity>
-                <View className="absolute left-0 right-0 items-center mt-5">
+
+                <View className="absolute left-0 right-0 items-center ">
                   <Image
                     source={images.logo}
-                    className="w-36 h-20"
+                    className="w-28 "
                     resizeMode="contain"
                   />
                 </View>
@@ -1034,34 +1035,37 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <View className="items-center mb-8 mt-4">
-                <Text className="text-[24px] font-neutral-bold  text-[#000000] mb-3">
+              <View className="items-center my-8">
+                <Text className="text-2xl font-neutral-medium  text-[#000000]/60 mb-1.5">
                   Lets get started
                 </Text>
               </View>
               <View className="items-center mb-3">
                 <TouchableOpacity
-                  className="bg-[#F3F3F3]/[10%] w-full items-center rounded-full py-3 px-6 border border-[#0000000F]/[5%]"
+                  className="bg-[#F3F3F3] w-full items-center rounded-[28px] py-3 px-6 border justify-center gap-2 flex-row border-[#0000000F]/[5%]"
                   activeOpacity={0.8}
                   onPress={() => {
                     setIsGoogleAuth(true);
                     setCurrentStep(STEPS.USERNAME);
                   }}
                 >
+                  <Text className="text-center font-semibold text-[16px]">
+                    Continue with goggle
+                  </Text>
                   <Image
                     source={icons.google}
-                    className="w-10 h-10"
+                    className="w-8 h-10"
                     resizeMode="contain"
                   />
                 </TouchableOpacity>
               </View>
-              <View className="mb-[30%]">
+              <View className="">
                 <TouchableOpacity
                   onPress={() => {
                     setIsGoogleAuth(false);
                     onContinue();
                   }}
-                  className="bg-[#0368FF] rounded-full py-6 px-6"
+                  className="bg-[#0368FF] rounded-[28px] py-6 px-6"
                   activeOpacity={0.8}
                 >
                   <Text className="text-[#FFFFFF] text-center font-semibold text-[16px]">

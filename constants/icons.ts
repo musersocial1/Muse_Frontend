@@ -32,6 +32,12 @@ import users from "@/assets/icons/users.png";
 import voice from "@/assets/icons/voice.png";
 import warn from "@/assets/icons/warn.png";
 
+// ⬇️ your new icons
+import camera from "@/assets/icons/camera.webp";
+import emoji from "@/assets/icons/emoji.webp";
+import gallery from "@/assets/icons/gallery.webp";
+import gif from "@/assets/icons/gif.webp";
+
 export const icons = {
   asana,
   home,
@@ -66,4 +72,10 @@ export const icons = {
   lock_2,
   posts,
   google,
+
+  // new ones
+  gallery,
+  emoji,
+  camera,
+  gif,
 };
