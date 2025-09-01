@@ -29,6 +29,7 @@ export const RouterConstantUtil = {
     start: "/(community)/create-community-startup",
     create: "/(community)/create-community",
     manage: "/(community)/manage-community",
+    user: "/(community)/user-view-community",
   },
   museai: {
     communitychat: "/(museai)/community-chat",
