@@ -4,9 +4,12 @@ import back from "@/assets/icons/back.png";
 import back_2 from "@/assets/icons/back_2.png";
 import back_3 from "@/assets/icons/back_3.png";
 import star from "@/assets/icons/bright-star.png";
+import bubbling from "@/assets/icons/bubbling.png";
 import cardinfo from "@/assets/icons/cardinfo.png";
+import comment from "@/assets/icons/comment.png";
 import communities from "@/assets/icons/communities.png";
 import dollar from "@/assets/icons/dollar.png";
+import done from "@/assets/icons/done.png";
 import dp from "@/assets/icons/dp.png";
 import email from "@/assets/icons/email.png";
 import eyeclose from "@/assets/icons/eyeclose.png";
@@ -19,6 +22,7 @@ import notification from "@/assets/icons/not.png";
 import notifications from "@/assets/icons/notification.png";
 import person_morph from "@/assets/icons/people-morph.png";
 import posts from "@/assets/icons/posts.png";
+import record from "@/assets/icons/record.png";
 import ring from "@/assets/icons/ring.png";
 import search from "@/assets/icons/search.png";
 import settings from "@/assets/icons/settings.png";
@@ -66,4 +70,8 @@ export const icons = {
   lock_2,
   posts,
   google,
+  record,
+  comment,
+  done,
+  bubbling,
 };

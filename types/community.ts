@@ -11,3 +11,29 @@ export interface CommunityData {
   coverImageKey: string;
   coverImageUploadUrl: string;
 }
+
+export interface Post {
+  id: string;
+  author: {
+    name: string;
+    username: string;
+    avatar: string;
+    verified: boolean;
+  };
+  content: string;
+  image?: string;
+  timestamp: string;
+  likes: number;
+  comments: number;
+  type: "text" | "image" | "longform";
+}
+
+export interface LongFormContent {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  price: number;
+  isLocked: boolean;
+  description?: string;
+}

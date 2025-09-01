@@ -19,8 +19,8 @@ const tabsConfig = [
     isProfile: false,
   },
   {
-    name: "community",
-    title: "Community",
+    name: "communities",
+    title: "Communities",
     icon: icons.asana,
     isProfile: false,
   },
