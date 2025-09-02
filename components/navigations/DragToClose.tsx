@@ -1,26 +1,53 @@
 import React, { useRef } from "react";
-import { Animated, PanResponder, TouchableOpacity, View } from "react-native";
+import { Animated, PanResponder, View } from "react-native";
 
-export default function DragToClose({ onClose }: { onClose: () => void }) {
-  const translateY = useRef(new Animated.Value(0)).current;
+export default function DragToClose({
+  translateY,
+  onClose,
+}: {
+  translateY: Animated.Value;
+  onClose: () => void;
+}) {
+  const shineAnim = useRef(new Animated.Value(0)).current;
 
-  const panResponder = useRef(
+  const responder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) =>
-        Math.abs(gestureState.dy) > 5,
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dy > 0) {
-          translateY.setValue(gestureState.dy);
-        }
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+
+      onPanResponderGrant: () => {
+        console.log("👉 Drag started");
+
+        // Animate to pure white
+        Animated.timing(shineAnim, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: false, // color animation can’t use native driver
+        }).start();
       },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy > 100) {
-          // drag down enough → close
-          onClose();
+
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) translateY.setValue(g.dy);
+      },
+
+      onPanResponderRelease: (_, g) => {
+        // Animate back to faded
+        Animated.timing(shineAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: false,
+        }).start();
+
+        if (g.dy > 120) {
+          Animated.timing(translateY, {
+            toValue: 600,
+            duration: 220,
+            useNativeDriver: true,
+          }).start(() => onClose());
         } else {
-          // reset back if not enoughly  dragged lolll
           Animated.spring(translateY, {
             toValue: 0,
+            bounciness: 6,
             useNativeDriver: true,
           }).start();
         }
@@ -28,14 +55,26 @@ export default function DragToClose({ onClose }: { onClose: () => void }) {
     })
   ).current;
 
+  // Interpolate shine effect
+  const barColor = shineAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["rgba(255,255,255,0.3)", "rgba(255,255,255,1)"],
+  });
+
   return (
-    <Animated.View
-      style={{ transform: [{ translateY }] }}
-      {...panResponder.panHandlers}
+    <View
+      {...responder.panHandlers}
+      className="w-full items-center py-4"
+      style={{ minHeight: 40 }}
     >
-      <TouchableOpacity onPress={onClose} className="items-center py-4">
-        <View className="w-12 h-1 bg-white/30 rounded-full" />
-      </TouchableOpacity>
-    </Animated.View>
+      <Animated.View
+        style={{
+          width: 58,
+          height: 4,
+          borderRadius: 2,
+          backgroundColor: barColor,
+        }}
+      />
+    </View>
   );
 }

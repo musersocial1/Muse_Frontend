@@ -1,20 +1,21 @@
 import { icons } from "@/constants/icons";
 import { LongFormContent } from "@/types/community";
-import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
+import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 
 const { width } = Dimensions.get("window");
 
@@ -144,6 +145,43 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       onClose();
     }
   };
+  const insets = useSafeAreaInsets();
+  const HIDE_OFFSET = 300; // how far we start below
+
+  // Shared translateY for the sheet
+  const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
+
+  // Animate sheet up when opening
+  useEffect(() => {
+    if (visible) {
+      sheetY.setValue(HIDE_OFFSET);
+      Animated.timing(sheetY, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      sheetY.setValue(HIDE_OFFSET);
+    }
+  }, [visible]);
+
+  // Blur opacity follows sheet position (down → fade out)
+  const blurOpacity = sheetY.interpolate({
+    inputRange: [0, HIDE_OFFSET],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  // Optional programmatic close (slide down then onClose)
+  const closeWithSlide = () => {
+    Animated.timing(sheetY, {
+      toValue: HIDE_OFFSET,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
 
   if (!content) return null;
 
@@ -190,39 +228,43 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       default:
         return (
           <>
-            <Text className="text-white text-[18px] font-bold text-center mb-6">
+            <Text className="text-white text-[18px] font-sfpro-bold text-center mb-6">
               Locked content
             </Text>
 
             <View className="px-6 mb-6">
-              <View className="relative rounded-2xl overflow-hidden mb-4">
+              <View className="relative rounded-[13px] overflow-hidden mb-2">
                 <Image
                   source={{ uri: content.thumbnail }}
                   style={{
                     width: "100%",
                     height: 160,
                   }}
+                  blurRadius={10}
                   resizeMode="cover"
-                  className="rounded-2xl"
+                  className="rounded-[13px] "
                 />
 
                 {/* Blur overlay */}
-                <BlurView
-                  intensity={15}
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    borderRadius: 16,
-                  }}
-                />
 
                 {/* Play button overlay */}
+
                 <View className="absolute inset-0 items-center justify-center">
-                  <View className="w-12 h-12 rounded-full bg-white/20 items-center justify-center border border-white/30">
-                    <Feather name="lock" size={20} color="white" />
+                  <View className="w-20 h-20 rounded-full items-center justify-center  overflow-hidden border-white border-2">
+                    <BlurView
+                      style={StyleSheet.absoluteFill}
+                      tint="light"
+                      intensity={80}
+                      className=" rounded-full"
+                    />
+                    <View className="w-10  h-10 rounded-full  items-center justify-center">
+                      <Image
+                        source={icons.lockedContent}
+                        alt="icons"
+                        className="w-full "
+                        resizeMode="contain"
+                      />
+                    </View>
                   </View>
                 </View>
 
@@ -234,25 +276,22 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
                 </View>
               </View>
 
-              <Text className="text-gray-300 text-center text-[15px]">
+              <Text className="text-white/50 font-sfpro-medium text-center text-sm">
                 {content.title}
               </Text>
             </View>
 
-            <View className="bg-[#38383857]/30 m-2 rounded-3xl">
-              <Text className="text-white text-center text-[17px] font-bold pb-1 pt-8">
-                This content is locked and
+            <View className="bg-[#38383857]/30  p-3 m-2 rounded-[25px]">
+              <Text className="text-white text-center   text-lg leading-6 font-sfpro-bold pb-6 pt-6 ">
+                This content is locked and {"\n"} costs ${content.price} to open
               </Text>
-              <Text className="text-white text-center text-[17px] font-bold mb-5">
-                costs ${content.price} to open
-              </Text>
-              <View className="px-6 pb-2">
+              <View className=" pb-2">
                 <TouchableOpacity
                   onPress={() => handlePayment(content)}
-                  className="bg-[#0368FF] rounded-full py-5 mb-4"
+                  className="bg-[#0368FF] w-full rounded-full py-5 "
                   activeOpacity={0.8}
                 >
-                  <Text className="text-white text-center text-[16px] font-bold">
+                  <Text className="text-white text-center text-[16px] font-sfpro-bold">
                     Pay ${content.price} to unlock
                   </Text>
                 </TouchableOpacity>
@@ -270,28 +309,35 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50">
-        <View className="flex-1 justify-end">
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      <View className="flex-1 ">
+        {/* Blur that fades with drag */}
+        <TouchableOpacity
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+          onPress={closeWithSlide}
+        >
+          <FadingBlurBackground opacity={blurOpacity} />
+        </TouchableOpacity>
+        <View
+          pointerEvents="box-none" // 👈 lets touches reach children
+          style={{ marginBottom: insets.bottom }}
+          className="flex-1 pb-3 px-3  items-center justify-end"
+        >
+          <Animated.View
             style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              alignItems: "center",
+              transform: [{ translateY: sheetY }],
+              width: "100%",
             }}
+            className="w-full max-w-lg"
           >
-            <View className="w-[90vw] max-w-[400px]">
-              <View className="bg-[#1E1E1E] rounded-3xl overflow-hidden mb-[6vw]">
-                {paymentState !== "processing" &&
-                  paymentState !== "success" && (
-                    <DragToClose onClose={onClose} />
-                  )}
+            <View className="bg-[#1D1D1C]  w-full  border border-white/10  rounded-[30px] overflow-hidden ">
+              {paymentState !== "processing" && paymentState !== "success" && (
+                <DragToClose translateY={sheetY} onClose={onClose} />
+              )}
 
-                {renderContent()}
-              </View>
+              {renderContent()}
             </View>
-          </KeyboardAvoidingView>
+          </Animated.View>
         </View>
       </View>
     </Modal>

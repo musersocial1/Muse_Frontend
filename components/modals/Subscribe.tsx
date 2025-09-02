@@ -3,15 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
+import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 
 const { width } = Dimensions.get("window");
 
@@ -111,7 +113,7 @@ const PlanSelector: React.FC<{
   onPlanChange: (plan: "monthly" | "annually") => void;
 }> = ({ selectedPlan, onPlanChange }) => {
   return (
-    <View className="flex-row bg-[#272727] rounded-full p-1 w-[130px] h-[42px]">
+    <View className="flex-row bg-[#272727]  rounded-full p-1 w-[130px] h-[35px]">
       <TouchableOpacity
         onPress={() => onPlanChange("monthly")}
         className={`flex-1 justify-center items-center rounded-full ${
@@ -120,8 +122,8 @@ const PlanSelector: React.FC<{
         activeOpacity={0.8}
       >
         <Text
-          className={`text-sm font-medium ${
-            selectedPlan === "monthly" ? "text-white" : "text-gray-400"
+          className={`text-xs font-sfpro-medium ${
+            selectedPlan === "monthly" ? "text-white" : "text-white/50"
           }`}
         >
           Monthly
@@ -136,8 +138,8 @@ const PlanSelector: React.FC<{
         activeOpacity={0.8}
       >
         <Text
-          className={`text-sm font-medium ${
-            selectedPlan === "annually" ? "text-white" : "text-gray-400"
+          className={`text-xs font-sfpro-medium ${
+            selectedPlan === "annually" ? "text-white" : "text-white/50"
           }`}
         >
           Annually
@@ -194,17 +196,18 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
   };
 
   const renderContent = () => {
+    // switch ("processing") {
     switch (paymentState) {
       case "processing":
         return (
-          <View className="items-center py-8 bg-[#121212CC]">
+          <View className="items-center p-6 ">
             <LoadingRing />
-            <Text className="text-white text-[24px] font-bold mb-8">
+            <Text className="text-white text-2xl font-sfpro-bold mb-8">
               Processing payment
             </Text>
             <TouchableOpacity
               onPress={handleCancel}
-              className="py-5 px-8 bg-[#1E1E1E] rounded-full w-full max-w-[340px] mx-auto"
+              className="py-5 px-8 bg-[#121212CC] rounded-full w-full max-w-lg mx-auto"
               activeOpacity={0.8}
             >
               <Text className="text-white text-[18px] font-bold text-center">
@@ -216,14 +219,14 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
 
       case "success":
         return (
-          <View className="items-center py-8 bg-[#121212CC]">
+          <View className="items-center p-6">
             <SuccessIcon />
-            <Text className="text-white text-[24px] font-bold mb-8">
+            <Text className="text-white text-2xl font-sfpro-bold mb-8">
               Payment successful
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="py-5 px-8 bg-[#1E1E1E] rounded-full w-full max-w-[340px] mx-auto text-center"
+              className="py-5 px-8 bg-[#121212CC] rounded-full w-full max-w-lg text-center"
               activeOpacity={0.8}
             >
               <Text className="text-white text-[18px] font-bold text-center">
@@ -234,17 +237,17 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
         );
       default:
         return (
-          <View className="px-6 py-8">
-            <Text className="text-white text-[28px] font-bold text-center mb-8">
+          <View className="p-5  gap-8">
+            <Text className="text-white text-2xl font-sfpro-bold text-center ">
               Subscribe
             </Text>
 
-            <View className="mb-8 bg-[#00000040]/[25%] rounded-[30px] p-6 flex-row items-center justify-between">
+            <View className=" bg-[#00000040]/[25%] rounded-[20px] p-4 flex-row items-center justify-between">
               <View>
-                <Text className="text-gray-400 text-[16px]">Monthly plan</Text>
-                <Text className="text-white text-[28px] font-bold">
-                  $100.00
+                <Text className="text-white/50 text-lg font-sfpro-medium">
+                  Monthly plan
                 </Text>
+                <Text className="text-white  font-sfpro-bold">$100.00</Text>
               </View>
 
               <PlanSelector
@@ -255,10 +258,10 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
 
             <TouchableOpacity
               onPress={handlePayment}
-              className="bg-[#0368FF] rounded-full py-5 mb-4"
+              className="bg-[#0368FF] rounded-full py-5"
               activeOpacity={0.8}
             >
-              <Text className="text-white text-center text-[18px] font-bold">
+              <Text className="text-white text-center text-base font-sfpro-bold">
                 Continue
               </Text>
             </TouchableOpacity>
@@ -267,35 +270,80 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
     }
   };
 
+  const insets = useSafeAreaInsets();
+  const HIDE_OFFSET = 300; // how far we start below
+
+  // Shared translateY for the sheet
+  const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
+
+  // Animate sheet up when opening
+  useEffect(() => {
+    if (visible) {
+      sheetY.setValue(HIDE_OFFSET);
+      Animated.timing(sheetY, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      sheetY.setValue(HIDE_OFFSET);
+      setTimeout(() => setPaymentState("subscriptions"), 300);
+    }
+  }, [visible]);
+
+  // Blur opacity follows sheet position (down → fade out)
+  const blurOpacity = sheetY.interpolate({
+    inputRange: [0, HIDE_OFFSET],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  // Optional programmatic close (slide down then onClose)
+  const closeWithSlide = () => {
+    Animated.timing(sheetY, {
+      toValue: HIDE_OFFSET,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50">
-        <View className="flex-1 justify-end">
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      <View className="flex-1 ">
+        {/* animated blur */}
+        {/* Blur that fades with drag */}
+        <TouchableOpacity
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+          onPress={closeWithSlide}
+        >
+          <FadingBlurBackground opacity={blurOpacity} />
+        </TouchableOpacity>
+        <View
+          pointerEvents="box-none" // 👈 lets touches reach children
+          style={{ marginBottom: insets.bottom }}
+          className="flex-1 pb-3 px-3  items-center justify-end"
+        >
+          <Animated.View
             style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              alignItems: "center",
+              transform: [{ translateY: sheetY }],
+              width: "100%",
             }}
+            className="w-full max-w-lg"
           >
-            <View className="w-[90vw] max-w-[400px]">
-              <View className="bg-[#1E1E1E] rounded-[40px] overflow-hidden mb-[10vw]">
-                {paymentState !== "processing" &&
-                  paymentState !== "success" && (
-                    <DragToClose onClose={onClose} />
-                  )}
-
-                {renderContent()}
-              </View>
+            <View className="bg-[#1D1D1C]  w-full  border border-white/10  rounded-[30px] overflow-hidden ">
+              {paymentState !== "processing" && paymentState !== "success" && (
+                <DragToClose translateY={sheetY} onClose={onClose} />
+              )}
+              {renderContent()}
             </View>
-          </KeyboardAvoidingView>
+          </Animated.View>
         </View>
       </View>
     </Modal>

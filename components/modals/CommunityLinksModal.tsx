@@ -1,16 +1,19 @@
 import { Feather } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
-  KeyboardAvoidingView,
+  Animated,
+  Easing,
   Linking,
   Modal,
-  Platform,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
+import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 
 interface CommunityLink {
   id: string;
@@ -61,21 +64,21 @@ const LinkItem: React.FC<LinkItemProps> = ({ link, onPress }) => {
   return (
     <TouchableOpacity
       onPress={() => onPress(link.url)}
-      className="bg-[#00000040]/[20%] rounded-[30px] p-5 mb-4 flex-row items-center justify-between"
+      className="bg-[#00000040]/[20%]  rounded-[20px] p-4  flex-row items-center justify-between"
       activeOpacity={0.8}
     >
       <View className="flex-1">
-        <Text className="text-white text-[18px] font-semibold mb-1">
+        <Text className="text-white text-base font-sfpro-bold mb-1">
           {link.platform}
         </Text>
-        <Text className="text-gray-400 font-medium text-[15px]">
+        <Text className="text-white/50 font-medium text-[15px]">
           {link.displayUrl}
         </Text>
       </View>
 
-      <View className="bg-[#FFFFFF0F]/[6%] rounded-full px-4 py-2 flex-row items-center">
-        <Feather name="link" size={16} color="white" className="mr-2" />
-        <Text className="text-white text-[14px] font-medium ml-2">
+      <View className="bg-[#FFFFFF0F]/[6%] rounded-full px-4 py-2.5 flex-row items-center">
+        <Feather name="link" size={18} color="white" className="" />
+        <Text className="text-white text-base font-sfpro-medium ml-2">
           Open links
         </Text>
       </View>
@@ -101,37 +104,86 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
     }
   };
 
+  const insets = useSafeAreaInsets();
+
+  const HIDE_OFFSET = 800; // how far we start below
+
+  // Shared translateY for the sheet
+  const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
+
+  // Animate sheet up when opening
+  useEffect(() => {
+    if (visible) {
+      sheetY.setValue(HIDE_OFFSET);
+      Animated.timing(sheetY, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      sheetY.setValue(HIDE_OFFSET);
+    }
+  }, [visible]);
+
+  // Blur opacity follows sheet position (down → fade out)
+  const blurOpacity = sheetY.interpolate({
+    inputRange: [0, HIDE_OFFSET],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  // Optional programmatic close (slide down then onClose)
+  const closeWithSlide = () => {
+    Animated.timing(sheetY, {
+      toValue: HIDE_OFFSET,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => onClose());
+  };
+
   return (
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50">
-        <View className="flex-1 justify-end">
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      <View className="flex-1 ">
+        {/* animated blur */}
+        {/* Blur that fades with drag */}
+        <TouchableOpacity
+          activeOpacity={1}
+          style={StyleSheet.absoluteFill}
+          onPress={closeWithSlide}
+        >
+          <FadingBlurBackground opacity={blurOpacity} />
+        </TouchableOpacity>
+        <View
+          pointerEvents="box-none" // 👈 lets touches reach children
+          style={{ marginBottom: insets.bottom }}
+          className="flex-1 pb-3 px-3  items-center justify-end"
+        >
+          <Animated.View
             style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              alignItems: "center",
+              transform: [{ translateY: sheetY }],
+              width: "100%",
             }}
+            className="w-full   max-w-lg"
           >
-            <View className="w-[90vw] max-w-[400px]">
-              <View className="bg-[#1E1E1E] rounded-3xl overflow-hidden mb-[10vw] max-h-[80vh]">
-                <DragToClose onClose={onClose} />
+            <View className="bg-[#1E1E1E] rounded-[30px] overflow-hidden">
+              <DragToClose translateY={sheetY} onClose={onClose} />
 
-                <Text className="text-white text-[20px] font-bold text-center mb-8">
-                  Community links
-                </Text>
+              <Text className="text-white  text-xl font-bold text-center  ">
+                Community links
+              </Text>
 
-                <ScrollView
-                  className="px-6"
-                  showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{ paddingBottom: 32 }}
-                >
+              <ScrollView
+                className=" p-6 "
+                showsVerticalScrollIndicator={false}
+              >
+                <View className=" gap-4">
                   {links.map((link) => (
                     <LinkItem
                       key={link.id}
@@ -139,10 +191,10 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
                       onPress={handleLinkPress}
                     />
                   ))}
-                </ScrollView>
-              </View>
+                </View>
+              </ScrollView>
             </View>
-          </KeyboardAvoidingView>
+          </Animated.View>
         </View>
       </View>
     </Modal>
