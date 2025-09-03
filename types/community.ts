@@ -22,10 +22,12 @@ export interface Post {
   };
   content: string;
   images?: string[];
+  vComments?: string[];
+  videos?: string[];
   timestamp: string;
   likes: number;
   comments: number;
-  type: "text" | "image" | "longform";
+  type: "text" | "image" | "longform" | "video";
 }
 
 export interface LongFormContent {

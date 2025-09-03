@@ -28,6 +28,7 @@ import no_moderators from "@/assets/icons/no-moderators.png";
 import notification from "@/assets/icons/not.png";
 import notifications from "@/assets/icons/notification.png";
 import person_morph from "@/assets/icons/people-morph.png";
+import play from "@/assets/icons/play.png";
 import posts from "@/assets/icons/posts.png";
 import record from "@/assets/icons/record.png";
 import ring from "@/assets/icons/ring.png";
@@ -90,4 +91,5 @@ export const icons = {
   no_moderators,
   envelope,
   video,
+  play,
 };

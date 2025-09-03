@@ -172,12 +172,6 @@ const CommunityManager: React.FC = () => {
     </View>
   );
 
-  const tabItems = [
-    { id: "info", title: "Community info", active: true },
-    { id: "members", title: "Members", active: false },
-    { id: "requests", title: "New requests", active: false },
-  ];
-
   const bottomNavItems = [
     {
       icon: icons.posts,

@@ -433,11 +433,11 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
         </KeyboardAvoidingView>
       </Modal>
 
-      {/* Calendar Modal - Separate top-level modal */}
+      {/* Calendar Modal  */}
       <Modal
         visible={calendarVisible}
         transparent
-        animationType="none"
+        animationType="slide"
         onRequestClose={() => closeCalendarSheet()}
         presentationStyle="overFullScreen"
         statusBarTranslucent={true}
@@ -453,7 +453,7 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
         />
       </Modal>
 
-      {/* Upload Progress Modal - Separate top-level modal */}
+      {/* Upload Progress Modal  */}
       <Modal
         visible={openPosting}
         transparent

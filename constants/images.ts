@@ -21,6 +21,9 @@ import img20 from "@/assets/images/IMG20.png";
 import img21 from "@/assets/images/img21.jpg";
 import img22 from "@/assets/images/img22.jpg";
 import img23 from "@/assets/images/IMG23.png";
+import img24 from "@/assets/images/IMG24.jpg";
+import img25 from "@/assets/images/IMG25.jpg";
+import img26 from "@/assets/images/IMG26.jpg";
 import img3 from "@/assets/images/IMG3.png";
 import img4 from "@/assets/images/IMG4.png";
 import img5 from "@/assets/images/IMG5.png";
@@ -71,6 +74,9 @@ export const images = {
   img21,
   img22,
   img23,
+  img24,
+  img25,
+  img26,
   logo_white,
   Comedy,
   bg_2,

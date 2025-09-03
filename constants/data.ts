@@ -1,4 +1,5 @@
 import { LongFormContent, Post } from "@/types/community";
+import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
   {
@@ -28,6 +29,26 @@ export const dummyAllPosts: Post[] = [
     },
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    videos: [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
+    ],
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "video",
+  },
+  {
+    id: "3",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     images: [
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
@@ -36,6 +57,29 @@ export const dummyAllPosts: Post[] = [
     likes: 2678,
     comments: 893,
     type: "image",
+  },
+  {
+    id: "4",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    vComments: [
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+    ],
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
   },
 ];
 
@@ -115,5 +159,120 @@ export const moderators = [
     email: "officialgrund@gmail.com",
     status: "pending",
     initials: "GJ",
+  },
+];
+
+export const user = {
+  name: "beyonce",
+  username: "@beyonceknowle",
+  profileImage:
+    "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+  verified: true,
+  communities: [
+    {
+      id: "1",
+      name: "K.Dots community",
+      memberCount: 456,
+      profileImage:
+        "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      memberImages: [
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        images.img24,
+      ],
+    },
+    {
+      id: "2",
+      name: "K.Dots community",
+      memberCount: 456,
+      profileImage:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      memberImages: [
+        "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      ],
+    },
+    {
+      id: "3",
+      name: "K.Dots community",
+      memberCount: 456,
+      profileImage:
+        "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+      memberImages: [
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+      ],
+    },
+  ],
+};
+
+export const videoComments = [
+  {
+    id: "1",
+    thumbnail: images.img25,
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "2",
+    thumbnail: images.img25,
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "3",
+    thumbnail: "",
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "4",
+    thumbnail: images.img26,
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "5",
+    thumbnail: images.img24,
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "6",
+    thumbnail: images.img25,
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+];
+
+export const textComments = [
+  {
+    id: "1",
+    author: {
+      name: "Jhayjameson",
+      username: "@Jhayjameson",
+      profileImage:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+    },
+    content:
+      'New season, new slay! 🔥 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story. 💅✨ Today, I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 👑',
+    timestamp: "2h",
+    likes: 2678,
+    replies: 653,
+  },
+  {
+    id: "2",
+    author: {
+      name: "Jhayjameson",
+      username: "@Jhayjameson",
+      profileImage:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+    },
+    content:
+      'New season, new slay! 🔥 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story. 💅✨ Today, I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 👑',
+    timestamp: "2h",
+    likes: 2678,
+    replies: 653,
   },
 ];
