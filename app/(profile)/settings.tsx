@@ -68,6 +68,12 @@ const SETTINGS_ITEMS = [
     type: "normal",
   },
   {
+    label: "Edit community",
+    icon: icons.communities,
+    route: RouterConstantUtil.community.manage,
+    type: "normal",
+  },
+  {
     label: "Muse Ai",
     icon: icons.communities,
     route: RouterConstantUtil.museai.communitychat,

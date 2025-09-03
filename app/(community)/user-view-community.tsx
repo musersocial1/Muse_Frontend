@@ -203,11 +203,16 @@ const UserViewCommunity: React.FC = () => {
                 <TouchableOpacity
                   key={item.key}
                   onPress={() => setActivePostType(item.key)}
-                  className="items-center  shrink  w-full"
+                  className="items-center shrink w-full"
                   activeOpacity={0.8}
                 >
-                  <View className="w-8 h-8  rounded-2xl items-center justify-center mb-2">
-                    <Image source={item.icon} className="h-full w-full" />
+                  <View className="w-8 h-8 rounded-2xl items-center justify-center mb-2">
+                    <Image
+                      source={item.icon}
+                      className={`h-full w-full ${
+                        item.active ? "opacity-100" : "opacity-40"
+                      }`}
+                    />
                   </View>
                   <Text
                     className={`text-[13px] font-sfpro-medium ${

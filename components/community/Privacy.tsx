@@ -1,10 +1,7 @@
-import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useState } from "react";
 import {
-  Animated,
-  Image,
   ScrollView,
   StyleSheet,
   Switch,
@@ -13,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ProgressiveBlur from "../ui/progressiveBlur";
 
 interface PrivacyScreenProps {
   onClose: () => void;
@@ -43,31 +39,7 @@ const Privacy: React.FC<PrivacyScreenProps> = ({ onClose }) => {
 
   return (
     <View className="flex-1 bg-primary rounded-3xl overflow-hidden">
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFillObject,
-          {
-            zIndex: 1,
-            height: 1500,
-          },
-        ]}
-      >
-        <ProgressiveBlur useAlt={true} />
-        <View className="w-full aspect-[1/3] rounded-3xl">
-          <Image
-            source={images.bg_2}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
-        </View>
-      </Animated.View>
-
-      {/* Header */}
-      <View
-        style={{ paddingTop: insets.top + 16 }}
-        className="flex-row relative items-center px-6  z-[200]"
-      >
+      <View className="flex-row relative  items-center px-6 pt-6  z-[200]">
         <TouchableOpacity
           onPress={onClose}
           activeOpacity={0.7}
@@ -99,7 +71,7 @@ const Privacy: React.FC<PrivacyScreenProps> = ({ onClose }) => {
             <TouchableOpacity
               onPress={() => handlePrivateToggle(true)}
               activeOpacity={0.8}
-              className="rounded-2xl px-4 py-6 overflow-hidden bg-transparent"
+              className="rounded-2xl  py-6 overflow-hidden bg-transparent"
               // style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
             >
               <View className="flex-row items-center justify-between mb-2">
@@ -123,7 +95,7 @@ const Privacy: React.FC<PrivacyScreenProps> = ({ onClose }) => {
             <TouchableOpacity
               onPress={() => handlePublicToggle(true)}
               activeOpacity={0.8}
-              className="rounded-2xl px-4 py-6 overflow-hidden"
+              className="rounded-2xl  py-6 overflow-hidden"
               // style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
             >
               <View className="flex-row items-center justify-between mb-2">

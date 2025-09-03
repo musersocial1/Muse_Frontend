@@ -53,6 +53,7 @@ interface OnboardingModalProps {
   detectedCallingCode: string;
   fullName: any;
   setFullName: any;
+  setDirection: (val: number) => void;
 }
 
 const OnboardingModal: React.FC<OnboardingModalProps> = ({
@@ -84,6 +85,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   setFullName,
   detectedCallingCode,
   detectedCountryCode,
+  setDirection,
 }) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -567,6 +569,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       switch (currentStep) {
         case STEPS.AUTH_METHOD: {
           if (isGoogleAuth) {
+            setDirection(-1);
             setCurrentStep(STEPS.USERNAME);
           } else {
             onContinue();
@@ -676,6 +679,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    if (isGoogleAuth && currentStep !== STEPS.VERIFY_OTP) {
+      setCurrentStep(STEPS.AUTH_METHOD);
+      setDirection(-1);
+    } else {
+      onBack();
     }
   };
 
@@ -910,7 +922,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <View className="px-6  ">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={onBack}
+                  onPress={handleBack}
                   className="p-2 bg-gray-100 rounded-full"
                   disabled={isLoading}
                 >
@@ -1014,7 +1026,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <View className="">
               <View className="flex-row justify-between items-center ">
                 <TouchableOpacity
-                  onPress={onBack}
+                  onPress={handleBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
@@ -1082,7 +1094,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <View className="px-6 py-8">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={onBack}
+                  onPress={handleBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
@@ -1225,7 +1237,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <View className="px-6 pt-6 pb-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={onBack}
+                  onPress={handleBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />
@@ -1327,7 +1339,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <View className="px-6 pt-6 pb-6">
               <View className="flex-row justify-between items-center mb-6">
                 <TouchableOpacity
-                  onPress={onBack}
+                  onPress={handleBack}
                   className="p-2 bg-gray-100 rounded-full"
                 >
                   <Feather name="arrow-left" size={20} color="#666" />

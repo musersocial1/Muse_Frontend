@@ -15,7 +15,7 @@ const CircleProgress: React.FC<Props> = ({
   strokeWidth = 3,
   progress,
   color = "#62F28F",
-  backgroundColor = "#222428",
+  backgroundColor = "rgba(255,255,255,0.5)",
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -24,7 +24,6 @@ const CircleProgress: React.FC<Props> = ({
   return (
     <View>
       <Svg width={size} height={size}>
-        {/* Background Circle */}
         <Circle
           stroke={backgroundColor}
           fill="none"

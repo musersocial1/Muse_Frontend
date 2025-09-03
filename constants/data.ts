@@ -28,8 +28,10 @@ export const dummyAllPosts: Post[] = [
     },
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    image:
+    images: [
       "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+    ],
     timestamp: "2h",
     likes: 2678,
     comments: 893,
@@ -103,5 +105,15 @@ export const dummyLongFormContent: LongFormContent[] = [
     isLocked: true,
     description:
       "Navigate the world of international dance competitions with expert tips and insider knowledge.",
+  },
+];
+
+export const moderators = [
+  {
+    id: "1",
+    name: "Grund jhay",
+    email: "officialgrund@gmail.com",
+    status: "pending",
+    initials: "GJ",
   },
 ];

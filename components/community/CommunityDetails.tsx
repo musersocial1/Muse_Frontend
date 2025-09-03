@@ -2,10 +2,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useRef, useState } from "react";
 
-import { images } from "@/constants/images";
 import {
-  Animated,
-  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -17,7 +14,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleProgress from "../ui/CircleProgress";
-import ProgressiveBlur from "../ui/progressiveBlur";
 
 interface CommunityDetailsProps {
   onClose: () => void;
@@ -85,26 +81,6 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
       <View className="flex-1 bg-primary rounded-3xl overflow-hidden">
-        <Animated.View
-          pointerEvents="none"
-          style={[
-            StyleSheet.absoluteFillObject,
-            {
-              zIndex: 1,
-              height: 1500,
-            },
-          ]}
-        >
-          <ProgressiveBlur useAlt={true} />
-          <View className="w-full aspect-[1/3] rounded-3xl">
-            <Image
-              source={images.bg_2}
-              className="w-full h-full"
-              resizeMode="cover"
-            />
-          </View>
-        </Animated.View>
-
         <View className="flex-row relative  items-center px-6 py-4  z-[200]">
           <TouchableOpacity
             onPress={onClose}
@@ -131,7 +107,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
           <View className="px-5 mt-20">
             <View className="px-6 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-6">
               <BlurView
-                intensity={30}
+                intensity={10}
                 tint="light"
                 style={[StyleSheet.absoluteFill]}
               />
@@ -143,9 +119,10 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
             <View className="mb-6">
               <View className="overflow-hidden rounded-[20px] px-6 py-8">
                 <BlurView
-                  intensity={30}
+                  intensity={10}
                   tint="light"
                   style={[StyleSheet.absoluteFill]}
+                  className="bg-[rgba(28, 28, 28, 0.7)]"
                 />
                 <Text className="text-[16px] font-sfpro-bold text-white mb-4">
                   Community bio
@@ -177,7 +154,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
             <View className="mb-6">
               <View className="pr-1 pl-4 rounded-[20px] flex-row items-center overflow-hidden h-[4.5rem] mb-4">
                 <BlurView
-                  intensity={30}
+                  intensity={10}
                   tint="light"
                   style={StyleSheet.absoluteFill}
                 />
@@ -234,7 +211,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
               ))}
             </View>
 
-            <View style={{ height: 120 }} />
+            {/* <View style={{ height: 120 }} /> */}
           </View>
         </ScrollView>
 
@@ -247,7 +224,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
         >
           <TouchableOpacity
             onPress={handleSave}
-            className="rounded-full bg-[#0368FF] py-4"
+            className="rounded-full bg-[#0368FF] py-5"
             activeOpacity={0.8}
           >
             <Text className="text-white text-xl font-sfpro-bold text-center">

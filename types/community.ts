@@ -21,7 +21,7 @@ export interface Post {
     verified: boolean;
   };
   content: string;
-  image?: string;
+  images?: string[];
   timestamp: string;
   likes: number;
   comments: number;

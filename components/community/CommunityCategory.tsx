@@ -1,10 +1,7 @@
-import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useState } from "react";
 import {
-  Animated,
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -12,7 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ProgressiveBlur from "../ui/progressiveBlur";
 
 const CommunityCategories = {
   Sport: [
@@ -40,7 +36,6 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
   onClose,
 }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const handleCategorySelect = (category: string) => {
     let updatedCategories;
@@ -66,19 +61,6 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
 
     onClose();
   };
-
-  const filteredCategories = Object.entries(CommunityCategories).reduce(
-    (acc, [categoryTitle, items]) => {
-      const filteredItems = items.filter((item) =>
-        item.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      if (filteredItems.length > 0) {
-        acc[categoryTitle] = filteredItems;
-      }
-      return acc;
-    },
-    {} as Record<string, string[]>
-  );
 
   const renderCategoryButton = (category: string) => {
     const isSelected = selectedCategories.includes(category);
@@ -106,26 +88,35 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
 
   return (
     <SafeAreaView className="relative flex-1 bg-primary rounded-3xl h-[900px] overflow-hidden px-6">
-      <Animated.View
+      {/* <Animated.View
         pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFillObject,
-          {
-            zIndex: 1,
-            height: 1500,
-          },
-        ]}
+        style={[StyleSheet.absoluteFillObject]}
+        className={`h-[300%]`}
       >
-        <ProgressiveBlur useAlt={true} />
-        <View className="w-full aspect-[1/4] rounded-3xl">
-          <Image
-            source={images.bg_2}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
+        <ProgressiveBlur useAlt={false} />
+        <View className="w-full   aspect-[1/2]">
+          <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+            <LinearGradient
+              colors={["#c3c9f4", "#d3a6b9", "#0d0b0d"]} // top → mid → bottom
+              locations={[0, 0.48, 1]}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+            />
+
+            <Svg style={StyleSheet.absoluteFillObject}>
+              <Defs>
+                <RadialGradient id="vignette" cx="50%" cy="-15%" r="100%">
+                  <Stop offset={0.55} stopColor="#000" stopOpacity={0} />
+                  <Stop offset={1} stopColor="#000" stopOpacity={0.85} />
+                </RadialGradient>
+              </Defs>
+              <Rect width="100%" height="100%" fill="url(#vignette)" />
+            </Svg>
+          </View>
         </View>
-      </Animated.View>
-      <View className="flex-row relative  items-center px-6 py-4  z-[100]">
+      </Animated.View> */}
+      <View className="flex-row relative  items-center px-6 py-4  z-[90] ">
         <TouchableOpacity
           onPress={onClose}
           activeOpacity={0.7}
@@ -144,7 +135,7 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
         </Text>
       </View>
 
-      <View className="flex-1 px-3 mt-4 relative z-[100]">
+      <View className="flex-1 px-3  relative z-[90] mt-7">
         <ScrollView
           showsVerticalScrollIndicator={false}
           className="flex-1"
@@ -166,7 +157,7 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
       <View className="pb-8 px-4 z-[100]">
         <TouchableOpacity
           onPress={handleSave}
-          className="rounded-full bg-[#0368FF] py-4 mt-6"
+          className="rounded-full bg-[#0368FF] py-5 mt-6"
         >
           <Text className="text-white text-xl font-sfpro-bold text-center">
             Save Changes

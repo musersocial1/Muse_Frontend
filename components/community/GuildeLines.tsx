@@ -1,10 +1,7 @@
-import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -18,7 +15,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CircleProgress from "../ui/CircleProgress";
-import ProgressiveBlur from "../ui/progressiveBlur";
 
 interface CommunityGuidelinesScreenProps {
   onClose: () => void;
@@ -81,32 +77,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View className="flex-1 bg-primary rounded-3xl overflow-hidden">
-          {/* Background */}
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                zIndex: 1,
-                height: 1500,
-              },
-            ]}
-          >
-            <ProgressiveBlur useAlt={true} />
-            <View className="w-full aspect-[1/3] rounded-3xl">
-              <Image
-                source={images.bg_2}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-          </Animated.View>
-
-          {/* Header */}
-          <View
-            style={{ paddingTop: insets.top + 16 }}
-            className="relative z-[200] px-5"
-          >
+          <View className="flex-row relative  items-center px-6 py-4 ">
             <TouchableOpacity
               onPress={onClose}
               activeOpacity={0.7}
@@ -122,20 +93,19 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
             </TouchableOpacity>
           </View>
 
-          {/* Content */}
           <ScrollView
             ref={scrollViewRef}
             showsVerticalScrollIndicator={false}
-            className="flex-1 relative z-[100]"
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{ flexGrow: 1 }}
+            className="flex-1 relative z-[200]"
           >
             <View className="px-5 mt-20">
               <View className="rounded-[20px] px-8 py-8 overflow-hidden">
                 <BlurView
                   style={[StyleSheet.absoluteFill]}
                   tint="light"
-                  intensity={28}
+                  intensity={10}
                 />
 
                 <Text className="text-white text-base font-sfpro-bold mb-4">
@@ -197,7 +167,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
                 </Text>
               </View>
 
-              <View style={{ height: 120 }} />
+              {/* <View style={{ height: 120 }} /> */}
             </View>
           </ScrollView>
 
@@ -210,7 +180,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
           >
             <TouchableOpacity
               onPress={handleSave}
-              className="rounded-full py-4"
+              className="rounded-full py-5"
               style={{ backgroundColor: "#0368FF" }}
               activeOpacity={0.8}
             >

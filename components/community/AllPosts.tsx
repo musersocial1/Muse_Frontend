@@ -1,11 +1,13 @@
 import { icons } from "@/constants/icons";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   FlatList,
   Image,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
   Text,
   TouchableOpacity,
   View,
@@ -18,6 +20,8 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+
   return (
     <View className="bg-[#1C1C1C] rounded-[30px] p-6 mb-4 overflow-hidden">
       <View className="flex-row items-center   pb-3">
@@ -70,33 +74,42 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       </View>
 
       {/* Post Image (if exists) */}
-      {post.type === "image" && post.image && (
-        <View className=" mb-3 rounded-3xl overflow-hidden">
-          <Image
-            source={{ uri: post.image }}
-            style={{
-              // width: width - 80,
-              height: 300,
-            }}
-            resizeMode="cover"
-            className="rounded-xl"
-          />
-          {/* <View className="absolute bottom-4 left-4 right-4">
-            <TouchableOpacity className="bg-black/60 w-full rounded-full px-4 py-4 flex-row items-center">
-              <Feather name="globe" size={14} color="white" />
-
-              <Text className="text-white text-[13px] font-medium ml-2">
-                Visit website
-              </Text>
-
-              <Feather
-                name="chevron-right"
-                size={14}
-                color="white"
-                className="ml-auto"
+      {post.type === "image" && post.images && post.images.length > 0 && (
+        <View className="mb-3 rounded-3xl overflow-hidden">
+          <FlatList
+            data={post.images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={{ width: width - 80, height: 300 }}
+                resizeMode="cover"
+                className="rounded-xl"
               />
-            </TouchableOpacity>
-          </View> */}
+            )}
+            onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+              const index = Math.round(
+                event.nativeEvent.contentOffset.x / (width - 80)
+              );
+              setActiveIndex(index);
+            }}
+            scrollEventThrottle={16}
+          />
+
+          {/* Dots Pagination */}
+          <View className="absolute bottom-8 w-full flex-row justify-center">
+            {post.images.map((_, i) => (
+              <View
+                key={i}
+                className={`h-2  mx-1 rounded-full ${
+                  i === activeIndex ? "bg-white w-6" : "bg-white/40 w-2"
+                }`}
+              />
+            ))}
+          </View>
         </View>
       )}
 
@@ -140,9 +153,10 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
 interface AllPostsProps {
   posts?: Post[];
+  addPost?: () => void;
 }
 
-const AllPosts: React.FC<AllPostsProps> = ({ posts }) => {
+const AllPosts: React.FC<AllPostsProps> = ({ posts, addPost }) => {
   if (!posts || posts.length === 0) {
     return (
       <View className="px-6 pb-20 items-center">
@@ -160,7 +174,7 @@ const AllPosts: React.FC<AllPostsProps> = ({ posts }) => {
         </Text>
 
         <TouchableOpacity
-          onPress={() => console.log("Make posts pressed")}
+          onPress={addPost}
           className="bg-[#0368FF] rounded-full py-4 px-8"
           activeOpacity={0.8}
         >

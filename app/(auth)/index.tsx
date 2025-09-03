@@ -402,6 +402,7 @@ export default function Index() {
         detectedCallingCode={detectedCallingCode}
         fullName={fullName}
         setFullName={setFullName}
+        setDirection={setDirection}
       />
 
       {isMoreInfoMounted && (

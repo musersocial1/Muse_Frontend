@@ -92,6 +92,7 @@ const LongFormCard: React.FC<LongFormCardProps> = ({ content, onPress }) => {
 
 interface LongFormProps {
   content?: LongFormContent[];
+  addPost?: () => void;
 }
 
 const LongForm: React.FC<LongFormProps> = ({ content }) => {

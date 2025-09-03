@@ -1,10 +1,7 @@
-import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useRef, useState } from "react";
 import {
-  Animated,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -19,7 +16,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import ProgressiveBlur from "../ui/progressiveBlur";
 
 interface PricingScreenProps {
   onClose: () => void;
@@ -93,35 +89,12 @@ const Pricing: React.FC<PricingScreenProps> = ({ onClose }) => {
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View className="flex-1 bg-black rounded-3xl overflow-hidden">
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFillObject,
-              {
-                zIndex: 1,
-                height: 1500,
-              },
-            ]}
-          >
-            <ProgressiveBlur useAlt={true} />
-            <View className="w-full aspect-[1/3] rounded-3xl">
-              <Image
-                source={images.bg_2}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-          </Animated.View>
-
-          <View
-            style={{ paddingTop: insets.top + 16 }}
-            className="flex-row relative items-center px-6 py-4 z-[200]"
-          >
+        <View className="flex-1 bg-primary rounded-3xl overflow-hidden">
+          <View className="flex-row relative  items-center px-6 py-4  z-[200]">
             <TouchableOpacity
               onPress={onClose}
               activeOpacity={0.7}
-              className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center"
+              className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
             >
               <BlurView style={[StyleSheet.absoluteFill]} />
               <Feather
@@ -156,7 +129,7 @@ const Pricing: React.FC<PricingScreenProps> = ({ onClose }) => {
 
               <View
                 className="w-full items-center rounded-[30px] overflow-hidden"
-                style={{ backgroundColor: "#1C1C1C" }}
+                style={{ backgroundColor: "rgba(28, 28, 28, 1)" }}
               >
                 <Text className="text-white/40 text-xl font-sfpro-bold py-5 pb-7 w-full text-center border-b border-b-white/5">
                   Enter pricing
@@ -198,7 +171,7 @@ const Pricing: React.FC<PricingScreenProps> = ({ onClose }) => {
                 </TouchableOpacity>
               </View>
 
-              <View style={{ height: 120 }} />
+              {/* <View style={{ height: 120 }} /> */}
             </View>
           </ScrollView>
 
@@ -210,7 +183,7 @@ const Pricing: React.FC<PricingScreenProps> = ({ onClose }) => {
           >
             <TouchableOpacity
               onPress={handleSave}
-              className="rounded-full bg-[#0368FF] py-4"
+              className="rounded-full bg-[#0368FF] py-5"
               activeOpacity={0.8}
             >
               <Text className="text-white text-xl font-sfpro-bold text-center">
