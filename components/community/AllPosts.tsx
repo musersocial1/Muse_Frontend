@@ -75,7 +75,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
 
       {/* Post Image (if exists) */}
       {post.type === "image" && post.images && post.images.length > 0 && (
-        <View className="mb-3 rounded-3xl overflow-hidden">
+        <View className="mb-3 w-full aspect-[1/0.9] rounded-3xl overflow-hidden">
           <FlatList
             data={post.images}
             horizontal
@@ -85,9 +85,9 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
             renderItem={({ item }) => (
               <Image
                 source={{ uri: item }}
-                style={{ width: width - 80, height: 300 }}
+                style={{ width: width - 40 }}
                 resizeMode="cover"
-                className="rounded-xl"
+                className=" "
               />
             )}
             onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
