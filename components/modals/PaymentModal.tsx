@@ -306,7 +306,7 @@ const PaymentFlow: React.FC<PaymentFlowProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <View className="flex-1 ">
