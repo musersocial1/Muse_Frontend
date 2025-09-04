@@ -1,7 +1,40 @@
 import { LongFormContent, Post } from "@/types/community";
-import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
+  {
+    id: "4",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    vComments: [
+      "https://i.pravatar.cc/100?img=6",
+      "https://i.pravatar.cc/100?img=7",
+      "https://i.pravatar.cc/100?img=8",
+      "https://i.pravatar.cc/100?img=9",
+      "https://i.pravatar.cc/100?img=10",
+      "https://i.pravatar.cc/100?img=11",
+      "https://i.pravatar.cc/100?img=12",
+      "https://i.pravatar.cc/100?img=13",
+      "https://i.pravatar.cc/100?img=14",
+      "https://i.pravatar.cc/100?img=15",
+      "https://i.pravatar.cc/100?img=16",
+      "https://i.pravatar.cc/100?img=17",
+      "https://i.pravatar.cc/100?img=18",
+      "https://i.pravatar.cc/100?img=19",
+      "https://i.pravatar.cc/100?img=20",
+    ],
+
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
   {
     id: "1",
     author: {
@@ -35,6 +68,8 @@ export const dummyAllPosts: Post[] = [
     ],
     timestamp: "2h",
     likes: 2678,
+    thumbnail:
+      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop",
     comments: 893,
     type: "video",
   },
@@ -50,16 +85,19 @@ export const dummyAllPosts: Post[] = [
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     images: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop", // modern living room
+      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop", // minimal workspace
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop", // stylish bedroom
+      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop", // cozy kitchen
     ],
     timestamp: "2h",
     likes: 2678,
     comments: 893,
     type: "image",
   },
+
   {
-    id: "4",
+    id: "6",
     author: {
       name: "beyonce",
       username: "@beyonceknow",
@@ -69,13 +107,6 @@ export const dummyAllPosts: Post[] = [
     },
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    vComments: [
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-    ],
     timestamp: "2h",
     likes: 2678,
     comments: 893,
@@ -174,34 +205,34 @@ export const user = {
       name: "K.Dots community",
       memberCount: 456,
       profileImage:
-        "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       memberImages: [
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
-        images.img24,
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       ],
     },
     {
       id: "2",
-      name: "K.Dots community",
-      memberCount: 456,
+      name: "Creative Minds",
+      memberCount: 512,
       profileImage:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       memberImages: [
-        "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       ],
     },
     {
       id: "3",
-      name: "K.Dots community",
-      memberCount: 456,
+      name: "Innovators Hub",
+      memberCount: 389,
       profileImage:
-        "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       memberImages: [
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+        "https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
       ],
     },
   ],
@@ -210,37 +241,73 @@ export const user = {
 export const videoComments = [
   {
     id: "1",
-    thumbnail: images.img25,
+    thumbnail: "https://picsum.photos/id/1011/400/600", // smiling woman
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },
   {
     id: "2",
-    thumbnail: images.img25,
+    thumbnail: "https://picsum.photos/id/1012/400/600", // couple laughing
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },
   {
     id: "3",
-    thumbnail: "",
+    thumbnail: "https://picsum.photos/id/1015/400/600", // outdoor portrait
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },
   {
     id: "4",
-    thumbnail: images.img26,
+    thumbnail: "https://picsum.photos/id/1016/400/600", // group shot
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },
   {
     id: "5",
-    thumbnail: images.img24,
+    thumbnail: "https://picsum.photos/id/1021/400/600", // food shot
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },
   {
     id: "6",
-    thumbnail: images.img25,
+    thumbnail: "https://picsum.photos/id/1027/400/600", // portrait close-up
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "7",
+    thumbnail: "https://picsum.photos/id/1035/400/600", // candid laughing
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "8",
+    thumbnail: "https://picsum.photos/id/1040/400/600", // stylish outdoor
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "9",
+    thumbnail: "https://picsum.photos/id/1052/400/600", // lifestyle scene
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "10",
+    thumbnail: "https://picsum.photos/id/1062/400/600", // portrait close-up
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "11",
+    thumbnail: "https://picsum.photos/id/1074/400/600", // joyful group
+    likes: "3.4k",
+    title: "New season, new slay! 🔥 Whether it's street style...",
+  },
+  {
+    id: "12",
+    thumbnail: "https://picsum.photos/id/1084/400/600", // cheerful vibe
     likes: "3.4k",
     title: "New season, new slay! 🔥 Whether it's street style...",
   },

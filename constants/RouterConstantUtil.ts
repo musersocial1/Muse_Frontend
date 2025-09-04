@@ -4,6 +4,7 @@ export const RouterConstantUtil = {
     group: "/(tabs)/group",
     profile: "/(tabs)/profile",
     search: "/(tabs)/search",
+    communities: "/(tabs)/communities",
   },
 
   profile: {

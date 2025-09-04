@@ -2,6 +2,7 @@ import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -10,6 +11,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   ScrollView,
+  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -33,8 +35,8 @@ const PostCard: React.FC<PostCardProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <View className="bg-[#1C1C1C] rounded-[30px] p-6 mb-4 overflow-hidden">
-      <View className="flex-row items-center   pb-3">
+    <View className="bg-[#1C1C1C] rounded-[30px]  mb-4 overflow-hidden">
+      <View className="flex-row items-center px-6 pt-6  pb-3">
         <TouchableOpacity
           onPress={() => setIsOpen(true)}
           className="w-12 h-12 rounded-full overflow-hidden mr-2"
@@ -77,7 +79,7 @@ const PostCard: React.FC<PostCardProps> = ({
         </View>
       </View>
 
-      <View className=" pb-3 ">
+      <View className=" pb-3 px-6 ">
         <Text className="text-white text-base  font-sfpro-regular leading-5">
           {post.content}
         </Text>
@@ -88,7 +90,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
       {/* Post Image (if exists) */}
       {post.type === "image" && post.images && post.images.length > 0 && (
-        <View className="mb-3 rounded-3xl overflow-hidden">
+        <View className="mb-3 w-full  aspect-[1/1]  rounded-[40px] overflow-hidden">
           <FlatList
             data={post.images}
             horizontal
@@ -98,9 +100,9 @@ const PostCard: React.FC<PostCardProps> = ({
             renderItem={({ item }) => (
               <Image
                 source={{ uri: item }}
-                style={{ width: width - 80, height: 300 }}
+                style={{ width: width }}
                 resizeMode="cover"
-                className="rounded-xl"
+                className=" "
               />
             )}
             onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -126,77 +128,54 @@ const PostCard: React.FC<PostCardProps> = ({
         </View>
       )}
       {post.type === "video" && post.videos && post.videos.length > 0 && (
-        <View className="mb-3 rounded-3xl w-full overflow-hidden bg-white/10 p-2 ">
-          <View className="rounded-3xl overflow-hidden">
-            <FlatList
-              data={post.videos}
-              horizontal
-              pagingEnabled
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <View style={{ width }} className="relative">
-                  {/* Video Thumbnail */}
-                  <Image
-                    source={{ uri: item }}
-                    style={{ width, height: 220 }}
-                    resizeMode="cover"
-                  />
+        <View className=" px-5">
+          <View className="  rounded-[20px] w-full gap-5  overflow-hidden bg-[#242424] p-3 ">
+            <View className="rounded-[12px]  overflow-hidden">
+              <View className="relative w-full">
+                {/* Video Thumbnail */}
+                <Image
+                  source={{ uri: post.thumbnail }}
+                  style={{ width, height: 220 }}
+                  resizeMode="cover"
+                />
 
-                  {/* Play Icon Overlay */}
-                  <View className="absolute inset-0 items-center justify-center">
-                    <View className="bg-black/50 rounded-full p-4">
-                      <Image
-                        source={icons.play}
-                        className="h-10 w-10"
-                        resizeMode="contain"
-                      />
-                    </View>
+                {/* Play Icon Overlay */}
+                <View className="absolute  inset-0 items-center justify-center">
+                  <View className="overflow-hidden rounded-full p-5">
+                    <BlurView style={StyleSheet.absoluteFill} intensity={50} />
+                    <Image
+                      source={icons.play}
+                      className="h-8 w-8 "
+                      resizeMode="contain"
+                    />
                   </View>
                 </View>
-              )}
-              onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
-                const index = Math.round(
-                  event.nativeEvent.contentOffset.x / width
-                );
-                setActiveIndex(index);
-              }}
-              scrollEventThrottle={16}
-            />
-
-            {/* Dots Pagination INSIDE video */}
-            <View className="absolute bottom-4 w-full flex-row justify-center">
-              {post.videos.map((_, i) => (
-                <View
-                  key={i}
-                  className={`h-2 mx-1 rounded-full ${
-                    i === activeIndex ? "bg-white w-6" : "bg-white/40 w-2"
-                  }`}
-                />
-              ))}
-            </View>
-          </View>
-
-          <View className="flex-row justify-between items-start px-3 py-3">
-            <View className="w-[80%]">
-              <Text className="text-white text-[16px] font-semibold">
-                The travails of being a dancer in the modern age
-              </Text>
-              <Text className="text-white/50 text-[13px] mt-1">
-                Content from TBD Podcast
-              </Text>
+              </View>
             </View>
 
-            {/* Duration tag */}
-            <View className="bg-[#00000030]/[19%] rounded-full px-3 py-2 self-start">
-              <Text className="text-white font-medium text-[12px]">45:54</Text>
+            <View className="flex-row pb-2 px-1 justify-between items-start  ">
+              <View className="w-[80%]">
+                <Text className="text-white text-[16px] font-sfpro-bold">
+                  The travails of being a dancer in the modern age
+                </Text>
+                <Text className="text-white/50 text-[13px]  font-sfpro-medium mt-2">
+                  Content from TBD Podcast
+                </Text>
+              </View>
+
+              {/* Duration tag */}
+              <View className="bg-[black]/[70%] rounded-full px-3 py-3 self-start">
+                <Text className="text-white font-medium text-[12px]">
+                  45:54
+                </Text>
+              </View>
             </View>
           </View>
         </View>
       )}
 
       {/* Post Actions */}
-      <View className="flex-row items-center  justify-between pt-4 ">
+      <View className="flex-row px-6 items-center pb-4 justify-between pt-4 ">
         <View className="flex-row gap-2">
           <TouchableOpacity
             onPress={() => setOpenComments(true)}
@@ -233,23 +212,33 @@ const PostCard: React.FC<PostCardProps> = ({
         </View>
       </View>
       {post.vComments && post.vComments.length > 0 && (
-        <View className="pt-4">
+        <View className=" pb-4 ">
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{ gap: 12 }}
+            contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
           >
-            {post.vComments.map((commentUri, index) => (
-              <View key={index} className="relative">
-                <View className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/40">
+            {post.vComments.slice(0, 6).map((commentUri, index) => (
+              <View key={index} className="relative ">
+                <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
                   <Image
                     source={{ uri: commentUri }}
-                    className="w-full h-full"
+                    className="w-full rounded-full h-full "
                     resizeMode="cover"
                   />
                 </View>
               </View>
             ))}
+            {/* See All Button */}
+            {post.vComments.length > 6 && (
+              <TouchableOpacity className="items-center">
+                <View className="w-20 h-20 rounded-full border-4 border-white/40 bg-[#2c2c2c] items-center justify-center">
+                  <Text className="text-white  text-base font-neutral-medium">
+                    See all
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
           </ScrollView>
         </View>
       )}

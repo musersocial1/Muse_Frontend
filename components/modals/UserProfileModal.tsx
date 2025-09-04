@@ -1,5 +1,6 @@
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -8,16 +9,15 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
 import { FadingBlurBackground } from "../ui/FadingBlurBackground";
+import UserProfileCommunities from "./userProfileCommunities";
 
 interface Community {
   id: string;
@@ -52,7 +52,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   const insets = useSafeAreaInsets();
-  const HIDE_OFFSET = 300;
+  const HIDE_OFFSET = 700;
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
   useEffect(() => {
@@ -89,23 +89,19 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   };
 
   const handleCommunitiesPress = () => {
-    setViewMode("communities");
-  };
-
-  const handleBackPress = () => {
-    setViewMode("profile");
+    setIsOpen(true);
   };
 
   const renderProfileView = () => {
     return (
       <View className="px-6 pb-6">
-        <Text className="text-[#FFFFFF] text-[20px] font-bold text-center mb-8">
+        <Text className="text-[#FFFFFF] text-[20px] font-sfpro-bold text-center mb-6">
           User profile
         </Text>
 
         <View className="items-center mb-8">
           <View className="mb-2 relative items-center justify-center">
-            <View className="w-[140px] h-[140px] rounded-full overflow-hidden border-2 border-white/10">
+            <View className="w-[120px] aspect-square rounded-full overflow-hidden border-2 border-white/10">
               <Image
                 source={images.img11}
                 className="w-full h-full"
@@ -115,9 +111,9 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
           </View>
 
           {/* Username + Verified */}
-          <View className="items-center">
-            <View className="flex-row items-center mb-2">
-              <Text className="text-white text-[28px] font-bold mr-2">
+          <View className="items-center  gap-3">
+            <View className="flex-row items-center ">
+              <Text className="text-white text-[20px] font-sfpro-bold mr-2">
                 {user.name}
               </Text>
               {user.verified && (
@@ -127,21 +123,21 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
               )}
             </View>
 
-            <Text className="text-white/60 text-[18px] font-medium mb-6">
+            <Text className="text-white/60 text-[16px] font-sfpro-medium">
               {user.username}
             </Text>
 
             {/* Communities */}
             <TouchableOpacity
               onPress={handleCommunitiesPress}
-              className="bg-[#FFFFFF]/[8%] rounded-full px-4 py-2 flex-row items-center mb-8"
+              className="bg-[#FFFFFF]/[8%] rounded-full p-3 flex-row items-center mb-2"
               activeOpacity={0.8}
             >
               <View className="flex-row mr-1">
-                {user.communities.slice(0, 2).map((community, index) => (
+                {user.communities.slice(0, 3).map((community, index) => (
                   <View
                     key={community.id}
-                    className="w-8 h-8 rounded-full overflow-hidden"
+                    className="w-9 h-9 rounded-full overflow-hidden"
                     style={{ marginLeft: index > 0 ? -8 : 0 }}
                   >
                     <Image
@@ -157,11 +153,11 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 ))}
               </View>
 
-              <Text className="text-white/80 text-[16px] font-medium mr-2">
+              <Text className="text-white/50 text-[16px] font-sfpro-medium mx-2">
                 +{user.communities.length} communities
               </Text>
 
-              <Feather name="chevron-right" size={16} color="#FFFFFF80" />
+              <Feather name="chevron-right" size={20} color="#FFFFFF80" />
             </TouchableOpacity>
           </View>
         </View>
@@ -182,7 +178,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
             elevation: 6,
           }}
         >
-          <Text className="text-black text-center text-[18px] font-bold">
+          <Text className="text-black text-center text-[16px] font-bold">
             Nudge
           </Text>
         </TouchableOpacity>
@@ -190,154 +186,72 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
     );
   };
 
-  const renderCommunitiesView = () => {
-    return (
-      <View className="px-6 pb-6">
-        <View className="flex-row items-center justify-between mb-6">
-          <TouchableOpacity
-            onPress={handleBackPress}
-            className="w-12 h-12 bg-[#F3F3F326]/[15%] rounded-full items-center justify-center"
-            activeOpacity={0.8}
-          >
-            <Feather name="chevron-left" size={20} color="white" />
-          </TouchableOpacity>
-
-          <Text className="text-[#FFFFFF] text-[20px] font-bold flex-1 text-center">
-            Communities
-          </Text>
-        </View>
-
-        {/* Search Bar */}
-        <View className="bg-[#3636364D]/[30%] rounded-full px-4 py-4 flex-row items-center mb-6  border border-[#FFFFFF1A]/[10%]">
-          <Feather name="search" size={20} color="#FFFFFF60" className="mr-3" />
-          <TextInput
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search"
-            placeholderTextColor="#FFFFFF60"
-            className="flex-1 text-white font-bold text-[16px] ml-1"
-          />
-        </View>
-
-        {/* Communities List */}
-        <ScrollView className="mb-6" showsVerticalScrollIndicator={false}>
-          {user.communities.map((community) => (
-            <View
-              key={community.id}
-              className="bg-[#2C2C2C] rounded-[24px] p-4 mb-4"
-            >
-              <View className="flex-row items-center justify-between">
-                <View className="flex-row items-center flex-1">
-                  <View className="w-14 h-14 rounded-full overflow-hidden mr-4">
-                    <Image
-                      source={{ uri: community.profileImage }}
-                      className="w-full h-full"
-                      resizeMode="cover"
-                    />
-                  </View>
-
-                  <View className="flex-1">
-                    <Text className="text-white text-[18px] font-bold mb-1">
-                      {community.name}
-                    </Text>
-
-                    <View className="flex-row items-center">
-                      <View className="flex-row mr-2">
-                        {community.memberImages
-                          .slice(0, 4)
-                          .map((image, index) => (
-                            <View
-                              key={index}
-                              className="w-5 h-5 rounded-full overflow-hidden "
-                              style={{ marginLeft: index > 0 ? -6 : 0 }}
-                            >
-                              <Image
-                                source={{ uri: image }}
-                                className="w-full h-full"
-                                resizeMode="cover"
-                              />
-                            </View>
-                          ))}
-                      </View>
-
-                      <Text className="text-[#FFFFFF]/60 text-[14px] font-medium">
-                        +{community.memberCount} Members
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-
-                {/* Details Button */}
-                <TouchableOpacity
-                  className="bg-white rounded-full px-6 py-3.5"
-                  activeOpacity={0.8}
-                >
-                  <Text className="text-black text-[14px] font-bold">
-                    Details
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </ScrollView>
-
-        {/* Done Button */}
-        <TouchableOpacity
-          onPress={closeWithSlide}
-          className="bg-white rounded-full py-5"
-          activeOpacity={0.8}
-        >
-          <Text className="text-black text-center text-[18px] font-bold">
-            Done
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View className="flex-1">
-        <TouchableOpacity
-          activeOpacity={1}
-          style={StyleSheet.absoluteFill}
-          onPress={closeWithSlide}
-        >
-          <FadingBlurBackground opacity={blurOpacity} />
-        </TouchableOpacity>
-
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <View
-            pointerEvents="box-none"
-            style={{ marginBottom: insets.bottom }}
-            className="flex-1 pb-3 px-3 items-center justify-end"
+    <>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="none"
+        onRequestClose={onClose}
+      >
+        <UserProfileCommunities
+          visible={isOpen}
+          onClose={() => setIsOpen(false)}
+          user={user}
+          onNudge={() => setIsOpen(false)}
+        />
+        <View className="flex-1">
+          <TouchableOpacity
+            activeOpacity={1}
+            style={StyleSheet.absoluteFill}
+            onPress={closeWithSlide}
           >
-            <Animated.View
-              style={{
-                transform: [{ translateY: sheetY }],
-                width: "100%",
-              }}
-              className="w-full max-w-lg"
+            <FadingBlurBackground opacity={blurOpacity} />
+          </TouchableOpacity>
+
+          <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <View
+              pointerEvents="box-none"
+              style={{ marginBottom: insets.bottom }}
+              className="flex-1 pb-3 px-3 items-center justify-end"
             >
-              <View className="bg-[#1D1D1C] w-full border border-white/10 rounded-[30px] overflow-hidden">
-                <DragToClose translateY={sheetY} onClose={onClose} />
-                {viewMode === "profile"
-                  ? renderProfileView()
-                  : renderCommunitiesView()}
-              </View>
-            </Animated.View>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+              <Animated.View
+                style={{
+                  transform: [{ translateY: sheetY }],
+                  width: "100%",
+                }}
+                className="w-full max-w-lg"
+              >
+                <View className=" w-full border border-white/10 rounded-[30px] overflow-hidden">
+                  <View className="flex-1 items-center  absolute top-0 left-0 right-0 bottom-0">
+                    <View className="w-[220px]  pt-24  blur-2xl aspect-square rounded-full  border-2 border-white/10">
+                      <Image
+                        source={images.img11}
+                        className="w-full rounded-full h-full"
+                        resizeMode="cover"
+                        blurRadius={150}
+                      />
+                    </View>
+                  </View>
+                  <BlurView
+                    style={StyleSheet.absoluteFill}
+                    tint="dark"
+                    intensity={100}
+                  />
+                  <DragToClose translateY={sheetY} onClose={onClose} />
+                  {renderProfileView()}
+                </View>
+              </Animated.View>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+    </>
   );
 };
 
