@@ -437,7 +437,7 @@ export default function TaylorStansChat() {
           </ScrollView>
 
           {/* Input Area */}
-          <View className="px-4 py-4 bg-[#121212]">
+          <View className="px-4  py-4 bg-[#121212]">
             <View className="flex-row items-center gap-2 space-x-3">
               <TouchableOpacity
                 onPress={handleImagePicker}

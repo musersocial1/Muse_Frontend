@@ -8,20 +8,26 @@ import Constants from "expo-constants";
 import * as FileSystem from "expo-file-system";
 import { LinearGradient } from "expo-linear-gradient";
 
+import { images } from "@/constants/images";
+import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import DragToClose from "../navigations/DragToClose";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -386,32 +392,79 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
     setInputHeight(height);
   };
 
+  const insets = useSafeAreaInsets();
+  const HIDE_OFFSET = 700;
+  const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
+
+  useEffect(() => {
+    if (showAIModal) {
+      sheetY.setValue(HIDE_OFFSET);
+      Animated.timing(sheetY, {
+        toValue: 0,
+        duration: 400,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }).start();
+    } else {
+      sheetY.setValue(HIDE_OFFSET);
+      // setTimeout(() => {
+      //   setViewMode("profile");
+      //   setSearchQuery("");
+      // }, 300);
+    }
+  }, [showAIModal]);
+
+  const blurOpacity = sheetY.interpolate({
+    inputRange: [0, HIDE_OFFSET],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  const closeWithSlide = () => {
+    Animated.timing(sheetY, {
+      toValue: HIDE_OFFSET,
+      duration: 220,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start(() => setShowAIModal(false));
+  };
+
   return (
     <Modal
       visible={showAIModal}
       transparent
-      animationType="slide"
-      onRequestClose={() => setShowAIModal(false)}
+      animationType="none"
+      onRequestClose={() => closeWithSlide()}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1 justify-end bg-black/50"
+        className="flex-1 px-2 items-center justify-end "
       >
-        <View
-          className="mx-4 mb-4 bg-neutral-900 rounded-3xl overflow-hidden"
+        <Animated.View
           style={{
+            transform: [{ translateY: sheetY }],
             height: getModalHeight(),
-            maxHeight: screenHeight * 0.8,
+            maxHeight: screenHeight * 0.6,
+            marginBottom: insets.bottom,
+            width: "100%",
           }}
+          className="w-full  relative max-w-lg border-2 border-white/10    mb-4 rounded-[40px] overflow-hidden"
         >
-          <TouchableOpacity
-            onPress={() => setShowAIModal(false)}
-            className="items-center py-3"
-          >
-            <View className="w-12 h-1 bg-white/30 rounded-full" />
-          </TouchableOpacity>
+          <BlurView
+            style={StyleSheet.absoluteFill}
+            intensity={90}
+            tint="systemThickMaterialDark"
+          />
+          <View className="w-full aspect-[1/1]   absolute bottom-0 left-0 right-0 ">
+            <Image
+              source={images.aibackground}
+              className="w-full h-full object-cover"
+            />
+          </View>
 
-          <View className="flex-row items-center justify-between px-6 pb-4">
+          <DragToClose translateY={sheetY} onClose={closeWithSlide} />
+
+          <View className="flex-row  items-center justify-between px-6  pb-4">
             {showHistory ? (
               <>
                 <TouchableOpacity
@@ -429,9 +482,9 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
               </>
             ) : (
               <>
-                <View className="w-12 h-12" />
+                <View className="w-12 h-12 " />
 
-                <Text className="text-white text-xl font-semibold">
+                <Text className="text-white  text-xl font-semibold">
                   Merlin AI
                 </Text>
 
@@ -612,7 +665,10 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                   name="plus"
                   size={20}
                   color="white"
-                  style={{ marginRight: 10, marginBottom: isMultiLine ? 8 : 0 }}
+                  style={{
+                    marginRight: 10,
+                    marginBottom: isMultiLine ? 8 : 0,
+                  }}
                 />
 
                 <TextInput
@@ -676,7 +732,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
               </View>
             </View>
           )}
-        </View>
+        </Animated.View>
       </KeyboardAvoidingView>
     </Modal>
   );
