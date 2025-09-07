@@ -1,4 +1,6 @@
+import AIModal from "@/components/modals/AiModal";
 import CreatePostStart from "@/components/modals/create-post-startup";
+import FloatingAIButton from "@/components/museai/FloatingAiButton";
 import ShrinkAnimation from "@/components/ui/ShrinkAnimation";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
@@ -140,6 +142,7 @@ export default function TabsLayout() {
   const { width, height } = Dimensions.get("window");
   const router = useRouter();
   const fabAnimated = useRef(new Animated.Value(0)).current;
+  const [showAIModal, setShowAIModal] = useState(false);
 
   const fabScale = fabAnimated.interpolate({
     inputRange: [0, 1],
@@ -204,6 +207,9 @@ export default function TabsLayout() {
             />
           ))}
         </Tabs>
+        <FloatingAIButton setShowAIModal={setShowAIModal} />
+
+        <AIModal showAIModal={showAIModal} setShowAIModal={setShowAIModal} />
         <CreatePostStart
           showModal={showModal}
           onClose={() => setShowModal(false)}

@@ -1,10 +1,8 @@
 import CarouselItem from "@/components/discover/CarouselItem";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
-import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { Podcast, PodcastItem } from "@/types/discover";
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -24,6 +22,7 @@ const { width, height } = Dimensions.get("window");
 interface PodcastListItemProps {
   podcast: PodcastItem;
   index: number;
+  showIndex: boolean;
 }
 
 const filterOptions = [
@@ -81,9 +80,18 @@ const podcastList: PodcastItem[] = Array(16)
     image: podcastImages[Math.floor(Math.random() * podcastImages.length)],
   }));
 
+const chunkArray = <T,>(array: T[], chunkSize: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+};
+
 const PodcastListItem: React.FC<PodcastListItemProps> = ({
   podcast,
   index,
+  showIndex,
 }) => {
   const animatedValue = useRef(new Animated.Value(0)).current;
 
@@ -111,7 +119,16 @@ const PodcastListItem: React.FC<PodcastListItemProps> = ({
       style={{ transform: [{ translateX }], opacity }}
       className=""
     >
-      <TouchableOpacity className="flex-row  border-b border-b-white/10 items-center p-4">
+      <TouchableOpacity
+        className={`flex-row  ${
+          showIndex ? "border-none py-3" : "border-b border-b-white/10 p-3"
+        } items-center `}
+      >
+        {showIndex && (
+          <Text className="text-white text-[20px] font-bold py-3 pr-3">
+            {index + 1}
+          </Text>
+        )}
         <Image
           source={podcast.image}
           className="w-16 h-16 rounded-2xl mr-4"
@@ -184,7 +201,7 @@ const FilterDropdown: React.FC<{
       {isOpen && (
         <Animated.View
           style={{ height: dropdownHeight }}
-          className="absolute top-14 right-4 w-[200px] max-w-[90vw] bg-[#2C2C2E] rounded-3xl overflow-hidden z-50"
+          className="absolute top-14 right-4 w-[200px] max-w-[90vw] bg-[#FFFFFF17]/[20%] rounded-3xl overflow-hidden z-50"
         >
           <ScrollView showsVerticalScrollIndicator={false}>
             {filterOptions.map((option, index) => (
@@ -196,7 +213,7 @@ const FilterDropdown: React.FC<{
                 }}
                 className={`px-4 py-4 ${
                   index !== filterOptions.length - 1
-                    ? "border-b border-gray-700"
+                    ? "border-b border-[#D9D9D999]/[10%]"
                     : ""
                 }`}
               >
@@ -218,7 +235,7 @@ const FilterDropdown: React.FC<{
 
 interface PodcastsProps {
   onClose?: () => void;
-  modalVisible: any;
+  modalVisible: boolean;
 }
 
 const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
@@ -228,6 +245,7 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
   const headerAnimated = useRef(new Animated.Value(0)).current;
   const carouselAnimated = useRef(new Animated.Value(0)).current;
   const contentAnimated = useRef(new Animated.Value(0)).current;
+  const podcastChunks = chunkArray(podcastList, 3);
 
   useEffect(() => {
     Animated.stagger(200, [
@@ -248,10 +266,6 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
       }),
     ]).start();
   }, []);
-
-  const navigateBack = () => {
-    router.push(RouterConstantUtil.tabs.search as any);
-  };
 
   const onCarouselScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset.x;
@@ -291,10 +305,10 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
       animationType="slide"
       visible={modalVisible}
       onRequestClose={onClose}
-      presentationStyle="formSheet" // or "pageSheet", or remove for default
+      presentationStyle="formSheet"
       statusBarTranslucent
     >
-      <SafeAreaView className="flex-1 bg-black">
+      <SafeAreaView className="flex-1 bg-primary">
         {/* Header */}
         <Animated.View
           style={{ opacity: headerAnimated }}
@@ -339,7 +353,52 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
             {renderPaginationDots()}
           </Animated.View>
 
-          <Animated.View style={{ opacity: contentAnimated }} className="">
+          {/* All charts horizontal section */}
+          <Animated.View style={{ opacity: contentAnimated }}>
+            <View className="flex-row px-5 justify-between items-center mb-6">
+              <Text className="text-[#FFFFFF] text-[22px] font-bold">
+                All charts
+              </Text>
+            </View>
+
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingHorizontal: 20,
+                paddingRight: 40,
+              }}
+              className="w-full"
+            >
+              {podcastChunks.map((chunk, chunkIndex) => (
+                <View
+                  key={chunkIndex}
+                  className="mr-6"
+                  style={{
+                    minWidth: 280,
+                    flexDirection: "column",
+                  }}
+                >
+                  {chunk.map((podcast, index) => {
+                    // Calculate the actual index for numbering (1, 2, 3, 4, 5, 6...)
+                    const actualIndex = (chunkIndex as number) * 3 + index;
+                    return (
+                      <View key={podcast.id} className="mb-3">
+                        <PodcastListItem
+                          podcast={podcast}
+                          index={actualIndex}
+                          showIndex={true}
+                        />
+                      </View>
+                    );
+                  })}
+                </View>
+              ))}
+            </ScrollView>
+          </Animated.View>
+
+          {/* All podcasts vertical section */}
+          <Animated.View style={{ opacity: contentAnimated }} className="mt-10">
             <View className="flex-row px-5 justify-between items-center mb-6">
               <Text className="text-[#FFFFFF] text-[22px] font-bold">
                 All podcast
@@ -360,6 +419,7 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
                   key={podcast.id}
                   podcast={podcast}
                   index={index}
+                  showIndex={false}
                 />
               ))}
             </View>
