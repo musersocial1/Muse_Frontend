@@ -277,7 +277,7 @@ const Home: React.FC = () => {
                   </TouchableOpacity>
 
                   {dropdownVisible && (
-                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
+                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border  border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
                       <BlurView
                         intensity={20}
                         style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}

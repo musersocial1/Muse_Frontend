@@ -1,10 +1,12 @@
+import AIModal from "@/components/modals/AiModal";
+import FloatingAIButton from "@/components/museai/FloatingAiButton";
 import AuthProvider from "@/context/AuthContext";
 import { customFonts } from "@/lib/fonts";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -23,14 +25,24 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, error]);
 
-  if (!fontsLoaded || error) return null;
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [fontError] = useFonts(customFonts);
 
+  useEffect(() => {
+    if (fontsLoaded || fontError) SplashScreen.hideAsync();
+  }, [fontsLoaded, fontError]);
+  if (!fontsLoaded || error) return null;
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <View style={{ flex: 1, backgroundColor: "#121212" }}>
+              <FloatingAIButton setShowAIModal={setShowAIModal} />
+              <AIModal
+                showAIModal={showAIModal}
+                setShowAIModal={setShowAIModal}
+              />
               <Stack
                 screenOptions={{
                   headerShown: false,

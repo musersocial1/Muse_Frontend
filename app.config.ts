@@ -10,6 +10,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: "muse",
   userInterfaceStyle: "dark",
   newArchEnabled: true,
+  jsEngine: "hermes", // 👈 add this here
 
   ios: {
     supportsTablet: true,

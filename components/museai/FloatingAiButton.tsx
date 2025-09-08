@@ -1,99 +1,136 @@
-import { TouchableOpacity, View } from "react-native";
-import { PanGestureHandler } from "react-native-gesture-handler";
-import Animated, {
-  runOnJS,
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from "react-native-reanimated";
+import { BlurView } from "expo-blur";
+import * as Haptics from "expo-haptics";
+import React, { useRef } from "react";
+import {
+  Animated,
+  Dimensions,
+  PanResponder,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(Math.max(v, min), max);
 
 const FloatingAIButton = ({
   setShowAIModal,
 }: {
   setShowAIModal: (val: boolean) => void;
 }) => {
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const scale = useSharedValue(1);
+  const insets = useSafeAreaInsets();
+  const { height: SCREEN_H } = Dimensions.get("window");
 
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: () => {
-      scale.value = withSpring(1.1);
-    },
-    onActive: (event) => {
-      translateX.value = event.translationX;
-      translateY.value = event.translationY;
-    },
-    onEnd: (event) => {
-      scale.value = withSpring(1);
+  const BUTTON_HEIGHT = 75;
 
-      if (
-        Math.abs(event.translationX) > 50 ||
-        Math.abs(event.translationY) > 50
-      ) {
-        runOnJS(setShowAIModal)(true);
-      }
+  const TOP_LIMIT = insets.top + 20;
+  const BOTTOM_LIMIT = SCREEN_H - BUTTON_HEIGHT - insets.bottom;
 
-      translateX.value = withSpring(0);
-      translateY.value = withSpring(0);
-    },
-  });
+  // Absolute Y (in pixels from top). Start at 40% of screen height.
+  const y = useRef(new Animated.Value(SCREEN_H * 0.4)).current;
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-        { scale: scale.value },
-      ],
-    };
-  });
+  // Keep the last committed Y here so we never read from Animated during move
+  const startYRef = useRef(SCREEN_H * 0.4);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_e, g) => Math.abs(g.dy) > 2,
+      onPanResponderTerminationRequest: () => false,
+
+      onPanResponderGrant: () => {
+        // Get the *current* animated value once at the start (safe & fast)
+        // stopAnimation returns the current value in the callback.
+        y.stopAnimation((val) => {
+          startYRef.current = typeof val === "number" ? val : startYRef.current;
+        });
+
+        // Haptic feedback (don’t block the UI thread)
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+      },
+
+      onPanResponderMove: (_e, g) => {
+        // Follow finger exactly: startY + deltaY, then clamp
+        const next = clamp(startYRef.current + g.dy, TOP_LIMIT, BOTTOM_LIMIT);
+        y.setValue(next);
+      },
+
+      onPanResponderRelease: (_e, g) => {
+        const finalY = clamp(startYRef.current + g.dy, TOP_LIMIT, BOTTOM_LIMIT);
+        startYRef.current = finalY; // commit new position
+
+        // Smooth settle (very gentle)
+        Animated.spring(y, {
+          toValue: finalY,
+          useNativeDriver: true,
+          speed: 18,
+          bounciness: 2,
+        }).start();
+      },
+
+      onPanResponderTerminate: (_e, g) => {
+        // Gesture cancelled — settle where it is
+        const finalY = clamp(startYRef.current + g.dy, TOP_LIMIT, BOTTOM_LIMIT);
+        startYRef.current = finalY;
+        Animated.spring(y, {
+          toValue: finalY,
+          useNativeDriver: true,
+          speed: 18,
+          bounciness: 2,
+        }).start();
+      },
+    })
+  ).current;
 
   return (
-    <PanGestureHandler onGestureEvent={gestureHandler}>
-      <Animated.View
-        style={[
-          {
-            position: "absolute",
-            right: 0,
-            top: "40%",
-            marginTop: -25,
-            zIndex: 1000,
-          },
-          animatedStyle,
-        ]}
+    <Animated.View
+      {...panResponder.panHandlers}
+      style={{
+        position: "absolute",
+        right: 0, // stick to the right edge
+        zIndex: 1000,
+        transform: [{ translateY: y }],
+      }}
+      // makes it easier to grab
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
+      <TouchableOpacity
+        onPress={() => setShowAIModal(true)}
+        activeOpacity={0.9}
+        style={{
+          width: 25,
+          height: BUTTON_HEIGHT,
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+          borderTopLeftRadius: 9,
+          borderBottomLeftRadius: 9,
+          justifyContent: "center",
+          paddingLeft: 10,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+        className="overflow-hidden"
       >
-        <TouchableOpacity
-          onPress={() => setShowAIModal(true)}
-          activeOpacity={0.8}
+        <BlurView
+          style={StyleSheet.absoluteFill}
+          intensity={50}
+          tint={Platform.OS == "android" ? "light" : "light"}
+        />
+        <View
           style={{
-            width: 20,
-            height: 80,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            borderTopLeftRadius: 25,
-            borderBottomLeftRadius: 25,
-            justifyContent: "center",
-            paddingLeft: 10,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 8,
+            width: 4,
+            height: 28,
+            backgroundColor: "white",
+            borderRadius: 2,
+            alignSelf: "flex-start",
           }}
-        >
-          <View
-            style={{
-              width: 4,
-              height: 24,
-              backgroundColor: "white",
-              borderRadius: 2,
-              alignSelf: "flex-start",
-            }}
-          />
-        </TouchableOpacity>
-      </Animated.View>
-    </PanGestureHandler>
+        />
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 

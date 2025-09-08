@@ -110,14 +110,18 @@ const UserProfileCommunities: React.FC<UserProfileModalProps> = ({
         </View>
 
         {/* Search Bar */}
-        <View className="bg-[#3636364D]/[30%] rounded-full px-4 py-4 flex-row items-center mb-4  border border-[#FFFFFF1A]/[10%]">
+        <View className="bg-[#3636364D]/[30%] rounded-full px-4  flex-row items-center mb-4  border border-[#FFFFFF1A]/[10%]">
           <Feather name="search" size={20} color="#FFFFFF60" className="mr-2" />
           <TextInput
             value={searchQuery}
             onChangeText={setSearchQuery}
             placeholder="Search"
             placeholderTextColor="#FFFFFF60"
-            className="flex-1 text-white font-sfpro-medium text-[16px] ml-1"
+            className={`flex-1 text-white font-sfpro-medium text-[16px] ml-1  ${
+              Platform.OS == "android" ? "py-3" : "py-4"
+            }`}
+            verticalAlign="middle"
+            // 👆 ensures same vertical height on iOS & Android
           />
         </View>
 
@@ -126,7 +130,7 @@ const UserProfileCommunities: React.FC<UserProfileModalProps> = ({
           {user.communities.map((community) => (
             <View
               key={community.id}
-              className="bg-[#2C2C2C] rounded-[24px] p-4 mb-4"
+              className="bg-[#2C2C2C]  rounded-[24px] p-4 mb-4"
             >
               <View className="flex-row items-center justify-between">
                 <View className="flex-row items-center flex-1">

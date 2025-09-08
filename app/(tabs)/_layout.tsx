@@ -1,19 +1,13 @@
-import AIModal from "@/components/modals/AiModal";
 import CreatePostStart from "@/components/modals/create-post-startup";
-import FloatingAIButton from "@/components/museai/FloatingAiButton";
 import ShrinkAnimation from "@/components/ui/ShrinkAnimation";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { BlurView } from "expo-blur";
-import { Tabs, useRouter } from "expo-router";
+import * as Haptics from "expo-haptics"; // 👈 add this
+import { Tabs } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Dimensions,
-  Image,
-  TouchableOpacity,
-  View,
-} from "react-native";
+
+import { Animated, Easing, Image, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const tabsConfig = [
@@ -110,14 +104,13 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
       <BlurView
         intensity={70} // Change for more/less blur
         tint={focused ? "extraLight" : "dark"}
-        className=" w-full h-full  "
-        // style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
+        className=" w-full h-full   "
+        experimentalBlurMethod="dimezisBlurView" // For Android
       >
         <Animated.View
           style={{
             transform: [{ scale: scaleValue }],
             opacity: opacityValue,
-            // ...shadowStyle,
           }}
           className={`w-full h-full rounded-full justify-center items-center border ${
             focused
@@ -139,30 +132,56 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
-  const { width, height } = Dimensions.get("window");
-  const router = useRouter();
-  const fabAnimated = useRef(new Animated.Value(0)).current;
-  const [showAIModal, setShowAIModal] = useState(false);
 
-  const fabScale = fabAnimated.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
+  const fabRef = useRef<View>(null);
 
+  // start from 0 so it animates in on mount
+  const fabScale = useRef(new Animated.Value(0)).current;
+  const [showModal, setShowModal] = useState(false);
+
+  // default mount animation
   useEffect(() => {
-    Animated.timing(fabAnimated, {
+    Animated.timing(fabScale, {
       toValue: 1,
-      duration: 600,
-      delay: 1000,
       useNativeDriver: true,
+      duration: 500,
+      delay: 800, // 👈 wait 500ms before starting
+      easing: Easing.out(Easing.back(1.7)), // 👈 overshoot pop effect
     }).start();
   }, []);
 
-  const [showModal, setShowModal] = useState(false);
+  // OPEN flow
+  const openPost = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+
+    setShowModal(true);
+    // grow back
+    Animated.timing(fabScale, {
+      toValue: 0,
+      useNativeDriver: true,
+      duration: 1000,
+      delay: 100, // 👈 wait 500ms before starting
+      easing: Easing.out(Easing.back(1.7)), // 👈 overshoot pop effect
+    }).start();
+  };
+
+  // CLOSE flow (from modal ✕)
+  const handleModalRequestClose = () => {
+    setShowModal(false);
+
+    // grow back
+    Animated.timing(fabScale, {
+      toValue: 1,
+      useNativeDriver: true,
+      duration: 400,
+      delay: 50, // 👈 wait 500ms before starting
+      easing: Easing.out(Easing.back(1.7)), // 👈 overshoot pop effect
+    }).start();
+  };
 
   return (
     <ShrinkAnimation onSwitch={() => console.log("Open community switcher")}>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1 }} className="">
         <Tabs
           screenOptions={{
             tabBarShowLabel: false,
@@ -207,27 +226,34 @@ export default function TabsLayout() {
             />
           ))}
         </Tabs>
-        <FloatingAIButton setShowAIModal={setShowAIModal} />
 
-        <AIModal showAIModal={showAIModal} setShowAIModal={setShowAIModal} />
-        <CreatePostStart
-          showModal={showModal}
-          onClose={() => setShowModal(false)}
-        />
+        {/* Transparent modal layered above, content opacity controlled via prop */}
+
+        {showModal && (
+          <CreatePostStart
+            showModal={showModal}
+            onClose={handleModalRequestClose}
+          />
+        )}
         <Animated.View
           style={{
+            // transform: [{ scale: fabScale }],
             transform: [{ scale: fabScale }],
             position: "absolute",
             bottom: insets.bottom + 80,
             right: 10,
+            // opacity: fabOpacity, // 👈 fade effect
             zIndex: 1000,
           }}
         >
           <TouchableOpacity
-            onPress={() => setShowModal(true)}
+            ref={fabRef}
+            // onPress={() => setShowModal(true)}
+            onPress={openPost}
+            activeOpacity={100}
             className="w-16 h-16   rounded-full items-center justify-center shadow-lg"
           >
-            <Image source={images.muse} className="h-full w-full" />
+            <Image source={images.postIcon} className="h-full w-full" />
           </TouchableOpacity>
         </Animated.View>
       </View>

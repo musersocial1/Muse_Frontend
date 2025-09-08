@@ -28,6 +28,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
+import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 
 const { height: screenHeight } = Dimensions.get("window");
 
@@ -436,6 +437,14 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
       animationType="none"
       onRequestClose={() => closeWithSlide()}
     >
+      <TouchableOpacity
+        activeOpacity={1}
+        style={StyleSheet.absoluteFill}
+        onPress={closeWithSlide}
+      >
+        <FadingBlurBackground opacity={blurOpacity} />
+      </TouchableOpacity>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1 px-2 items-center justify-end "
@@ -445,10 +454,12 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
             transform: [{ translateY: sheetY }],
             height: getModalHeight(),
             maxHeight: screenHeight * 0.6,
-            marginBottom: insets.bottom,
+            // marginBottom: insets.bottom,
             width: "100%",
           }}
-          className="w-full  relative max-w-lg border-2 border-white/10    mb-4 rounded-[40px] overflow-hidden"
+          className={`w-full ${
+            Platform.OS == "android" ? "bg-neutral-500" : ""
+          } relative max-w-lg border-2 border-white/10    mb-4 rounded-[40px] overflow-hidden`}
         >
           <BlurView
             style={StyleSheet.absoluteFill}
@@ -464,7 +475,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
 
           <DragToClose translateY={sheetY} onClose={closeWithSlide} />
 
-          <View className="flex-row  items-center justify-between px-6  pb-4">
+          <View className="flex-row   justify-between px-6  pb-4">
             {showHistory ? (
               <>
                 <TouchableOpacity
@@ -653,14 +664,19 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
           </View>
 
           {!showHistory && (
-            <View className="px-6 pb-8 pt-4">
+            <View className=" p-4 pt-4">
               <View
                 className={`flex-row ${
                   isMultiLine ? "items-end" : "items-center"
-                } bg-[#FFFFFF30]/[19%] border border-[#00000029]/[16%] px-5 ${
+                } bg-[#FFFFFF30]/[19%] overflow-hidden  border border-[#00000029]/[16%] px-5 ${
                   isMultiLine ? "rounded-lg py-3" : "rounded-full py-3"
                 }`}
               >
+                <BlurView
+                  style={StyleSheet.absoluteFill}
+                  intensity={70}
+                  tint="dark"
+                />
                 <Feather
                   name="plus"
                   size={20}
@@ -672,7 +688,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                 />
 
                 <TextInput
-                  className="flex-1 text-white text-base ml-0"
+                  className="flex-1 text-white border2 placeholder:text-white text-[16px] ml-0"
                   placeholder="Type or tap mic to speak"
                   placeholderTextColor="#9CA3AF"
                   value={aiInput}

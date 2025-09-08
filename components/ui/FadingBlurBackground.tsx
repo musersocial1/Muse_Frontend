@@ -11,11 +11,14 @@ export function FadingBlurBackground({
   opacity: Animated.AnimatedInterpolation<number> | Animated.Value;
 }) {
   return (
-    <AnimatedBlur
-      style={[StyleSheet.absoluteFillObject, { opacity }]}
-      tint="systemChromeMaterialDark"
-      intensity={100}
-      pointerEvents="none"
-    />
+    <>
+      <AnimatedBlur
+        style={[StyleSheet.absoluteFillObject, { opacity }]}
+        tint="dark"
+        intensity={100}
+        pointerEvents="none"
+        experimentalBlurMethod="dimezisBlurView" // For Android
+      />
+    </>
   );
 }

@@ -84,8 +84,8 @@ const UserViewCommunity: React.FC = () => {
             {/* Vignette overlay (dark corners / bottom) */}
             <Svg style={StyleSheet.absoluteFillObject}>
               <Defs>
-                <RadialGradient id="vignette" cx="50%" cy="-15%" r="100%">
-                  <Stop offset={0.55} stopColor="#000" stopOpacity={0} />
+                <RadialGradient id="vignette" cx="50%" cy="-20%" r="100%">
+                  <Stop offset={0.3} stopColor="#000" stopOpacity={0} />
                   <Stop offset={1} stopColor="#000" stopOpacity={0.85} />
                 </RadialGradient>
               </Defs>
@@ -184,7 +184,7 @@ const UserViewCommunity: React.FC = () => {
 
             <TouchableOpacity
               onPress={() => setShowSubscriptionModal(true)}
-              className="bg-[#0368FF] rounded-[20px] py-[22px] px-8 w-[96%] max-w-lg mx-auto text-center"
+              className="bg-[#0368FF] rounded-[20px] py-[16px] px-8 w-[94%] max-w-lg mx-auto text-center"
               activeOpacity={0.8}
             >
               <Text className="text-white  text-[16px] font-sfpro-bold text-center">
