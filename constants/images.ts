@@ -34,7 +34,7 @@ import img8 from "@/assets/images/IMG8.png";
 import img9 from "@/assets/images/IMG9.png";
 import joinCommunity from "@/assets/images/join.png";
 import male from "@/assets/images/male.png";
-import logo from "@/assets/images/muse-logo.png";
+import logo from "@/assets/images/muse-logo2.png";
 import logo_white from "@/assets/images/muse-white-logo.png";
 import otpmodalbg from "@/assets/images/otpmodalbg.png";
 import postIcon from "@/assets/images/postIcon.webp";

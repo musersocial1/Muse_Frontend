@@ -39,6 +39,7 @@ interface UserProfileModalProps {
     communities: Community[];
   };
   onNudge: () => void;
+  onDone?: (selectedIds: string[]) => void; // 👈 add
 }
 
 type ViewMode = "profile" | "communities";
@@ -48,6 +49,7 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
   onClose,
   user,
   onNudge,
+  onDone,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>("profile");
   const [searchQuery, setSearchQuery] = useState("");
@@ -240,7 +242,10 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
 
         {/* Done Button */}
         <TouchableOpacity
-          onPress={closeWithSlide}
+          onPress={() => {
+            onDone?.(selectedCommunityIds);
+            closeWithSlide();
+          }}
           className="bg-white rounded-full py-[18px]"
           activeOpacity={0.8}
         >
