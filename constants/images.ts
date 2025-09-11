@@ -1,6 +1,8 @@
 import aibackground from "@/assets/images/aibackground.webp";
 import bg_2 from "@/assets/images/bg_2.png";
 import Comedy from "@/assets/images/Comedy.png";
+import comment from "@/assets/images/comment.webp";
+import comment_delete from "@/assets/images/comment_delete.webp";
 import createCommunity from "@/assets/images/create.png";
 import ent from "@/assets/images/ent.png";
 import female from "@/assets/images/female.png";
@@ -82,4 +84,6 @@ export const images = {
   Comedy,
   bg_2,
   aibackground,
+  comment,
+  comment_delete,
 };

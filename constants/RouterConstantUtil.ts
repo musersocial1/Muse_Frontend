@@ -22,6 +22,7 @@ export const RouterConstantUtil = {
   },
   discover: {
     podcats: "/(discover)/podcasts",
+    videoReply: "/(discover)/video-reply",
   },
   makepost: {
     start: "/(makepost)/create-post-startup",

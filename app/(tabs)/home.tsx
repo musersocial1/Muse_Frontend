@@ -15,6 +15,7 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -44,6 +45,16 @@ const Home: React.FC = () => {
     { id: 3, name: "Sports", icon: "activity" },
     { id: 4, name: "Tech", icon: "cpu" },
     { id: 5, name: "Art", icon: "image" },
+  ];
+
+  const stories = [
+    images.img6,
+    images.img7,
+    images.img8,
+    images.img9,
+    images.img10,
+    images.img11,
+    images.img12,
   ];
 
   const onRefresh = async () => {
@@ -348,6 +359,25 @@ const Home: React.FC = () => {
                 </TouchableOpacity>
               </View>
             </View>
+          </View>
+          <View className=" pb-4 ">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
+            >
+              {stories.map((story, index) => (
+                <View key={index} className="relative ">
+                  <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#FFFFFFA1]/[63%]">
+                    <Image
+                      source={story}
+                      className="w-full rounded-full h-full "
+                      resizeMode="cover"
+                    />
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
           </View>
           <View className="flex-row   flex-1 justify-center items-center gap-3">
             <AllFeeds posts={posts} addPost={() => setShowUpload(true)} />

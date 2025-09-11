@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { TextInput } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
 import { FadingBlurBackground } from "../ui/FadingBlurBackground";
@@ -48,7 +49,8 @@ interface VideoCommentsModalProps {
   videoComments: VideoComment[];
   textComments: TextComment[];
   onLeaveComment?: () => void;
-  onRecordComment?: () => void;
+  onRecordComment?: (video: any) => void;
+  onOpenVideo: (video: any) => void;
 }
 
 type TabMode = "videos" | "replies";
@@ -59,9 +61,12 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
   videoComments,
   textComments,
   onLeaveComment = () => console.log("Leave comment pressed"),
-  onRecordComment = () => console.log("Record comment pressed"),
+  onRecordComment,
+  onOpenVideo,
 }) => {
   const [tabMode, setTabMode] = useState<TabMode>("replies");
+  const [comment, setComment] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
   const { height } = Dimensions.get("window");
 
   const insets = useSafeAreaInsets();
@@ -214,7 +219,10 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
         </View>
 
         {/* Play button */}
-        <View className="absolute inset-0 items-center justify-center">
+        <TouchableOpacity
+          onPress={() => onOpenVideo(video)}
+          className="absolute inset-0 items-center justify-center"
+        >
           <View className=" overflow-hidden rounded-full p-3">
             <BlurView
               style={StyleSheet.absoluteFill}
@@ -227,7 +235,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
               resizeMode="contain"
             />
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Title overlay */}
         <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
@@ -266,13 +274,12 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
     return (
       <ScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}
-        className=""
         showsVerticalScrollIndicator={false}
       >
         {renderVideosPreview()}
-        {textComments.map((comment) => (
+        {textComments.map((comment, index) => (
           <>
-            <View key={comment.id} className="px-5">
+            <View key={index} className="px-5">
               <View className="mb-6 ">
                 <View className="flex-row items-center mb-3 pt-10">
                   <View className="w-12 h-12 rounded-full overflow-hidden mr-3">
@@ -361,8 +368,8 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
   const renderBottomActions = () => {
     return (
       <View className="px-2">
-        <View className="flex-row items-center  bg-[#454545] rounded-full p-2">
-          <View className="w-12  ml-1.5 h-12 rounded-full overflow-hidden ">
+        <View className="flex-row items-center bg-[#454545] rounded-full p-2">
+          <View className="w-12 ml-1.5 h-12 rounded-full overflow-hidden">
             <Image
               source={{
                 uri: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
@@ -372,18 +379,24 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             />
           </View>
 
-          <TouchableOpacity
-            onPress={onLeaveComment}
-            className="flex-1  bg-transparent  px-4 py-3 mr-3 justify-center"
-            activeOpacity={0.8}
-          >
-            <Text className="text-white text-[14.6px] font-sfpro-medium">
-              Leave a comment
-            </Text>
-          </TouchableOpacity>
+          <TextInput
+            value={comment}
+            onChangeText={setComment}
+            placeholder="Leave a comment"
+            placeholderTextColor="#FFFFFF80"
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="flex-1 text-white text-[14.6px] font-sfpro-medium px-4 py-3 mr-3"
+            style={{
+              backgroundColor: "transparent",
+            }}
+          />
 
-          <TouchableOpacity className="flex-row items-center bg-[#00000066]/[40%] rounded-full p-4">
-            <View className="w-5 h-5 rounded-full items-center justify-center mr-2 ">
+          <TouchableOpacity
+            onPress={onRecordComment}
+            className="flex-row items-center bg-[#00000066]/[40%] rounded-full p-4"
+          >
+            <View className="w-5 h-5 rounded-full items-center justify-center mr-2">
               <Image source={icons.record} className="h-full w-full" />
             </View>
             <Text className="text-white font-sfpro-regular tracking-tighter text-sm">
@@ -391,6 +404,37 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* EXTRA KEYBOARD BAR (only when focused) */}
+        {/* {isFocused && (
+          <View className="flex-row items-center justify-between px-4 py-2 bg-[#1C1C1C]">
+            <View className="flex-row items-center space-x-4">
+              <TouchableOpacity>
+                <Ionicons name="happy-outline" size={22} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="image-outline" size={22} color="white" />
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <Ionicons name="search" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <View className="flex-row items-center space-x-3">
+              <Text className="text-white/60 text-sm">
+                {comment.length}/280
+              </Text>
+              <TouchableOpacity
+                disabled={comment.trim().length === 0}
+                className={`px-4 py-1.5 rounded-full ${
+                  comment.trim().length > 0 ? "bg-blue-500" : "bg-[#444]"
+                }`}
+              >
+                <Text className="text-white font-bold text-sm">Post</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )} */}
       </View>
     );
   };
@@ -408,7 +452,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
           </Text>
           {videoComments.length > 3 && (
             <TouchableOpacity
-              onPress={() => scrollToPage(0)} // 👈 go to full Videos page
+              onPress={() => scrollToPage(0)}
               className="bg-[#FFFFFF]/[14%] rounded-full px-4 py-3"
               activeOpacity={0.8}
             >
@@ -443,7 +487,10 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                   {video.likes}
                 </Text>
               </View>
-              <View className="absolute inset-0 items-center justify-center">
+              <TouchableOpacity
+                onPress={() => onOpenVideo(video)}
+                className="absolute inset-0 items-center justify-center"
+              >
                 <View className="overflow-hidden rounded-full p-3">
                   <BlurView
                     style={StyleSheet.absoluteFill}
@@ -456,7 +503,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                     resizeMode="contain"
                   />
                 </View>
-              </View>
+              </TouchableOpacity>
               <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                 <Text
                   className="text-white text-[12px] font-bold"
@@ -505,11 +552,6 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
               {/* Tab Selector */}
               {renderTabSelector()}
-              {/* 
-              <ScrollView style={{ height: height * 0.75 }}>
-                {renderVideosView()}
-                {tabMode === "replies" && renderTextComments()}
-              </ScrollView> */}
 
               <Animated.ScrollView
                 ref={pagerRef}

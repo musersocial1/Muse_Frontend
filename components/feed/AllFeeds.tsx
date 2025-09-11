@@ -1,5 +1,12 @@
-import { textComments, user, videoComments } from "@/constants/data";
+import {
+  MOCK_REPLY_TO,
+  MOCK_USER,
+  textComments,
+  user,
+  videoComments,
+} from "@/constants/data";
 import { icons } from "@/constants/icons";
+import { images } from "@/constants/images";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -16,8 +23,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DeletePostFlowModal from "../modals/DeletePostFlowModal";
+import FlagMemberFlowModal from "../modals/FlagMemberModal";
+import FlagPostFlowModal from "../modals/FlagPostFlowModal";
+import NudgeSuccessModal from "../modals/NudgeSuccessModal";
+import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoCommentsModal from "../modals/VideoComments";
+import { VideoReplyModal } from "../modals/VideoReply";
 
 const { width } = Dimensions.get("window");
 
@@ -25,12 +38,14 @@ interface PostCardProps {
   post: Post;
   setIsOpen: (val: boolean) => void;
   setOpenComments: (val: boolean) => void;
+  setShowRecordModal: (val: boolean) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
   setOpenComments,
+  setShowRecordModal,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -191,7 +206,10 @@ const PostCard: React.FC<PostCardProps> = ({
             <Text className="text-white text-sm">{post.likes}</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center bg-[#363636]/[40%] rounded-full p-3">
+          <TouchableOpacity
+            onPress={() => setShowRecordModal(true)}
+            className="flex-row items-center bg-[#363636]/[40%] rounded-full p-3"
+          >
             <View className="w-5 h-5 rounded-full items-center justify-center mr-2 ">
               <Image source={icons.record} className="h-full w-full" />
             </View>
@@ -254,6 +272,56 @@ interface AllFeedsProps {
 const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openComponent, setOpenComments] = useState(false);
+  const [videoModalVisible, setVideoModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [videoData, setVideoData] = useState<any>(null);
+  const [deletePost, setDeletePost] = useState(false);
+  const [flagPost, setFlagPost] = useState(false);
+  const [flagMember, setFlagMember] = useState(false);
+  const [showRecordModal, setShowRecordModal] = useState(false);
+
+  const handleRecordComment = (video: any) => {
+    setVideoData(video);
+    setOpenComments(false);
+    setTimeout(() => {
+      setShowRecordModal(true);
+    }, 100);
+  };
+  const handleVideoPress = (video: any) => {
+    setVideoData(video);
+    setOpenComments(false);
+    setTimeout(() => {
+      setVideoModalVisible(true);
+    }, 100);
+  };
+
+  const handleDelete = () => {
+    setVideoModalVisible(false);
+    setTimeout(() => {
+      setDeletePost(true);
+    }, 100);
+  };
+
+  const handleFlagPost = () => {
+    setVideoModalVisible(false);
+    setTimeout(() => {
+      setFlagPost(true);
+    }, 100);
+  };
+
+  const handleFlagMember = () => {
+    setVideoModalVisible(false);
+    setTimeout(() => {
+      setFlagMember(true);
+    }, 100);
+  };
+
+  const handleNudge = () => {
+    setIsOpen(false);
+    setTimeout(() => {
+      setModalVisible(true);
+    }, 100);
+  };
 
   if (!posts || posts.length === 0) {
     return (
@@ -374,6 +442,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
             post={item}
             setIsOpen={setIsOpen}
             setOpenComments={setOpenComments}
+            setShowRecordModal={setShowRecordModal}
           />
         )}
         showsVerticalScrollIndicator={false}
@@ -388,15 +457,76 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
         visible={isOpen}
         onClose={() => setIsOpen(false)}
         user={user}
-        onNudge={() => setIsOpen(false)}
+        onNudge={handleNudge}
+      />
+      <NudgeSuccessModal
+        visible={modalVisible}
+        onDone={() => setModalVisible(false)}
+        undoNudge={() => setModalVisible(false)}
+        avatarUrl={icons.user}
+        username="Ericjames"
       />
       <VideoCommentsModal
         visible={openComponent}
-        onClose={() => setOpenComments(false)}
+        onClose={() => {
+          setVideoModalVisible(false);
+          setVideoData(null);
+        }}
         videoComments={videoComments}
         textComments={textComments}
         onLeaveComment={() => console.log("leave comment")}
-        onRecordComment={() => console.log("leave comment")}
+        onRecordComment={handleRecordComment}
+        onOpenVideo={handleVideoPress}
+      />
+
+      <VideoReplyModal
+        visible={videoModalVisible}
+        onClose={() => setVideoModalVisible(false)}
+        videoUri={images.comment}
+        posterUri={videoComments[0].thumbnail}
+        user={MOCK_USER}
+        replyingTo={MOCK_REPLY_TO}
+        likes={Number(videoData?.likes ?? 0)}
+        comments={653}
+        description={videoData?.title ?? ""}
+        onDelete={handleDelete}
+        onFlagPost={handleFlagPost}
+        onFlagMember={handleFlagMember}
+      />
+
+      <DeletePostFlowModal
+        visible={deletePost}
+        post={{
+          image: images.comment,
+          description: "New season, new slay! 🔥 Whether it's street...",
+        }}
+        onClose={() => setDeletePost(false)}
+      />
+      <FlagPostFlowModal
+        visible={flagPost}
+        post={{
+          image: images.comment,
+          description: "New season, new slay! 🔥 Whether it's street...",
+        }}
+        onClose={() => setFlagPost(false)}
+      />
+      <FlagMemberFlowModal
+        visible={flagMember}
+        member={{
+          avatar: images.comment,
+          name: "Chris Melody",
+          username: "Chris",
+        }}
+        onClose={() => setFlagMember(false)}
+      />
+
+      <RecordCommentModal
+        visible={showRecordModal}
+        onClose={() => setShowRecordModal(false)}
+        onSubmit={(data) => {
+          console.log("Posted:", data);
+          setShowRecordModal(false);
+        }}
       />
     </>
   );

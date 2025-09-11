@@ -17,7 +17,8 @@ const DiscoverLayout = () => {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="podcasts" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="podcasts" options={{ headerShown: false }} /> */}
+        <Stack.Screen name="video-reply" options={{ headerShown: false }} />
       </Stack>
     </>
   );

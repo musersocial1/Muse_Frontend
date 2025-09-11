@@ -151,8 +151,6 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
       onRequestClose={onClose}
     >
       <View className="flex-1 ">
-        {/* animated blur */}
-        {/* Blur that fades with drag */}
         <TouchableOpacity
           activeOpacity={1}
           style={StyleSheet.absoluteFill}
@@ -161,7 +159,7 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
           <FadingBlurBackground opacity={blurOpacity} />
         </TouchableOpacity>
         <View
-          pointerEvents="box-none" // 👈 lets touches reach children
+          pointerEvents="box-none"
           style={{ marginBottom: insets.bottom }}
           className="flex-1 pb-3 px-3  items-center justify-end"
         >

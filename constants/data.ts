@@ -343,3 +343,14 @@ export const textComments = [
     replies: 653,
   },
 ];
+
+export const MOCK_USER = {
+  name: "Marysnyder_",
+  avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+};
+export const MOCK_REPLY_TO = {
+  name: "Stella martins",
+  avatar: "https://randomuser.me/api/portraits/women/2.jpg",
+};
+export const MOCK_POSTER =
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=687&q=80";
