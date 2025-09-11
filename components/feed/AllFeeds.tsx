@@ -2,6 +2,7 @@ import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
 import React, { useState } from "react";
 import {
@@ -33,6 +34,7 @@ const PostCard: React.FC<PostCardProps> = ({
   setOpenComments,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const videoRefs = React.useRef<any[]>([]).current;
 
   return (
     <View className="bg-[#1C1C1C] rounded-[30px]  mb-4 overflow-hidden">
@@ -226,17 +228,50 @@ const PostCard: React.FC<PostCardProps> = ({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
           >
-            {post.vComments.slice(0, 6).map((commentUri, index) => (
-              <View key={index} className="relative ">
-                <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
-                  <Image
+            {post.vComments.slice(0, 6).map((commentUri, index) => {
+              return (
+                <View key={index} className="relative ">
+                  <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
+                    {/* <Image
                     source={{ uri: commentUri }}
                     className="w-full rounded-full h-full "
                     resizeMode="cover"
-                  />
+                  /> */}
+                    <Video
+                      source={{ uri: commentUri }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: 999,
+                      }}
+                      resizeMode={ResizeMode.COVER}
+                      shouldPlay
+                      isLooping={false}
+                      isMuted
+                      // Limit playback to 3 seconds
+                      onLoad={() => {
+                        const loop = async () => {
+                          try {
+                            await videoRefs[index]?.playFromPositionAsync(0); // start from beginning
+                            setTimeout(async () => {
+                              await videoRefs[index]?.pauseAsync(); // pause after 3s
+                              loop(); // restart again
+                            }, 3000);
+                          } catch (e) {
+                            console.log("Video loop error", e);
+                          }
+                        };
+
+                        loop(); // kick off the loop
+                      }}
+                      ref={(ref) => {
+                        if (!videoRefs[index]) videoRefs[index] = ref;
+                      }}
+                    />
+                  </View>
                 </View>
-              </View>
-            ))}
+              );
+            })}
             {/* See All Button */}
             {post.vComments.length > 6 && (
               <TouchableOpacity className="items-center">
