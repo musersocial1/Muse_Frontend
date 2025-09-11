@@ -21,8 +21,8 @@ export interface Post {
     verified: boolean;
   };
   content: string;
-  thumbnail?: string;
-  images?: string[];
+  thumbnail?: number;
+  images?: (string | number)[];
   vComments?: string[];
   videos?: string[];
   timestamp: string;

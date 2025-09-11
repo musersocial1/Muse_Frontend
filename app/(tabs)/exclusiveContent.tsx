@@ -1,7 +1,6 @@
 import DiscoveryExclusivesScreen from "@/components/ExclusiveContent/DiscoveryExclusivesSection";
-import React from "react";
 
-const ExclusiveContent: React.FC = () => {
+const ExclusiveContent = () => {
   return <DiscoveryExclusivesScreen />;
 };
 

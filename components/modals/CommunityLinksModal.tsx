@@ -5,7 +5,7 @@ import {
   Easing,
   Linking,
   Modal,
-  ScrollView,
+  PanResponder,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -106,12 +106,13 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
 
   const insets = useSafeAreaInsets();
 
-  const HIDE_OFFSET = 800; // how far we start below
+  // get full device height
+  const SCREEN_HEIGHT = 500;
 
-  // Shared translateY for the sheet
+  // instead of hardcoding 700
+  const HIDE_OFFSET = SCREEN_HEIGHT;
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
-  // Animate sheet up when opening
   useEffect(() => {
     if (visible) {
       sheetY.setValue(HIDE_OFFSET);
@@ -126,14 +127,12 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
     }
   }, [visible]);
 
-  // Blur opacity follows sheet position (down → fade out)
   const blurOpacity = sheetY.interpolate({
     inputRange: [0, HIDE_OFFSET],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
-  // Optional programmatic close (slide down then onClose)
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
       toValue: HIDE_OFFSET,
@@ -142,6 +141,33 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
       useNativeDriver: true,
     }).start(() => onClose());
   };
+
+  const responder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) sheetY.setValue(g.dy);
+      },
+
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          Animated.timing(sheetY, {
+            toValue: 600,
+            duration: 220,
+            useNativeDriver: true,
+          }).start(() => onClose());
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0,
+            bounciness: 6,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   return (
     <Modal
@@ -171,6 +197,7 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
               width: "100%",
             }}
             className="w-full   max-w-lg"
+            {...responder.panHandlers}
           >
             <View className="bg-[#1E1E1E] rounded-[30px] overflow-hidden">
               <DragToClose translateY={sheetY} onClose={onClose} />
@@ -179,9 +206,9 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
                 Community links
               </Text>
 
-              <ScrollView
+              <View
                 className=" p-6 "
-                showsVerticalScrollIndicator={false}
+                // showsVerticalScrollIndicator={false}
               >
                 <View className=" gap-4">
                   {links.map((link) => (
@@ -192,7 +219,7 @@ const CommunityLinksModal: React.FC<CommunityLinksModalProps> = ({
                     />
                   ))}
                 </View>
-              </ScrollView>
+              </View>
             </View>
           </Animated.View>
         </View>

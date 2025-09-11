@@ -15,8 +15,8 @@ import CustomNavBar from "./CustomNavBar";
 const { height } = Dimensions.get("window");
 
 // --- Config ---
-const GESTURE_ACTIVATION_THRESHOLD = 10; // Pixels to move before gesture activates
-const RELEASE_THRESHOLD = 0.5; // Must drag 30% of ACTIVE_HEIGHT to open
+const GESTURE_ACTIVATION_THRESHOLD = 5; // Pixels to move before gesture activates
+const RELEASE_THRESHOLD = 0; // Must drag 30% of ACTIVE_HEIGHT to open
 const ACTIVE_HEIGHT = 70; // drag distance needed to trigger
 
 export default function ShrinkAnimation({ children, onSwitch }: any) {
@@ -28,36 +28,30 @@ export default function ShrinkAnimation({ children, onSwitch }: any) {
   const hasVibrated = useRef(false);
 
   const openSwitcher = () => {
-    if (isSwitcherOpen.current) return; // 👈 already open, do nothing
-    isSwitcherOpen.current = true; // 👈 mark as open
-    hasVibrated.current = true; // 👈 mark vibration happened
+    console.log("switercher is opened");
+    if (isSwitcherOpen.current) return;
+    isSwitcherOpen.current = true;
+    hasVibrated.current = true;
+    console.log("switercher is opened again on there");
 
-    // Vibrate once
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-
     setIsMounted(true);
 
-    Animated.parallel([
+    // 👇 first finish the blur, then fade in switcher
+    Animated.sequence([
+      // Animated.timing(blurOpacity, {
+      //   toValue: 1,
+      //   duration: 250,
+      //   easing: Easing.out(Easing.ease),
+      //   useNativeDriver: true,
+      // }),
       Animated.timing(switcherOpacity, {
         toValue: 1,
-        duration: 400,
+        duration: 350,
         easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
-      Animated.timing(blurOpacity, {
-        toValue: 1,
-        duration: 300,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      Animated.timing(switcherOpacity, {
-        toValue: 1,
-        duration: 100,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      });
-    });
+    ]).start(() => onSwitch?.());
   };
 
   const closeSwitcher = () => {
@@ -118,6 +112,9 @@ export default function ShrinkAnimation({ children, onSwitch }: any) {
             closeSwitcher();
           }
         }
+        // else {
+        //   closeSwitcher();
+        // }
       },
 
       onPanResponderTerminate: () => {
@@ -132,43 +129,36 @@ export default function ShrinkAnimation({ children, onSwitch }: any) {
   });
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Blur background */}
-
-      {/* Main content */}
-      <View style={{ flex: 1 }} className=" bg-white">
-        {enhancedChildren}
-        <CustomNavBar panHandlers={panResponder.panHandlers} />
-      </View>
+    <View style={{ flex: 1 }} className=" bg-white">
+      {enhancedChildren}
+      <CustomNavBar panHandlers={panResponder.panHandlers} />
 
       {isMounted && (
-        <Animated.View
-          style={[StyleSheet.absoluteFill, { opacity: blurOpacity }]}
-          className={" z-[1100] "}
-        >
-          <BlurView
-            style={[StyleSheet.absoluteFill]}
-            experimentalBlurMethod="dimezisBlurView"
-            tint="dark"
-            intensity={100}
-            className=" flex-1 "
-          />
-        </Animated.View>
-      )}
-
-      {/* Community Switcher */}
-      {isMounted && (
-        <Animated.View
-          style={[
-            StyleSheet.absoluteFillObject,
-            {
-              opacity: switcherOpacity,
-            },
-          ]}
-          className={"z-[9999]"}
-        >
-          <CommunitySwitcher onClose={closeSwitcher} />
-        </Animated.View>
+        <>
+          <Animated.View
+            style={[StyleSheet.absoluteFill, { opacity: blurOpacity }]}
+            className={" z-[1100] "}
+          >
+            <BlurView
+              style={[StyleSheet.absoluteFill]}
+              experimentalBlurMethod="dimezisBlurView"
+              tint="dark"
+              intensity={100}
+              className=" flex-1 "
+            />
+          </Animated.View>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                opacity: switcherOpacity,
+              },
+            ]}
+            className={"z-[9999]"}
+          >
+            <CommunitySwitcher onClose={closeSwitcher} />
+          </Animated.View>
+        </>
       )}
     </View>
   );

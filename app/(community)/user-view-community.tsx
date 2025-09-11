@@ -1,4 +1,3 @@
-import AllPosts from "@/components/community/AllPosts";
 import LongForm from "@/components/community/LongForm";
 import CommunityLinksModal from "@/components/modals/CommunityLinksModal";
 import SubscriptionFlow from "@/components/modals/Subscribe";
@@ -9,10 +8,12 @@ import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
+import * as NavigationBar from "expo-navigation-bar";
 import { router } from "expo-router";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 
+import AllFeeds from "@/components/feed/AllFeeds";
 import {
   Animated,
   Dimensions,
@@ -61,9 +62,29 @@ const UserViewCommunity: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    // background black
+    // NavigationBar.setBackgroundColorAsync("#000000");
+    // icons white (light = dark icons, dark = light icons)
+    NavigationBar.setButtonStyleAsync("light"); // 👈 makes icons white
+  }, []);
+
+  const pagerX = useRef(new Animated.Value(0)).current;
+  const pagerRef = useRef<ScrollView | null>(null);
+
+  const pages = ["all", "creators", "longform"];
+
+  const goToPage = (key: string) => {
+    const pageIndex = pages.indexOf(key);
+    if (pageIndex !== -1) {
+      setActivePostType(key);
+      pagerRef.current?.scrollTo({ x: pageIndex * width, animated: true });
+    }
+  };
+
   // const insets = useSafeAreaInsets()
   return (
-    <View className="flex-1 bg-primary">
+    <View className="flex-1  bg-black">
       <Animated.View
         pointerEvents="none"
         style={[StyleSheet.absoluteFillObject]}
@@ -95,15 +116,18 @@ const UserViewCommunity: React.FC = () => {
         </View>
       </Animated.View>
       <View
-        style={{ top: insets.top + 10 }}
-        className="absolute  left-0 right-0 flex-row justify-between items-center px-6 z-[100]"
+        style={{ paddingTop: insets.top + 10 }}
+        className="absolute top-0 left-0 pb-2 right-0 flex-row justify-between items-center  px-6 z-[100]"
       >
         <TouchableOpacity
           onPress={() => router.back()}
           activeOpacity={0.7}
           className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
         >
-          <BlurView style={[StyleSheet.absoluteFill]} />
+          <BlurView
+            experimentalBlurMethod="dimezisBlurView"
+            style={[StyleSheet.absoluteFill]}
+          />
           <Feather
             name="chevron-left"
             size={20}
@@ -120,6 +144,7 @@ const UserViewCommunity: React.FC = () => {
           >
             <BlurView
               intensity={10}
+              experimentalBlurMethod="dimezisBlurView"
               style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
             />
             <Feather name="share" size={20} color="#fff" />
@@ -202,7 +227,7 @@ const UserViewCommunity: React.FC = () => {
               {bottomNavItems.map((item, index) => (
                 <TouchableOpacity
                   key={item.key}
-                  onPress={() => setActivePostType(item.key)}
+                  onPress={() => goToPage(item.key)} // 👈 scrolls instead of just setting state
                   className="items-center shrink w-full"
                   activeOpacity={0.8}
                 >
@@ -226,11 +251,53 @@ const UserViewCommunity: React.FC = () => {
             </View>
           </View>
 
-          {activePostType === "all" && <AllPosts posts={posts} />}
-          {activePostType === "creators" && <AllPosts posts={posts} />}
+          {/* {activePostType === "all" && (
+            <View className="flex-row   flex-1 justify-center items-center gap-3">
+              <AllFeeds posts={posts} />
+            </View>
+          )}
+          {activePostType === "creators" && (
+            <View className="flex-row   flex-1 justify-center items-center gap-3">
+              <AllFeeds posts={posts} />
+            </View>
+          )}
           {activePostType === "longform" && (
             <LongForm content={dummyLongFormContent} />
-          )}
+          )} */}
+
+          {/* Horizontal pager */}
+          <Animated.ScrollView
+            ref={pagerRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            scrollEventThrottle={16}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: pagerX } } }],
+              { useNativeDriver: false }
+            )}
+            onMomentumScrollEnd={(e) => {
+              const pageIndex = Math.round(
+                e.nativeEvent.contentOffset.x / width
+              );
+              setActivePostType(pages[pageIndex]); // sync with nav state
+            }}
+          >
+            {/* Page 0: All */}
+            <View style={{ width, paddingHorizontal: 4 }}>
+              <AllFeeds posts={posts} />
+            </View>
+
+            {/* Page 1: Creators */}
+            <View style={{ width, paddingHorizontal: 4 }}>
+              <AllFeeds posts={posts} />
+            </View>
+
+            {/* Page 2: Longform */}
+            <View style={{ width, paddingHorizontal: 4 }}>
+              <LongForm content={dummyLongFormContent} />
+            </View>
+          </Animated.ScrollView>
         </View>
       </ScrollView>
 

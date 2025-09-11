@@ -56,6 +56,14 @@ import latest2 from "@/assets/images/Xcontent/latest2.webp";
 import Xcomm1 from "@/assets/images/Xcontent/Xcomm1.webp";
 import Xcomm2 from "@/assets/images/Xcontent/Xcomm2.webp";
 import Xcomm3 from "@/assets/images/Xcontent/Xcomm3.webp";
+
+// FEED IMAGES
+import feed1 from "@/assets/images/feed/feed1.webp";
+import feed2 from "@/assets/images/feed/feed2.webp";
+import feed3 from "@/assets/images/feed/feed3.webp";
+import feed4 from "@/assets/images/feed/feed4.webp";
+import feed5 from "@/assets/images/feed/feed5.webp";
+import feed6 from "@/assets/images/feed/feed6.webp";
 export const images = {
   splash,
   logo,
@@ -115,4 +123,12 @@ export const images = {
   latest2,
   Xpod1,
   Xpod2,
+
+  // 👇 New Feed images
+  feed1,
+  feed2,
+  feed3,
+  feed4,
+  feed5,
+  feed6,
 };

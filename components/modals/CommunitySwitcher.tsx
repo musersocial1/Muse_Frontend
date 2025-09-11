@@ -25,7 +25,9 @@ interface Community {
 }
 
 import { images } from "@/constants/images";
+import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { BlurView } from "expo-blur";
+import { useRouter } from "expo-router";
 
 const communities: Community[] = [
   {
@@ -65,12 +67,18 @@ const CommunityCard: React.FC<{
   size: number;
   onClose: any;
 }> = ({ community, size, onClose }) => {
+  const router = useRouter();
   return (
     <TouchableOpacity
       className="items-center mb-10 w-[47%] "
       activeOpacity={0.9}
-      //   onPress={() => router.push(RouterConstantUtil.community.user as any)}
-      onPress={() => onClose()}
+      onPress={() => {
+        router.replace(RouterConstantUtil.community.user as any);
+        // setTimeout(() => {
+        //   onClose();
+        // }, 1000);
+      }}
+      // onPress={() => onClose()}
     >
       <View
         // style={{ width: size, height: size, borderRadius: size / 2 }}

@@ -1,4 +1,5 @@
 import { LongFormContent, Post } from "@/types/community";
+import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
   {
@@ -68,8 +69,7 @@ export const dummyAllPosts: Post[] = [
     ],
     timestamp: "2h",
     likes: 2678,
-    thumbnail:
-      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop",
+    thumbnail: images.latest2,
     comments: 893,
     type: "video",
   },
@@ -85,11 +85,14 @@ export const dummyAllPosts: Post[] = [
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop", // modern living room
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop", // minimal workspace
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop", // stylish bedroom
-      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop", // cozy kitchen
+      images.feed4,
+      images.feed5,
+      images.feed6,
+      images.feed1,
+      images.feed2,
+      images.feed3,
     ],
+
     timestamp: "2h",
     likes: 2678,
     comments: 893,

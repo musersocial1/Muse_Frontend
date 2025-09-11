@@ -86,15 +86,6 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
     extrapolate: "clamp",
   });
 
-  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
-    []
-  );
-
-  const toggleCommunity = (id: string) => {
-    setSelectedCommunityIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
       toValue: HIDE_OFFSET,
@@ -254,6 +245,16 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
+    );
+  };
+
+  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
+    []
+  );
+
+  const toggleCommunity = (id: string) => {
+    setSelectedCommunityIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
