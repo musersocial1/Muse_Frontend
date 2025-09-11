@@ -39,6 +39,7 @@ interface UserProfileModalProps {
     communities: Community[];
   };
   onNudge: () => void;
+  onDone?: (selectedIds: string[]) => void; // 👈 add
 }
 
 type ViewMode = "profile" | "communities";
@@ -48,6 +49,7 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
   onClose,
   user,
   onNudge,
+  onDone,
 }) => {
   const [viewMode, setViewMode] = useState<ViewMode>("profile");
   const [searchQuery, setSearchQuery] = useState("");
@@ -84,15 +86,6 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
     extrapolate: "clamp",
   });
 
-  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
-    []
-  );
-
-  const toggleCommunity = (id: string) => {
-    setSelectedCommunityIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
       toValue: HIDE_OFFSET,
@@ -240,7 +233,10 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
 
         {/* Done Button */}
         <TouchableOpacity
-          onPress={closeWithSlide}
+          onPress={() => {
+            onDone?.(selectedCommunityIds);
+            closeWithSlide();
+          }}
           className="bg-white rounded-full py-[18px]"
           activeOpacity={0.8}
         >
@@ -249,6 +245,16 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
           </Text>
         </TouchableOpacity>
       </View>
+    );
+  };
+
+  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
+    []
+  );
+
+  const toggleCommunity = (id: string) => {
+    setSelectedCommunityIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 

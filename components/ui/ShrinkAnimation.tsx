@@ -1,129 +1,165 @@
-import CommunitySwitcher from "@/components/community/CommunitySwitcher";
-import React, { useRef } from "react";
+import { BlurView } from "expo-blur";
+import * as Haptics from "expo-haptics";
+import React, { useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
+  Easing,
   PanResponder,
   StyleSheet,
   View,
 } from "react-native";
+import CommunitySwitcher from "../modals/CommunitySwitcher";
+import CustomNavBar from "./CustomNavBar";
 
 const { height } = Dimensions.get("window");
 
-export default function ShrinkAnimation({ children, onSwitch }: any) {
-  const scale = useRef(new Animated.Value(1)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
-  const switcherTranslateY = useRef(new Animated.Value(height)).current;
+// --- Config ---
+const GESTURE_ACTIVATION_THRESHOLD = 5; // Pixels to move before gesture activates
+const RELEASE_THRESHOLD = 0; // Must drag 30% of ACTIVE_HEIGHT to open
+const ACTIVE_HEIGHT = 70; // drag distance needed to trigger
 
-  // Expose an "open" function so TabsLayout or children can trigger programmatically
+export default function ShrinkAnimation({ children, onSwitch }: any) {
+  const blurOpacity = useRef(new Animated.Value(0)).current;
+  const switcherOpacity = useRef(new Animated.Value(0)).current;
+  const [isMounted, setIsMounted] = useState(false);
+
+  const isSwitcherOpen = useRef(false);
+  const hasVibrated = useRef(false);
+
   const openSwitcher = () => {
-    Animated.parallel([
-      Animated.timing(scale, {
-        toValue: 0.85,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 60,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(overlayOpacity, {
+    console.log("switercher is opened");
+    if (isSwitcherOpen.current) return;
+    isSwitcherOpen.current = true;
+    hasVibrated.current = true;
+    console.log("switercher is opened again on there");
+
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    setIsMounted(true);
+
+    // 👇 first finish the blur, then fade in switcher
+    Animated.sequence([
+      // Animated.timing(blurOpacity, {
+      //   toValue: 1,
+      //   duration: 250,
+      //   easing: Easing.out(Easing.ease),
+      //   useNativeDriver: true,
+      // }),
+      Animated.timing(switcherOpacity, {
         toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(switcherTranslateY, {
-        toValue: 0,
-        duration: 250,
+        duration: 350,
+        easing: Easing.out(Easing.ease),
         useNativeDriver: true,
       }),
     ]).start(() => onSwitch?.());
   };
 
   const closeSwitcher = () => {
+    if (!isSwitcherOpen.current) return; // 👈 already closed
+    isSwitcherOpen.current = false;
+    hasVibrated.current = false; // 👈 reset for next drag
+
     Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-      Animated.spring(overlayOpacity, {
+      Animated.timing(switcherOpacity, {
         toValue: 0,
+        duration: 300,
+        easing: Easing.in(Easing.ease),
         useNativeDriver: true,
       }),
-      Animated.spring(switcherTranslateY, {
-        toValue: height,
+      Animated.timing(blurOpacity, {
+        toValue: 0,
+        duration: 250,
+        easing: Easing.in(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start(() => {
+      setIsMounted(false);
+    });
   };
 
-  // Gesture handlers stay the same…
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: (_, g) => g.y0 > height - 120,
-      onMoveShouldSetPanResponder: (_, g) =>
-        g.y0 > height - 120 && Math.abs(g.dy) > 10,
-
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => {
+        const { dx, dy } = g;
+        return (
+          Math.abs(dy) > Math.abs(dx) &&
+          Math.abs(dy) > GESTURE_ACTIVATION_THRESHOLD
+        );
+      },
       onPanResponderMove: (_, g) => {
-        const progress = Math.min(Math.max(-g.dy / height, 0), 1);
-        scale.setValue(1 - progress * 0.15);
-        translateY.setValue(progress * 60);
-        overlayOpacity.setValue(progress);
-        switcherTranslateY.setValue(height * (1 - progress));
+        setIsMounted(true);
+
+        const dragDistance = Math.max(0, -g.dy);
+        const progress = Math.min(dragDistance / ACTIVE_HEIGHT, 1);
+
+        blurOpacity.setValue(progress);
+
+        if (dragDistance >= ACTIVE_HEIGHT && !isSwitcherOpen.current) {
+          openSwitcher(); // 👈 runs once
+        }
       },
 
       onPanResponderRelease: (_, g) => {
-        if (g.dy < -100) {
-          openSwitcher();
-        } else {
-          closeSwitcher();
+        const dragDistance = Math.max(0, -g.dy);
+        const progress = Math.min(dragDistance / ACTIVE_HEIGHT, 1);
+        const isFlick = Math.abs(g.vy) > 0.5;
+
+        if (!isSwitcherOpen.current) {
+          if (progress > RELEASE_THRESHOLD || isFlick) {
+            openSwitcher();
+          } else {
+            closeSwitcher();
+          }
         }
+        // else {
+        //   closeSwitcher();
+        // }
+      },
+
+      onPanResponderTerminate: () => {
+        closeSwitcher();
       },
     })
   ).current;
 
-  // Inject control props into children
   const enhancedChildren = React.cloneElement(children, {
     openSwitcher,
     closeSwitcher,
-    panHandlers: panResponder.panHandlers, // 👈 add this
   });
 
-  // inside ShrinkAnimation return
   return (
-    <View style={{ flex: 1 }}>
-      {/* Switcher */}
-      <Animated.View
-        style={{
-          ...StyleSheet.absoluteFillObject,
-          transform: [{ translateY: switcherTranslateY }],
-        }}
-      >
-        <CommunitySwitcher />
-      </Animated.View>
+    <View style={{ flex: 1 }} className=" bg-white">
+      {enhancedChildren}
+      <CustomNavBar panHandlers={panResponder.panHandlers} />
 
-      {/* Dim background */}
-      <Animated.View
-        style={[
-          StyleSheet.absoluteFillObject,
-          { backgroundColor: "rgba(0,0,0,0.5)", opacity: overlayOpacity },
-        ]}
-      />
-
-      {/* Tabs */}
-      <Animated.View
-        style={{
-          flex: 1,
-          transform: [{ scale }, { translateY }],
-          borderRadius: overlayOpacity.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, 20],
-          }),
-          overflow: "hidden",
-        }}
-      >
-        {enhancedChildren}
-      </Animated.View>
+      {isMounted && (
+        <>
+          <Animated.View
+            style={[StyleSheet.absoluteFill, { opacity: blurOpacity }]}
+            className={" z-[1100] "}
+          >
+            <BlurView
+              style={[StyleSheet.absoluteFill]}
+              experimentalBlurMethod="dimezisBlurView"
+              tint="dark"
+              intensity={100}
+              className=" flex-1 "
+            />
+          </Animated.View>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFillObject,
+              {
+                opacity: switcherOpacity,
+              },
+            ]}
+            className={"z-[9999]"}
+          >
+            <CommunitySwitcher onClose={closeSwitcher} />
+          </Animated.View>
+        </>
+      )}
     </View>
   );
 }

@@ -1,4 +1,5 @@
 import { LongFormContent, Post } from "@/types/community";
+import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
   {
@@ -13,21 +14,16 @@ export const dummyAllPosts: Post[] = [
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     vComments: [
-      "https://i.pravatar.cc/100?img=6",
-      "https://i.pravatar.cc/100?img=7",
-      "https://i.pravatar.cc/100?img=8",
-      "https://i.pravatar.cc/100?img=9",
-      "https://i.pravatar.cc/100?img=10",
-      "https://i.pravatar.cc/100?img=11",
-      "https://i.pravatar.cc/100?img=12",
-      "https://i.pravatar.cc/100?img=13",
-      "https://i.pravatar.cc/100?img=14",
-      "https://i.pravatar.cc/100?img=15",
-      "https://i.pravatar.cc/100?img=16",
-      "https://i.pravatar.cc/100?img=17",
-      "https://i.pravatar.cc/100?img=18",
-      "https://i.pravatar.cc/100?img=19",
-      "https://i.pravatar.cc/100?img=20",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F11057646-hd_1080_1920_30fps.mp4?alt=media&token=9dfac30d-42aa-4814-929a-31c7687f5358",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F4098943-uhd_4096_2160_25fps.mp4?alt=media&token=4f25bdf9-67bf-4d9c-b5d3-06c05477a708",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F4098950-uhd_4096_2160_25fps.mp4?alt=media&token=d5953e8e-ba25-4304-867e-b92e309f0d40",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F4100353-uhd_4096_2160_25fps.mp4?alt=media&token=1689dcb6-5908-4d37-b655-683390b7f1ea",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F4110294-uhd_3840_2160_30fps.mp4?alt=media&token=873ec58f-8854-49d0-b46e-e4a0db23f817",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F4435751-uhd_3840_2160_25fps.mp4?alt=media&token=1f6a023f-08ac-4862-a4b5-970244533185",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F5528018-uhd_2160_3840_25fps.mp4?alt=media&token=4ff3d444-ff1d-4400-b3a1-ea45b7d7e4d2",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F7426713-hd_1080_1920_25fps.mp4?alt=media&token=43904d7d-c8b4-4544-9beb-ab3c19955ce3",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F7660481-uhd_3840_2160_25fps.mp4?alt=media&token=ac9948b2-36b0-4137-8e3d-cc6cc35a96ce",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2F8632780-uhd_3840_2160_25fps.mp4?alt=media&token=af3e14df-ebe5-4356-bdff-64cdddc53772",
     ],
 
     timestamp: "2h",
@@ -68,8 +64,7 @@ export const dummyAllPosts: Post[] = [
     ],
     timestamp: "2h",
     likes: 2678,
-    thumbnail:
-      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop",
+    thumbnail: images.latest2,
     comments: 893,
     type: "video",
   },
@@ -85,11 +80,14 @@ export const dummyAllPosts: Post[] = [
     content:
       'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     images: [
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop", // modern living room
-      "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400&h=300&fit=crop", // minimal workspace
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop", // stylish bedroom
-      "https://images.unsplash.com/photo-1501876725168-00c445821c9e?w=400&h=300&fit=crop", // cozy kitchen
+      images.feed4,
+      images.feed5,
+      images.feed6,
+      images.feed1,
+      images.feed2,
+      images.feed3,
     ],
+
     timestamp: "2h",
     likes: 2678,
     comments: 893,

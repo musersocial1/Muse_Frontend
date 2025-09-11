@@ -36,23 +36,30 @@ const NudgeSuccessModal: React.FC<Props> = ({
               You nudged{" "}
             </Text>
             <View
+              className="rounded-full relative"
               style={{
                 shadowColor: "#000",
-                shadowOffset: { width: 0, height: 6 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.35,
+                shadowRadius: 14.1,
+                elevation: 12,
                 borderRadius: 999,
+                borderWidth: 1,
+                borderColor: "#000",
+                backgroundColor: "#000",
+                paddingBottom: 4,
               }}
             >
               <Image
                 source={avatarUrl}
-                className="w-11 h-11 rounded-full mx-2 border-2 border-white bg-[#222]"
+                className="w-11 h-11 rounded-full   bg-[#222] drop-shadow-[999px]"
                 resizeMode="cover"
               />
             </View>
 
-            <Text className="text-white text-[27px] font-bold">{username}</Text>
+            <Text className="text-white text-[27px] font-bold ml-1">
+              {username}
+            </Text>
           </View>
           <Text className="text-white/70 text-center text-[16px] font-normal mt-2">
             Now you can see all their updates once its{"\n"}made including
@@ -60,7 +67,6 @@ const NudgeSuccessModal: React.FC<Props> = ({
           </Text>
         </View>
 
-        {/* Bottom Buttons */}
         <View
           className="flex-row px-4 pb-6 pt-2 gap-3"
           style={{

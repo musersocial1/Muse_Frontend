@@ -1,11 +1,10 @@
 import AllFeeds from "@/components/feed/AllFeeds";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
-import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -133,6 +132,34 @@ const Home: React.FC = () => {
     : progress;
   const [canTrigger, setCanTrigger] = useState(false);
 
+  const { triggerUpload } = useLocalSearchParams();
+  const [uploadVisible, setUploadVisible] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Simulate a 5s upload
+  const simulateUpload = () => {
+    setUploadVisible(true);
+    setUploadProgress(0);
+
+    const totalMs = 50000000;
+    const start = Date.now();
+    const interval = setInterval(() => {
+      const p = Math.min((Date.now() - start) / totalMs, 1);
+      setUploadProgress(p);
+
+      if (p >= 1) {
+        clearInterval(interval);
+        setTimeout(() => setUploadVisible(false), 800);
+      }
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (true) {
+      simulateUpload();
+    }
+  }, [true]);
+
   return (
     <SafeAreaView className="flex-1  bg-[#121212]">
       <Animated.View className="flex-1 ">
@@ -259,9 +286,9 @@ const Home: React.FC = () => {
               <View className="flex-row space-x-3  gap-2">
                 <View className="relative">
                   <TouchableOpacity
-                    onPress={() =>
-                      router.replace(RouterConstantUtil.tabs.communities as any)
-                    }
+                    // onPress={() =>
+                    //   router.replace(RouterConstantUtil.tabs.communities as any)
+                    // }
                     // onPress={() => setDropdownVisible(!dropdownVisible)}
                     className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm  z-20"
                     activeOpacity={0.7}
@@ -288,7 +315,7 @@ const Home: React.FC = () => {
                   </TouchableOpacity>
 
                   {dropdownVisible && (
-                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border  border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
+                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
                       <BlurView
                         intensity={20}
                         style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
@@ -392,6 +419,20 @@ const Home: React.FC = () => {
           />
         )}
       </Animated.View>
+
+      {/* Upload Toast */}
+      {/* {uploadVisible && (
+        <UploadToast
+          visible={uploadVisible}
+          progress={uploadProgress}
+          title="Uploading your posts"
+          avatars={[
+            "https://randomuser.me/api/portraits/women/44.jpg",
+            "https://randomuser.me/api/portraits/men/32.jpg",
+          ]}
+          onCancel={() => setUploadVisible(false)}
+        />
+      )} */}
     </SafeAreaView>
   );
 };

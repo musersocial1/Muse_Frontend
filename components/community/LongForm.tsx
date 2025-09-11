@@ -25,36 +25,24 @@ const LongFormCard: React.FC<LongFormCardProps> = ({ content, onPress }) => {
     <TouchableOpacity
       onPress={onPress}
       className=" max-w-lg mb-4 mx-1  "
-      activeOpacity={0.8}
+      activeOpacity={0.95}
     >
       <View className="relative   rounded-[15px] overflow-hidden">
         <Image
           source={{ uri: content.thumbnail }}
           className="rounded-[15px] aspect-[1/0.55] w-full "
           resizeMode="cover"
+          blurRadius={5}
         />
-
-        {content.isLocked && (
-          <BlurView
-            intensity={30}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              borderRadius: 16,
-            }}
-          />
-        )}
 
         <View className="absolute inset-0 items-center justify-center">
           <View className="w-24 h-24 rounded-full items-center justify-center  overflow-hidden border-white border-2">
             <BlurView
               style={StyleSheet.absoluteFill}
-              tint="light"
-              intensity={80}
+              tint="dark"
+              intensity={40}
               className=" rounded-full"
+              experimentalBlurMethod="dimezisBlurView"
             />
             <View className="w-10  h-10 rounded-full  items-center justify-center">
               <Image
@@ -76,7 +64,7 @@ const LongFormCard: React.FC<LongFormCardProps> = ({ content, onPress }) => {
 
       <View className="flex-row  items-center justify-between py-2  mt-2">
         <View className=" w-[80%]">
-          <Text className="text-white text-[20px] font-sfpro-medium ">
+          <Text className="text-white leading-[18px] text-[18px] font-sfpro-medium mb-2 ">
             {content.title}
           </Text>
 

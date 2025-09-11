@@ -36,12 +36,36 @@ import img8 from "@/assets/images/IMG8.png";
 import img9 from "@/assets/images/IMG9.png";
 import joinCommunity from "@/assets/images/join.png";
 import male from "@/assets/images/male.png";
-import logo from "@/assets/images/muse-logo.png";
+import logo from "@/assets/images/muse-logo2.png";
 import logo_white from "@/assets/images/muse-white-logo.png";
 import otpmodalbg from "@/assets/images/otpmodalbg.png";
 import postIcon from "@/assets/images/postIcon.webp";
 import splash from "@/assets/images/splash.jpg";
+import Xpod1 from "@/assets/images/Xcontent/Xpod1.webp";
+import Xpod2 from "@/assets/images/Xcontent/Xpod2.webp";
 
+// COMMNUNITY SWITCHER IMAGES
+import comm1 from "@/assets/images/communitySwitcher/comm1.webp";
+import comm2 from "@/assets/images/communitySwitcher/comm2.webp";
+import comm3 from "@/assets/images/communitySwitcher/comm3.webp";
+import comm4 from "@/assets/images/communitySwitcher/comm4.webp";
+import comm5 from "@/assets/images/communitySwitcher/comm5.webp";
+import comm6 from "@/assets/images/communitySwitcher/comm6.webp";
+
+// Xcontent IMAGES
+import latest1 from "@/assets/images/Xcontent/latest1.webp";
+import latest2 from "@/assets/images/Xcontent/latest2.webp";
+import Xcomm1 from "@/assets/images/Xcontent/Xcomm1.webp";
+import Xcomm2 from "@/assets/images/Xcontent/Xcomm2.webp";
+import Xcomm3 from "@/assets/images/Xcontent/Xcomm3.webp";
+
+// FEED IMAGES
+import feed1 from "@/assets/images/feed/feed1.webp";
+import feed2 from "@/assets/images/feed/feed2.webp";
+import feed3 from "@/assets/images/feed/feed3.webp";
+import feed4 from "@/assets/images/feed/feed4.webp";
+import feed5 from "@/assets/images/feed/feed5.webp";
+import feed6 from "@/assets/images/feed/feed6.webp";
 export const images = {
   splash,
   logo,
@@ -86,4 +110,29 @@ export const images = {
   aibackground,
   comment,
   comment_delete,
+
+  // 👇 New community switcher images
+  comm1,
+  comm2,
+  comm3,
+  comm4,
+  comm5,
+  comm6,
+
+  // 👇 New Xcontent images
+  Xcomm1,
+  Xcomm2,
+  Xcomm3,
+  latest1,
+  latest2,
+  Xpod1,
+  Xpod2,
+
+  // 👇 New Feed images
+  feed1,
+  feed2,
+  feed3,
+  feed4,
+  feed5,
+  feed6,
 };

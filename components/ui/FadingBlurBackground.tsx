@@ -13,7 +13,7 @@ export function FadingBlurBackground({
   return (
     <>
       <AnimatedBlur
-        style={[StyleSheet.absoluteFillObject, { opacity }]}
+        style={[StyleSheet.absoluteFillObject, { opacity: opacity }]}
         tint="dark"
         intensity={100}
         pointerEvents="none"

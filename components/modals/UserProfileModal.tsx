@@ -8,6 +8,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   StyleSheet,
   Text,
@@ -52,7 +53,12 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
   const [searchQuery, setSearchQuery] = useState("");
 
   const insets = useSafeAreaInsets();
-  const HIDE_OFFSET = 700;
+
+  // get full device height
+  const SCREEN_HEIGHT = 700;
+
+  // instead of hardcoding 700
+  const HIDE_OFFSET = SCREEN_HEIGHT;
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
   useEffect(() => {
@@ -87,6 +93,33 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
       useNativeDriver: true,
     }).start(() => onClose());
   };
+
+  const responder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) sheetY.setValue(g.dy);
+      },
+
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          Animated.timing(sheetY, {
+            toValue: 600,
+            duration: 220,
+            useNativeDriver: true,
+          }).start(() => onClose());
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0,
+            bounciness: 6,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const handleCommunitiesPress = () => {
     setIsOpen(true);
@@ -218,13 +251,14 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
             <View
               pointerEvents="box-none"
               style={{ marginBottom: insets.bottom }}
-              className="flex-1 pb-3 px-3 items-center justify-end"
+              className="flex-1 pb-0 px-3 items-center justify-end"
             >
               <Animated.View
                 style={{
                   transform: [{ translateY: sheetY }],
                   width: "100%",
                 }}
+                {...responder.panHandlers}
                 className="w-full max-w-lg"
               >
                 <View className=" w-full border border-white/10 rounded-[30px] overflow-hidden">

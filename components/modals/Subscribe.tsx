@@ -6,6 +6,7 @@ import {
   Easing,
   Image,
   Modal,
+  PanResponder,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -271,12 +272,14 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
   };
 
   const insets = useSafeAreaInsets();
-  const HIDE_OFFSET = 300; // how far we start below
 
-  // Shared translateY for the sheet
+  // get full device height
+  const SCREEN_HEIGHT = 400;
+
+  // instead of hardcoding 700
+  const HIDE_OFFSET = SCREEN_HEIGHT;
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
-  // Animate sheet up when opening
   useEffect(() => {
     if (visible) {
       sheetY.setValue(HIDE_OFFSET);
@@ -288,18 +291,18 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
       }).start();
     } else {
       sheetY.setValue(HIDE_OFFSET);
-      setTimeout(() => setPaymentState("subscriptions"), 300);
+      setTimeout(() => {
+        setTimeout(() => setPaymentState("subscriptions"), 300);
+      }, 300);
     }
   }, [visible]);
 
-  // Blur opacity follows sheet position (down → fade out)
   const blurOpacity = sheetY.interpolate({
     inputRange: [0, HIDE_OFFSET],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
-  // Optional programmatic close (slide down then onClose)
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
       toValue: HIDE_OFFSET,
@@ -308,6 +311,33 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
       useNativeDriver: true,
     }).start(() => onClose());
   };
+
+  const responder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) sheetY.setValue(g.dy);
+      },
+
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          Animated.timing(sheetY, {
+            toValue: 600,
+            duration: 220,
+            useNativeDriver: true,
+          }).start(() => onClose());
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0,
+            bounciness: 6,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
   return (
     <Modal
       visible={visible}
@@ -331,6 +361,7 @@ const SubscriptionFlow: React.FC<SubscriptionFlowProps> = ({
           className="flex-1 pb-3 px-3  items-center justify-end"
         >
           <Animated.View
+            {...responder.panHandlers}
             style={{
               transform: [{ translateY: sheetY }],
               width: "100%",

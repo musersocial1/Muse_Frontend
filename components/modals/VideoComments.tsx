@@ -9,6 +9,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   ScrollView,
   StyleSheet,
@@ -86,7 +87,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
       sheetY.setValue(HIDE_OFFSET);
       setTimeout(() => {
         setTabMode("videos");
-      }, 300);
+      }, 10);
     }
   }, [visible]);
 
@@ -104,6 +105,33 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
       useNativeDriver: true,
     }).start(() => onClose());
   };
+
+  const responder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) sheetY.setValue(g.dy);
+      },
+
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > 120) {
+          Animated.timing(sheetY, {
+            toValue: 600,
+            duration: 220,
+            useNativeDriver: true,
+          }).start(() => onClose());
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0,
+            bounciness: 6,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const pagerX = useRef(new Animated.Value(0)).current;
   const progress = pagerX.interpolate({
@@ -278,8 +306,8 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
       >
         {renderVideosPreview()}
         {textComments.map((comment, index) => (
-          <>
-            <View key={index} className="px-5">
+          <React.Fragment key={index}>
+            <View className="px-5">
               <View className="mb-6 ">
                 <View className="flex-row items-center mb-3 pt-10">
                   <View className="w-12 h-12 rounded-full overflow-hidden mr-3">
@@ -359,7 +387,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             </View>
 
             <View className="border-b border-b-[#D9D9D9]/[20%] w-full" />
-          </>
+          </React.Fragment>
         ))}
       </ScrollView>
     );
@@ -547,7 +575,10 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             }}
             className="w-full max-w-lg self-center"
           >
-            <View className="bg-[#1C1C1C]  w-full rounded-t-[30px] overflow-hidden">
+            <View
+              {...responder.panHandlers}
+              className="bg-[#1C1C1C]   w-full rounded-t-[30px] overflow-hidden"
+            >
               <DragToClose translateY={sheetY} onClose={onClose} />
 
               {/* Tab Selector */}
@@ -555,11 +586,12 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
               <Animated.ScrollView
                 ref={pagerRef}
+                // nestedScrollEnabled
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 scrollEventThrottle={16}
-                style={{ height: height * 0.75 }}
+                style={{ maxHeight: height * 0.55 }}
                 onScroll={Animated.event(
                   [{ nativeEvent: { contentOffset: { x: pagerX } } }],
                   { useNativeDriver: false }

@@ -134,6 +134,9 @@ export default function CreatePostStart({ showModal, onClose }: any) {
 
   // 🔹 Content opacity
   const contentOpacity = useRef(new Animated.Value(0)).current;
+  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
+    []
+  );
 
   // expand circle on mount
   // track if circle already expanded
@@ -325,9 +328,28 @@ export default function CreatePostStart({ showModal, onClose }: any) {
                 strokeDashoffset,
               }}
               onPost={() => {
-                setShowCommunities(true);
                 Keyboard.dismiss();
-              }} // 👈 show communities modal
+
+                if (selectedCommunityIds.length > 0) {
+                  // ✅ If already selected → go straight home
+                  console.log("Posting to:", selectedCommunityIds);
+                  router.replace({
+                    pathname: "/(tabs)/home",
+                    params: {
+                      triggerUpload: "1",
+                      communities: selectedCommunityIds.join(","),
+                    },
+                  });
+
+                  handleClose();
+                } else {
+                  // ✅ If nothing selected → open modal
+
+                  setTimeout(() => {
+                    setShowCommunities(true);
+                  }, 60);
+                }
+              }}
             />
           </Animated.View>
 
@@ -335,6 +357,10 @@ export default function CreatePostStart({ showModal, onClose }: any) {
             visible={showCommunities}
             onClose={() => setShowCommunities(false)}
             onNudge={() => console.log("Nudge pressed")}
+            // 👇 whenever communities are chosen, update state
+            onDone={(ids) => {
+              setSelectedCommunityIds(ids);
+            }}
             user={user}
           />
         </KeyboardAvoidingView>

@@ -74,6 +74,7 @@ const ProgressiveBlur: React.FC<ProgressiveBlurProps> = ({ useAlt }) => {
           style={[StyleSheet.absoluteFill]}
         >
           <BlurView
+            experimentalBlurMethod="dimezisBlurView"
             intensity={Platform.OS == "android" ? 100 : 100}
             tint={
               Platform.OS == "android" ? "systemUltraThinMaterialDark" : "dark"
@@ -82,6 +83,7 @@ const ProgressiveBlur: React.FC<ProgressiveBlurProps> = ({ useAlt }) => {
             style={[StyleSheet.absoluteFill]}
           ></BlurView>
           <BlurView
+            experimentalBlurMethod="dimezisBlurView"
             intensity={Platform.OS == "android" ? 100 : 100}
             tint={
               Platform.OS == "android" ? "systemUltraThinMaterialDark" : "dark"
@@ -89,6 +91,7 @@ const ProgressiveBlur: React.FC<ProgressiveBlurProps> = ({ useAlt }) => {
             style={[StyleSheet.absoluteFill]}
           ></BlurView>
           <BlurView
+            experimentalBlurMethod="dimezisBlurView"
             intensity={Platform.OS == "android" ? 100 : 100}
             tint={
               Platform.OS == "android" ? "systemUltraThinMaterialDark" : "dark"
@@ -97,6 +100,7 @@ const ProgressiveBlur: React.FC<ProgressiveBlurProps> = ({ useAlt }) => {
             style={[StyleSheet.absoluteFill]}
           ></BlurView>
           <BlurView
+            experimentalBlurMethod="dimezisBlurView"
             intensity={Platform.OS == "android" ? 100 : 100}
             tint={
               Platform.OS == "android" ? "systemUltraThinMaterialDark" : "dark"
