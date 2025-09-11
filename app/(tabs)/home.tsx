@@ -1,8 +1,6 @@
 import AllFeeds from "@/components/feed/AllFeeds";
-import UploadToast from "@/components/feed/UploadToast";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
-import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -277,9 +275,9 @@ const Home: React.FC = () => {
               <View className="flex-row space-x-3  gap-2">
                 <View className="relative">
                   <TouchableOpacity
-                    onPress={() =>
-                      router.replace(RouterConstantUtil.tabs.communities as any)
-                    }
+                    // onPress={() =>
+                    //   router.replace(RouterConstantUtil.tabs.communities as any)
+                    // }
                     // onPress={() => setDropdownVisible(!dropdownVisible)}
                     className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm  z-20"
                     activeOpacity={0.7}
@@ -393,7 +391,7 @@ const Home: React.FC = () => {
       </Animated.View>
 
       {/* Upload Toast */}
-      {uploadVisible && (
+      {/* {uploadVisible && (
         <UploadToast
           visible={uploadVisible}
           progress={uploadProgress}
@@ -404,7 +402,7 @@ const Home: React.FC = () => {
           ]}
           onCancel={() => setUploadVisible(false)}
         />
-      )}
+      )} */}
     </SafeAreaView>
   );
 };

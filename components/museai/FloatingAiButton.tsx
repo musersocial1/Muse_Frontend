@@ -5,7 +5,6 @@ import {
   Animated,
   Dimensions,
   PanResponder,
-  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -118,7 +117,8 @@ const FloatingAIButton = ({
         <BlurView
           style={StyleSheet.absoluteFill}
           intensity={50}
-          tint={Platform.OS == "android" ? "light" : "light"}
+          experimentalBlurMethod="dimezisBlurView"
+          tint={"light"}
         />
         <View
           style={{

@@ -271,7 +271,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
       >
         {renderVideosPreview()}
         {textComments.map((comment) => (
-          <>
+          <React.Fragment key={comment.id}>
             <View key={comment.id} className="px-5">
               <View className="mb-6 ">
                 <View className="flex-row items-center mb-3 pt-10">
@@ -352,7 +352,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             </View>
 
             <View className="border-b border-b-[#D9D9D9]/[20%] w-full" />
-          </>
+          </React.Fragment>
         ))}
       </ScrollView>
     );

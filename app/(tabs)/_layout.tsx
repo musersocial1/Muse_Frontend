@@ -4,7 +4,7 @@ import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics"; // 👈 add this
-import { Tabs } from "expo-router";
+import { Tabs, usePathname, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
 import { Animated, Easing, Image, TouchableOpacity, View } from "react-native";
@@ -24,8 +24,8 @@ const tabsConfig = [
     isProfile: false,
   },
   {
-    name: "communities",
-    title: "Communities",
+    name: "exclusiveContent",
+    title: "exclusiveContent",
     icon: icons.asana,
     isProfile: false,
   },
@@ -42,7 +42,7 @@ const tabsConfig = [
     isProfile: true,
   },
 ];
-function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
+function TabIcon({ focused, icon, title, isProfile }: any) {
   const scaleValue = useRef(new Animated.Value(focused ? 1.05 : 1)).current;
   const opacityValue = useRef(new Animated.Value(focused ? 1 : 0.7)).current;
 
@@ -70,10 +70,7 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
 
   if (isProfile) {
     return (
-      <View
-        {...panHandlers} // 👈 swipe gestures on the icon
-        className="w-14 h-14 overflow-hidden rounded-full"
-      >
+      <View className="w-14 h-14 overflow-hidden rounded-full">
         <BlurView
           intensity={70} // Change for more/less blur
           tint={focused ? "extraLight" : "dark"}
@@ -97,10 +94,7 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
 
   // Regular tabs - icon in circle
   return (
-    <View
-      {...panHandlers} // 👈 swipe gestures on the icon
-      className="w-16 h-16 overflow-hidden rounded-full"
-    >
+    <View className="w-16 h-16 overflow-hidden rounded-full">
       <BlurView
         intensity={70} // Change for more/less blur
         tint={focused ? "extraLight" : "dark"}
@@ -130,7 +124,7 @@ function TabIcon({ focused, icon, title, isProfile, panHandlers }: any) {
   );
 }
 
-export default function TabsLayout() {
+export default function TabsLayout({ panHandlers }: any) {
   const insets = useSafeAreaInsets();
 
   const fabRef = useRef<View>(null);
@@ -179,55 +173,100 @@ export default function TabsLayout() {
     }).start();
   };
 
+  const [showCommunities, setShowCommunities] = useState(true);
+  // const navigation = useNavigation();
+  const pathname = usePathname(); // 👈 current route path
+
+  const router = useRouter();
   return (
     <ShrinkAnimation onSwitch={() => console.log("Open community switcher")}>
       <View style={{ flex: 1 }} className="">
         <Tabs
           screenOptions={{
+            headerShown: false, // 👈 hide the "home" title header
+            tabBarStyle: { display: "none" }, // 👈 this kills the white strip
             tabBarShowLabel: false,
             tabBarItemStyle: {
               justifyContent: "center",
               alignItems: "center",
-              height: 60,
+              height: 0,
               flex: 1,
             },
-            tabBarStyle: {
-              backgroundColor: "transparent",
-              borderTopWidth: 0,
-              borderRadius: 30,
-              marginHorizontal: 34,
-              gap: 0,
-              marginBottom: insets.bottom,
-              height: 60,
-              position: "absolute",
-              borderWidth: 0,
-              elevation: 0,
-              shadowOpacity: 0,
-              paddingHorizontal: 0,
-            },
+            // tabBarStyle: {
+            //   // backgroundColor: "transparent",
+            //   // borderTopWidth: 0,
+            //   // borderRadius: 30,
+            //   marginHorizontal: 34,
+            //   // gap: 0,
+            //   marginBottom: insets.bottom,
+            //   height: 0,
+            //   position: "absolute",
+            //   // borderWidth: 0,
+            //   // elevation: 0,
+            //   // shadowOpacity: 0,
+            //   // paddingHorizontal: 0,
+            // },
           }}
-        >
-          {tabsConfig.map((tab) => (
+        />
+        {/* {tabsConfig.map((tab) => (
             <Tabs.Screen
               key={tab.name}
               name={tab.name}
               options={{
-                title: tab.title,
+                tabBarIcon: () => null, // 👈 disables icons + triangles
+                // title: tab.title,
                 headerShown: false,
-                tabBarIcon: ({ focused }) => (
-                  <TabIcon
-                    focused={focused}
-                    icon={tab.icon}
-                    title={tab.title}
-                    isProfile={tab.isProfile}
-                  />
-                ),
+                // tabBarIcon: ({ focused }) => (
+                //   <TabIcon
+                //     focused={focused}
+                //     icon={tab.icon}
+                //     title={tab.title}
+                //     isProfile={tab.isProfile}
+                //   />
+                // ),
               }}
             />
           ))}
-        </Tabs>
+        </Tabs> */}
+
+        {/* Now build your own bar */}
+        {/* <View
+          style={{ bottom: insets.bottom + 5, marginHorizontal: 34 }}
+          // pointerEvents="none"
+          {...panHandlers} // 👈 attach PanResponder to nav bar container
+          className="absolute h-[60px] gap-3  left-[0px] right-[0px] flex-row justify-center "
+        >
+          {tabsConfig.map((tab) => {
+            const route =
+              RouterConstantUtil.tabs[
+                tab.name as keyof typeof RouterConstantUtil.tabs
+              ];
+            // const focused = pathname === route;
+            const focused = `/(tabs)${pathname}` === route;
+
+            return (
+              <TouchableOpacity
+                key={tab.name}
+                activeOpacity={100}
+                onPress={() => router.replace(route)} // 👈 navigates to /(tabs)/name
+              >
+                <TabIcon
+                  focused={focused}
+                  icon={tab.icon}
+                  title={tab.title}
+                  isProfile={tab.isProfile}
+                />
+              </TouchableOpacity>
+            );
+          })}
+        </View> */}
 
         {/* Transparent modal layered above, content opacity controlled via prop */}
+
+        {/* <CommunitySwitcher
+          visible={showCommunities}
+          onClose={() => setShowCommunities(false)}
+        /> */}
 
         {showModal && (
           <CreatePostStart

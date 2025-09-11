@@ -4,7 +4,7 @@ export const RouterConstantUtil = {
     group: "/(tabs)/group",
     profile: "/(tabs)/profile",
     search: "/(tabs)/search",
-    communities: "/(tabs)/communities",
+    exclusiveContent: "/(tabs)/exclusiveContent",
   },
 
   profile: {
@@ -40,4 +40,4 @@ export const RouterConstantUtil = {
     login: "/(auth)",
     register: "/(auth)",
   },
-};
+} as const; // 👈 THIS is the magic

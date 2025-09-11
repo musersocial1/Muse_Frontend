@@ -44,6 +44,7 @@ import users from "@/assets/icons/users.png";
 import video from "@/assets/icons/video.png";
 import voice from "@/assets/icons/voice.png";
 import warn from "@/assets/icons/warn.png";
+import Xdownloads from "@/assets/icons/Xdownloads.webp";
 
 export const icons = {
   asana,
@@ -92,4 +93,5 @@ export const icons = {
   envelope,
   video,
   play,
+  Xdownloads,
 };
