@@ -43,6 +43,7 @@ export function TabIcon({ focused, icon, title, isProfile }: any) {
           intensity={70}
           tint={focused ? "extraLight" : "dark"}
           className="w-full h-full"
+          experimentalBlurMethod="dimezisBlurView"
         >
           <Animated.View
             style={{
@@ -64,6 +65,7 @@ export function TabIcon({ focused, icon, title, isProfile }: any) {
         intensity={70}
         tint={focused ? "extraLight" : "dark"}
         className="w-full h-full"
+        experimentalBlurMethod="dimezisBlurView"
       >
         <Animated.View
           style={{ transform: [{ scale: scaleValue }], opacity: opacityValue }}

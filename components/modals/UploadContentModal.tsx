@@ -298,6 +298,7 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
                     tint="light"
                     intensity={10}
                     style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <View className="w-16 h-16 bg-white/10 rounded-xl items-center justify-center mb-4">
                     <Feather
@@ -339,6 +340,7 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
                     tint="light"
                     intensity={10}
                     style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <TextInput
                     value={title}
@@ -354,6 +356,7 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
                     tint="light"
                     intensity={10}
                     style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <TextInput
                     value={description}
@@ -374,6 +377,7 @@ const UploadContentModal: React.FC<UploadContentModalProps> = ({
                     tint="light"
                     intensity={10}
                     style={StyleSheet.absoluteFill}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <View className="flex-row justify-between items-center">
                     <View className="flex-1">

@@ -75,7 +75,10 @@ const CommunityType: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             activeOpacity={0.7}
             className="ml-5 h-14 left-0 w-14 absolute top-0 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
           >
-            <BlurView style={[StyleSheet.absoluteFill]} />
+            <BlurView
+              style={[StyleSheet.absoluteFill]}
+              experimentalBlurMethod="dimezisBlurView"
+            />
             <Feather
               name="chevron-left"
               size={20}

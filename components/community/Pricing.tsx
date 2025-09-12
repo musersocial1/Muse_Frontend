@@ -102,6 +102,7 @@ const Pricing: React.FC<PricingScreenProps> = ({ onClose }) => {
                 size={20}
                 color="#fff"
                 style={{ opacity: 0.7 }}
+                experimentalBlurMethod="dimezisBlurView"
               />
             </TouchableOpacity>
           </View>

@@ -198,6 +198,7 @@ const AddModerators: React.FC<AddModeratorsFlowProps> = ({
           intensity={20}
           tint="light"
           style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
+          experimentalBlurMethod="dimezisBlurView"
         />
         <TextInput
           value={moderatorName}
@@ -213,6 +214,7 @@ const AddModerators: React.FC<AddModeratorsFlowProps> = ({
           intensity={20}
           tint="light"
           style={[StyleSheet.absoluteFill, { borderRadius: 20 }]}
+          experimentalBlurMethod="dimezisBlurView"
         />
         <TextInput
           value={moderatorEmail}

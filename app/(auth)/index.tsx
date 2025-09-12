@@ -313,7 +313,12 @@ export default function Index() {
           }}
         />
 
-        <BlurView intensity={blurIntensity} tint="dark" className="   flex-1">
+        <BlurView
+          intensity={blurIntensity}
+          experimentalBlurMethod="dimezisBlurView"
+          tint="dark"
+          className="   flex-1"
+        >
           {/* <View className=" bg-black h-full  flex-1 inset-0 z-[100]" /> */}
 
           <Animated.View
@@ -346,7 +351,11 @@ export default function Index() {
               </View>
 
               <View className="w-full  space-y-3">
-                <BlurView intensity={20} tint="light">
+                <BlurView
+                  experimentalBlurMethod="dimezisBlurView"
+                  intensity={20}
+                  tint="light"
+                >
                   <TouchableOpacity
                     className="bg-white/10 border border-white/20 rounded-2xl py-5 px-6 backdrop-blur-md"
                     activeOpacity={0.8}

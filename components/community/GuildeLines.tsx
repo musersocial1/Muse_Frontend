@@ -89,6 +89,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
                 size={20}
                 color="#fff"
                 style={{ opacity: 0.7 }}
+                experimentalBlurMethod="dimezisBlurView"
               />
             </TouchableOpacity>
           </View>
@@ -106,6 +107,7 @@ const CommunityGuidelines: React.FC<CommunityGuidelinesScreenProps> = ({
                   style={[StyleSheet.absoluteFill]}
                   tint="light"
                   intensity={10}
+                  experimentalBlurMethod="dimezisBlurView"
                 />
 
                 <Text className="text-white text-base font-sfpro-bold mb-4">

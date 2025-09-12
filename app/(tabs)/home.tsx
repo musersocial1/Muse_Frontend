@@ -292,6 +292,7 @@ const Home: React.FC = () => {
                     <BlurView
                       intensity={10}
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                      experimentalBlurMethod="dimezisBlurView"
                     />
 
                     <Text
@@ -314,6 +315,7 @@ const Home: React.FC = () => {
                       <BlurView
                         intensity={20}
                         style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
+                        experimentalBlurMethod="dimezisBlurView"
                       />
                       <View className="p-2">
                         <Text className="text-white/60 text-xs font-medium px-3 py-2 uppercase tracking-wider">
@@ -371,6 +373,7 @@ const Home: React.FC = () => {
                   <BlurView
                     intensity={10}
                     style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <Feather
                     name="bell"

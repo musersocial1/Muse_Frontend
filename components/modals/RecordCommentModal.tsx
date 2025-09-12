@@ -421,6 +421,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
                       <BlurView
                         style={StyleSheet.absoluteFill}
                         intensity={50}
+                        experimentalBlurMethod="dimezisBlurView"
                       />
                       <Image
                         source={icons.play}
@@ -444,6 +445,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
                     tint="light"
                     style={StyleSheet.absoluteFill}
                     className="bg-[rgba(28, 28, 28, 0.7)]"
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <View className="flex-row items-start">
                     <Image

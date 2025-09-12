@@ -251,6 +251,7 @@ export default function MoreInfoModal({
           }}
           tint="light"
           className="bg-black/20 overflow-hidden py-2.5 relative"
+          experimentalBlurMethod="dimezisBlurView"
         >
           <Animated.View className="bg-white p-2 rounded-[24px]">
             <DateTimePicker
@@ -294,6 +295,7 @@ export default function MoreInfoModal({
               intensity={100}
               tint="light"
               className=" p-1.5 overflow-hidden "
+              experimentalBlurMethod="dimezisBlurView"
             >
               <TouchableOpacity
                 onPress={() => updateFormData("accountType", "join")}
@@ -345,6 +347,7 @@ export default function MoreInfoModal({
               intensity={100}
               tint="light"
               className=" p-1.5 overflow-hidden "
+              experimentalBlurMethod="dimezisBlurView"
             >
               <TouchableOpacity
                 onPress={() =>
@@ -461,6 +464,7 @@ export default function MoreInfoModal({
             intensity={70}
             tint="dark"
             className="flex items-center w-full flex-row justify-between h-full p-7"
+            experimentalBlurMethod="dimezisBlurView"
           >
             <Text className="text-white font-neutral-medium leading-[20px]  text-[20px] font-medium">
               Prefer not to say

@@ -87,7 +87,10 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
             activeOpacity={0.7}
             className="absolute  ml-5 h-14 left-0 w-14  top-4 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
           >
-            <BlurView style={[StyleSheet.absoluteFill]} />
+            <BlurView
+              style={[StyleSheet.absoluteFill]}
+              experimentalBlurMethod="dimezisBlurView"
+            />
             <Feather
               name="chevron-left"
               size={20}
@@ -110,6 +113,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
                 intensity={10}
                 tint="light"
                 style={[StyleSheet.absoluteFill]}
+                experimentalBlurMethod="dimezisBlurView"
               />
               <Text className="text-[20px] font-sfpro-bold tracking-wider text-white/80 my-2">
                 {communityName}
@@ -123,6 +127,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
                   tint="light"
                   style={[StyleSheet.absoluteFill]}
                   className="bg-[rgba(28, 28, 28, 0.7)]"
+                  experimentalBlurMethod="dimezisBlurView"
                 />
                 <Text className="text-[16px] font-sfpro-bold text-white mb-4">
                   Community bio
@@ -157,6 +162,7 @@ const CommunityDetails: React.FC<CommunityDetailsProps> = ({ onClose }) => {
                   intensity={10}
                   tint="light"
                   style={StyleSheet.absoluteFill}
+                  experimentalBlurMethod="dimezisBlurView"
                 />
                 <TextInput
                   value={linkInput}

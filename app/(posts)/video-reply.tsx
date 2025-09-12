@@ -214,7 +214,7 @@ export default function VideoReply() {
         {/* Dropdown menu */}
         {showMenu && index === currentIndex && (
           <View
-            className="absolute top-40 right-[7%] bg-[#12121299]/[60%]  rounded-2xl z-50 min-w-[200px] p-2"
+            className="absolute top-40 right-[7%] bg-[#12121299]/[60%] overflow-hidden  rounded-2xl z-50 min-w-[200px] p-2"
             style={{
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 12 },
@@ -223,8 +223,14 @@ export default function VideoReply() {
               elevation: 16,
             }}
           >
+            <BlurView
+              style={[StyleSheet.absoluteFill, { shadowRadius: 94.13 }]}
+              intensity={100}
+              experimentalBlurMethod="dimezisBlurView"
+            />
+
             <TouchableOpacity
-              className="flex-row items-center px-5 py-3.5"
+              className="flex-row items-center px-5 py-5"
               onPress={handleDelete}
             >
               <Feather name="trash-2" size={20} color="#D1D5DB" />
@@ -232,7 +238,7 @@ export default function VideoReply() {
             </TouchableOpacity>
             <View className="h-px bg-white/10 mx-5" />
             <TouchableOpacity
-              className="flex-row items-center px-5 py-3.5"
+              className="flex-row items-center px-5 py-5"
               onPress={handleFlagPost}
             >
               <Feather name="flag" size={20} color="#D1D5DB" />
@@ -240,7 +246,7 @@ export default function VideoReply() {
             </TouchableOpacity>
             <View className="h-px bg-white/10 mx-5" />
             <TouchableOpacity
-              className="flex-row items-center px-5 py-3.5"
+              className="flex-row items-center px-5 py-5"
               onPress={handleFlagMember}
             >
               <Feather name="user-x" size={20} color="#D1D5DB" />

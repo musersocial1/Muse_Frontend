@@ -78,7 +78,10 @@ export const VideoReplyModal: React.FC<VideoReplyModalProps> = ({
               activeOpacity={0.7}
               className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
             >
-              <BlurView style={[StyleSheet.absoluteFill]} />
+              <BlurView
+                style={[StyleSheet.absoluteFill]}
+                experimentalBlurMethod="dimezisBlurView"
+              />
               <Feather
                 name="chevron-left"
                 size={20}
@@ -116,6 +119,7 @@ export const VideoReplyModal: React.FC<VideoReplyModalProps> = ({
                 <BlurView
                   intensity={60}
                   tint="dark"
+                  experimentalBlurMethod="dimezisBlurView"
                   style={[StyleSheet.absoluteFill, { borderRadius: 40 }]}
                 />
 
@@ -143,7 +147,10 @@ export const VideoReplyModal: React.FC<VideoReplyModalProps> = ({
               activeOpacity={0.7}
               className="h-14 w-14 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
             >
-              <BlurView style={[StyleSheet.absoluteFill]} />
+              <BlurView
+                style={[StyleSheet.absoluteFill]}
+                experimentalBlurMethod="dimezisBlurView"
+              />
               <Feather
                 name="more-vertical"
                 size={20}
@@ -201,7 +208,11 @@ export const VideoReplyModal: React.FC<VideoReplyModalProps> = ({
 
           <View className="absolute inset-0 items-center justify-center">
             <TouchableOpacity className="w-16 h-16 rounded-full overflow-hidden items-center justify-center bg-black/40">
-              <BlurView style={StyleSheet.absoluteFill} intensity={50} />
+              <BlurView
+                style={StyleSheet.absoluteFill}
+                experimentalBlurMethod="dimezisBlurView"
+                intensity={50}
+              />
               <Image
                 source={icons.play}
                 className="h-8 w-8"

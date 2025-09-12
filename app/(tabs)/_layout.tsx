@@ -75,6 +75,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
           intensity={70} // Change for more/less blur
           tint={focused ? "extraLight" : "dark"}
           className=" w-full h-full  "
+          experimentalBlurMethod="dimezisBlurView"
           // style={[StyleSheet.absoluteFill, { borderRadius: 999 }]}
         >
           <Animated.View

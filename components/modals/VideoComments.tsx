@@ -240,6 +240,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             style={StyleSheet.absoluteFill}
             tint="dark"
             intensity={50}
+            experimentalBlurMethod="dimezisBlurView"
           />
 
           <Feather name="heart" size={12} color="white" className="" />
@@ -260,6 +261,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
               style={StyleSheet.absoluteFill}
               tint="dark"
               intensity={50}
+              experimentalBlurMethod="dimezisBlurView"
             />
             <Image
               source={icons.play}
@@ -513,6 +515,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                   style={StyleSheet.absoluteFill}
                   tint="dark"
                   intensity={50}
+                  experimentalBlurMethod="dimezisBlurView"
                 />
                 <Feather name="heart" size={12} color="white" />
                 <Text className="text-white text-[13px] font-sfpro-medium ml-1">
@@ -530,6 +533,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                     style={StyleSheet.absoluteFill}
                     tint="dark"
                     intensity={50}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <Image
                     source={icons.play}

@@ -276,6 +276,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({
                     style={StyleSheet.absoluteFill}
                     tint="dark"
                     intensity={100}
+                    experimentalBlurMethod="dimezisBlurView"
                   />
                   <DragToClose translateY={sheetY} onClose={onClose} />
                   {renderProfileView()}

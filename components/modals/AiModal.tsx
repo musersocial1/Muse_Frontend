@@ -465,6 +465,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
             style={StyleSheet.absoluteFill}
             intensity={90}
             tint="systemThickMaterialDark"
+            experimentalBlurMethod="dimezisBlurView"
           />
           <View className="w-full aspect-[1/1]   absolute bottom-0 left-0 right-0 ">
             <Image

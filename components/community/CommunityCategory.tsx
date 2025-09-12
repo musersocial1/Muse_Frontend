@@ -74,7 +74,10 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
         }`}
         activeOpacity={0.7}
       >
-        <BlurView style={[StyleSheet.absoluteFill]} />
+        <BlurView
+          style={[StyleSheet.absoluteFill]}
+          experimentalBlurMethod="dimezisBlurView"
+        />
         <Text
           className={`text-base  font-neutral-medium tracking-wider ${
             isSelected ? "text-white" : "text-white/70"
@@ -122,7 +125,10 @@ const CommunityCategory: React.FC<CommunityCategoryScreenProps> = ({
           activeOpacity={0.7}
           className="absolute  ml-5 h-14 left-0 w-14  top-4 overflow-hidden border-white/30 border rounded-full bg-black/20 items-center justify-center z-20"
         >
-          <BlurView style={[StyleSheet.absoluteFill]} />
+          <BlurView
+            style={[StyleSheet.absoluteFill]}
+            experimentalBlurMethod="dimezisBlurView"
+          />
           <Feather
             name="chevron-left"
             size={20}

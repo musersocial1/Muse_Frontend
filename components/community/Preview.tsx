@@ -48,6 +48,7 @@ const Preview: React.FC<{
               size={20}
               color="#fff"
               style={{ opacity: 0.7 }}
+              experimentalBlurMethod="dimezisBlurView"
             />
           </TouchableOpacity>
 
