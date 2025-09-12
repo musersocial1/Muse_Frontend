@@ -1,4 +1,5 @@
 import AllFeeds from "@/components/feed/AllFeeds";
+import UploadToast from "@/components/feed/UploadToast";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
@@ -153,12 +154,6 @@ const Home: React.FC = () => {
       }
     }, 100);
   };
-
-  useEffect(() => {
-    if (true) {
-      simulateUpload();
-    }
-  }, [true]);
 
   return (
     <SafeAreaView className="flex-1  bg-[#121212]">
@@ -407,7 +402,12 @@ const Home: React.FC = () => {
             </ScrollView>
           </View>
           <View className="flex-row   flex-1 justify-center items-center gap-3">
-            <AllFeeds posts={posts} addPost={() => setShowUpload(true)} />
+            <AllFeeds
+              posts={posts}
+              addPost={() => setShowUpload(true)}
+              setUploadVisible={setUploadVisible}
+              simulateUpload={simulateUpload}
+            />
           </View>
         </Animated.ScrollView>
 
@@ -421,18 +421,18 @@ const Home: React.FC = () => {
       </Animated.View>
 
       {/* Upload Toast */}
-      {/* {uploadVisible && (
+      {uploadVisible && (
         <UploadToast
           visible={uploadVisible}
           progress={uploadProgress}
-          title="Uploading your posts"
+          title="Uploading comment"
           avatars={[
             "https://randomuser.me/api/portraits/women/44.jpg",
             "https://randomuser.me/api/portraits/men/32.jpg",
           ]}
           onCancel={() => setUploadVisible(false)}
         />
-      )} */}
+      )}
     </SafeAreaView>
   );
 };

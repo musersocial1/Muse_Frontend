@@ -58,10 +58,7 @@ const SearchResultCard: React.FC<SearchResultCardProps> = ({
   });
 
   return (
-    <Animated.View
-      style={{ transform: [{ translateY }], opacity }}
-      className=""
-    >
+    <Animated.View style={{ transform: [{ translateY }], opacity }}>
       <TouchableOpacity
         className="flex-row items-center p-3"
         onPress={() =>

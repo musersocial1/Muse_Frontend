@@ -1,12 +1,5 @@
-import {
-  MOCK_REPLY_TO,
-  MOCK_USER,
-  textComments,
-  user,
-  videoComments,
-} from "@/constants/data";
+import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
-import { images } from "@/constants/images";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
@@ -24,14 +17,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import DeletePostFlowModal from "../modals/DeletePostFlowModal";
-import FlagMemberFlowModal from "../modals/FlagMemberModal";
-import FlagPostFlowModal from "../modals/FlagPostFlowModal";
 import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoCommentsModal from "../modals/VideoComments";
-import { VideoReplyModal } from "../modals/VideoReply";
 
 const { width } = Dimensions.get("window");
 
@@ -310,17 +299,21 @@ const PostCard: React.FC<PostCardProps> = ({
 interface AllFeedsProps {
   posts?: Post[];
   addPost?: () => void;
+  setUploadVisible?: (val: boolean) => void;
+  simulateUpload?: any;
 }
 
-const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
+const AllFeeds: React.FC<AllFeedsProps> = ({
+  posts,
+  addPost,
+  setUploadVisible,
+  simulateUpload,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openComponent, setOpenComments] = useState(false);
   const [videoModalVisible, setVideoModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
-  const [deletePost, setDeletePost] = useState(false);
-  const [flagPost, setFlagPost] = useState(false);
-  const [flagMember, setFlagMember] = useState(false);
   const [showRecordModal, setShowRecordModal] = useState(false);
 
   const handleRecordComment = (video: any) => {
@@ -335,27 +328,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
     setOpenComments(false);
     setTimeout(() => {
       setVideoModalVisible(true);
-    }, 100);
-  };
-
-  const handleDelete = () => {
-    setVideoModalVisible(false);
-    setTimeout(() => {
-      setDeletePost(true);
-    }, 100);
-  };
-
-  const handleFlagPost = () => {
-    setVideoModalVisible(false);
-    setTimeout(() => {
-      setFlagPost(true);
-    }, 100);
-  };
-
-  const handleFlagMember = () => {
-    setVideoModalVisible(false);
-    setTimeout(() => {
-      setFlagMember(true);
     }, 100);
   };
 
@@ -476,7 +448,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
   }
 
   return (
-    <>
+    <View className="relative">
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
@@ -512,7 +484,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
       <VideoCommentsModal
         visible={openComponent}
         onClose={() => {
-          setVideoModalVisible(false);
+          setOpenComments(false);
           setVideoData(null);
         }}
         videoComments={videoComments}
@@ -522,56 +494,17 @@ const AllFeeds: React.FC<AllFeedsProps> = ({ posts, addPost }) => {
         onOpenVideo={handleVideoPress}
       />
 
-      <VideoReplyModal
-        visible={videoModalVisible}
-        onClose={() => setVideoModalVisible(false)}
-        videoUri={images.comment}
-        posterUri={videoComments[0].thumbnail}
-        user={MOCK_USER}
-        replyingTo={MOCK_REPLY_TO}
-        likes={Number(videoData?.likes ?? 0)}
-        comments={653}
-        description={videoData?.title ?? ""}
-        onDelete={handleDelete}
-        onFlagPost={handleFlagPost}
-        onFlagMember={handleFlagMember}
-      />
-
-      <DeletePostFlowModal
-        visible={deletePost}
-        post={{
-          image: images.comment,
-          description: "New season, new slay! 🔥 Whether it's street...",
-        }}
-        onClose={() => setDeletePost(false)}
-      />
-      <FlagPostFlowModal
-        visible={flagPost}
-        post={{
-          image: images.comment,
-          description: "New season, new slay! 🔥 Whether it's street...",
-        }}
-        onClose={() => setFlagPost(false)}
-      />
-      <FlagMemberFlowModal
-        visible={flagMember}
-        member={{
-          avatar: images.comment,
-          name: "Chris Melody",
-          username: "Chris",
-        }}
-        onClose={() => setFlagMember(false)}
-      />
-
       <RecordCommentModal
         visible={showRecordModal}
         onClose={() => setShowRecordModal(false)}
         onSubmit={(data) => {
           console.log("Posted:", data);
           setShowRecordModal(false);
+          setUploadVisible?.(true);
+          simulateUpload();
         }}
       />
-    </>
+    </View>
   );
 };
 

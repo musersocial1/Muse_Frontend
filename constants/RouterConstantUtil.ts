@@ -20,6 +20,9 @@ export const RouterConstantUtil = {
     notifications: "/(profile)/notifications",
     tags: "/(profile)/tags",
   },
+  posts: {
+    videoReply: "/video-reply",
+  },
   discover: {
     podcats: "/(discover)/podcasts",
     videoReply: "/(discover)/video-reply",

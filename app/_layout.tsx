@@ -66,6 +66,7 @@ export default function RootLayout() {
                   name="(museai)"
                   options={{ headerShown: false }}
                 />
+                <Stack.Screen name="(posts)" options={{ headerShown: false }} />
                 {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
               </Stack>
             </View>

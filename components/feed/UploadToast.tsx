@@ -69,7 +69,7 @@ export default function UploadToast({
 
   return (
     <View
-      style={{ bottom: insets.bottom + 200 }}
+      style={{ bottom: insets.bottom + 150 }}
       className="absolute z-[1000000]  left-0 right-0 justify-end items-center"
       pointerEvents="box-none"
     >

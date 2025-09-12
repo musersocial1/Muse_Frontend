@@ -1,10 +1,10 @@
 import { Stack } from "expo-router";
 import React from "react";
-import { StatusBar, StyleSheet } from "react-native";
+import { StatusBar, View } from "react-native";
 
-const DiscoverLayout = () => {
+const PostLayout = () => {
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <StatusBar
         hidden={false}
         barStyle="light-content"
@@ -17,13 +17,10 @@ const DiscoverLayout = () => {
           headerShown: false,
         }}
       >
-        {/* <Stack.Screen name="podcasts" options={{ headerShown: false }} /> */}
         <Stack.Screen name="video-reply" options={{ headerShown: false }} />
       </Stack>
-    </>
+    </View>
   );
 };
 
-export default DiscoverLayout;
-
-const styles = StyleSheet.create({});
+export default PostLayout;

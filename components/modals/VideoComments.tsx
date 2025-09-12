@@ -1,6 +1,8 @@
 import { icons } from "@/constants/icons";
+import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
+import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -248,7 +250,9 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
         {/* Play button */}
         <TouchableOpacity
-          onPress={() => onOpenVideo(video)}
+          onPress={() =>
+            router.replace(RouterConstantUtil.posts.videoReply as any)
+          }
           className="absolute inset-0 items-center justify-center"
         >
           <View className=" overflow-hidden rounded-full p-3">
@@ -395,7 +399,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
   const renderBottomActions = () => {
     return (
-      <View className="px-2">
+      <View className="px-4">
         <View className="flex-row items-center bg-[#454545] rounded-full p-2">
           <View className="w-12 ml-1.5 h-12 rounded-full overflow-hidden">
             <Image
@@ -516,7 +520,9 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                 </Text>
               </View>
               <TouchableOpacity
-                onPress={() => onOpenVideo(video)}
+                onPress={() =>
+                  router.replace(RouterConstantUtil.posts.videoReply as any)
+                }
                 className="absolute inset-0 items-center justify-center"
               >
                 <View className="overflow-hidden rounded-full p-3">
@@ -551,7 +557,7 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
     <Modal
       visible={visible}
       transparent
-      animationType="none"
+      animationType="slide"
       onRequestClose={onClose}
     >
       <View style={{ flex: 1, justifyContent: "flex-end" }}>
@@ -609,14 +615,14 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                 {/* Page 1: Replies + 3-video preview */}
                 <View style={{ width, height: height * 0.75 }}>
                   {renderTextComments()}
-                  <View
-                    style={{ bottom: insets.bottom }}
-                    className="left-0 absolute right-0"
-                  >
-                    {renderBottomActions()}
-                  </View>
                 </View>
               </Animated.ScrollView>
+              <View
+                style={{ bottom: insets.bottom, zIndex: 10 }}
+                className="left-0 absolute right-0"
+              >
+                {renderBottomActions()}
+              </View>
             </View>
           </Animated.View>
         </KeyboardAvoidingView>

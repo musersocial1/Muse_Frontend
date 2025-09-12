@@ -65,6 +65,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
 
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [permissionsRequested, setPermissionsRequested] = useState(false);
 
   const hasPermission =
     cameraPermission?.granted && microphonePermission?.granted;
@@ -86,14 +87,25 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (
-      visible &&
-      (!cameraPermission?.granted || !microphonePermission?.granted)
-    ) {
-      requestCameraPermission();
-      requestMicrophonePermission();
+    if (visible && !permissionsRequested) {
+      const requestPermissions = async () => {
+        if (!cameraPermission?.granted) {
+          await requestCameraPermission();
+        }
+        if (!microphonePermission?.granted) {
+          await requestMicrophonePermission();
+        }
+        setPermissionsRequested(true);
+      };
+
+      requestPermissions();
     }
-  }, [visible, cameraPermission, microphonePermission]);
+
+    // Reset permission request flag when modal closes
+    if (!visible) {
+      setPermissionsRequested(false);
+    }
+  }, [visible]);
 
   // Reset on close
   useEffect(() => {
@@ -104,6 +116,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
       setSecs(0);
       setIsInputFocused(false);
       setIsKeyboardVisible(false);
+      setPermissionsRequested(false);
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -195,6 +208,12 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
     setIsInputFocused(false);
   };
 
+  const handleRequestPermissions = async () => {
+    await requestCameraPermission();
+    await requestMicrophonePermission();
+    setPermissionsRequested(true);
+  };
+
   // Permissions loading
   if (!cameraPermission || !microphonePermission) {
     return (
@@ -215,10 +234,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
             Camera & microphone permissions are required
           </Text>
           <TouchableOpacity
-            onPress={() => {
-              requestCameraPermission();
-              requestMicrophonePermission();
-            }}
+            onPress={handleRequestPermissions}
             className="bg-secondary rounded-full px-6 py-4 mb-4"
           >
             <Text className="text-white font-semibold">Grant Permissions</Text>
@@ -258,7 +274,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
                   <Feather name="x" size={22} color="white" />
                 </TouchableOpacity>
                 <View className="flex-1 items-center">
-                  <View className="px-7 py-4 rounded-full bg-[#0368FFB5]/[71%]">
+                  <View className="px-7 py-4 rounded-full bg-[#0368FF]">
                     <Text className="text-[15px] font-medium text-white">
                       {fmtTime(secs)}
                     </Text>
@@ -326,7 +342,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
                 <Feather name="x" size={22} color="white" />
               </TouchableOpacity>
               <View className="flex-1 items-center">
-                <View className="px-7 py-4 rounded-full bg-[#0368FFB5]/[71%]">
+                <View className="px-7 py-4 rounded-full bg-[#0368FF]">
                   <Text className="text-[15px] font-medium text-white">
                     {fmtTime(secs)}
                   </Text>
@@ -393,8 +409,8 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
                   <Image
                     source={images.comment}
                     style={{
-                      width: 178,
-                      height: 228,
+                      width: 168,
+                      height: 248,
                       borderRadius: 20,
                       backgroundColor: "#222",
                     }}
