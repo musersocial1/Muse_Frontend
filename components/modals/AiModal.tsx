@@ -689,7 +689,7 @@ const AIModal: React.FC<Props> = ({ showAIModal, setShowAIModal }) => {
                 />
 
                 <TextInput
-                  className="flex-1 text-white border2 placeholder:text-white text-[16px] ml-0"
+                  className="flex-1 text-white text-[16px] ml-0"
                   placeholder="Type or tap mic to speak"
                   placeholderTextColor="#9CA3AF"
                   value={aiInput}

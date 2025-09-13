@@ -4,7 +4,7 @@ import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics"; // 👈 add this
-import { Tabs, usePathname, useRouter } from "expo-router";
+import { Tabs } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 
 import { Animated, Easing, Image, TouchableOpacity, View } from "react-native";
@@ -173,12 +173,6 @@ export default function TabsLayout({ panHandlers }: any) {
       easing: Easing.out(Easing.back(1.7)), // 👈 overshoot pop effect
     }).start();
   };
-
-  const [showCommunities, setShowCommunities] = useState(true);
-  // const navigation = useNavigation();
-  const pathname = usePathname(); // 👈 current route path
-
-  const router = useRouter();
   return (
     <ShrinkAnimation onSwitch={() => console.log("Open community switcher")}>
       <View style={{ flex: 1 }} className="">

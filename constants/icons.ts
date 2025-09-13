@@ -7,10 +7,12 @@ import star from "@/assets/icons/bright-star.png";
 import bubbling from "@/assets/icons/bubbling.png";
 import camera from "@/assets/icons/camera.webp";
 import cardinfo from "@/assets/icons/cardinfo.png";
+import chat_message from "@/assets/icons/chat_comment.webp";
 import comment from "@/assets/icons/comment.png";
 import communities from "@/assets/icons/communities.png";
 import dollar from "@/assets/icons/dollar.png";
 import done from "@/assets/icons/done.png";
+import downlaod from "@/assets/icons/download.webp";
 import dp from "@/assets/icons/dp.png";
 import email from "@/assets/icons/email.png";
 import emoji from "@/assets/icons/emoji.webp";
@@ -29,6 +31,8 @@ import notification from "@/assets/icons/not.png";
 import notifications from "@/assets/icons/notification.png";
 import person_morph from "@/assets/icons/people-morph.png";
 import play from "@/assets/icons/play.png";
+import playback_left from "@/assets/icons/playback-left.webp";
+import playback_right from "@/assets/icons/playback-right.webp";
 import posts from "@/assets/icons/posts.png";
 import record from "@/assets/icons/record.png";
 import ring from "@/assets/icons/ring.png";
@@ -94,4 +98,8 @@ export const icons = {
   video,
   play,
   Xdownloads,
+  downlaod,
+  playback_left,
+  playback_right,
+  chat_message,
 };

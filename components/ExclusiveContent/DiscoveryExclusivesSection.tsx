@@ -1,4 +1,3 @@
-// DiscoveryExclusivesScreen.tsx
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { Ionicons } from "@expo/vector-icons";
@@ -19,6 +18,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import MediaPlayerModal from "../modals/MediaPlayer";
 
 type Video = {
   id: string;
@@ -215,8 +215,9 @@ export default function DiscoveryExclusivesScreen() {
 
   const [showAll, setShowAll] = useState(false);
   const insets = useSafeAreaInsets();
+  const [showPlayer, setShowPlayer] = useState(false);
 
-  // 👇 Animated values
+  //  Animated values
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(40)).current;
 
@@ -297,7 +298,7 @@ export default function DiscoveryExclusivesScreen() {
           <View className="flex-row flex-wrap px-3 gap-4">
             {LATEST.slice(0, showAll ? LATEST.length : 2).map((item) => (
               <View key={item.id} className="w-[48%] ">
-                <VideoCard item={item} />
+                <VideoCard item={item} setShowPlayer={setShowPlayer} />
               </View>
             ))}
           </View>
@@ -334,6 +335,15 @@ export default function DiscoveryExclusivesScreen() {
           />
         </Section>
       </ScrollView>
+      <MediaPlayerModal
+        isVisible={showPlayer}
+        onClose={() => setShowPlayer(false)}
+        videoUrl={images.media}
+        audioUrl={images.media}
+        title="Conversations with Bornfrosh & Al"
+        author="John"
+        duration={1847}
+      />
     </Animated.View>
     // </SafeAreaView>
   );
@@ -382,9 +392,15 @@ function SeeAll({
   );
 }
 
-function VideoCard({ item }: { item: Video }) {
+function VideoCard({
+  item,
+  setShowPlayer,
+}: {
+  item: Video;
+  setShowPlayer: (val: boolean) => void;
+}) {
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => setShowPlayer(true)}>
       <View className="rounded-[13px]  overflow-hidden bg-[#141414]">
         <ImageBackground
           source={
