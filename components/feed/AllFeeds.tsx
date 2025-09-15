@@ -318,7 +318,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   const handleRecordComment = (video: any) => {
     setVideoData(video);
-    setOpenComments(false);
+    // setOpenComments(false);
     setTimeout(() => {
       setShowRecordModal(true);
     }, 100);

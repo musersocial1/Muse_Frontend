@@ -1,5 +1,6 @@
 import { icons } from "@/constants/icons";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { VideoComment } from "@/types/post";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -19,19 +20,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { FlatList, TextInput } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import DragToClose from "../navigations/DragToClose";
 import { FadingBlurBackground } from "../ui/FadingBlurBackground";
+import VideoReply from "./video-reply";
 
 const { width } = Dimensions.get("window");
-
-interface VideoComment {
-  id: string;
-  thumbnail: string;
-  likes: string;
-  title: string;
-}
 
 interface TextComment {
   id: string;
@@ -92,6 +87,9 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
       }, 10);
     }
   }, [visible]);
+
+  const [showVideoReply, setShowVideoReply] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const blurOpacity = sheetY.interpolate({
     inputRange: [0, HIDE_OFFSET],
@@ -172,6 +170,23 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
     pagerRef.current?.scrollTo({ x: i * width, animated: true });
   };
 
+  const thumbRefs = useRef<{ [key: string]: any }>({});
+  const [startRect, setStartRect] = useState<{
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  } | null>(null);
+
+  const handleOpenVideo = (index: number, id: string) => {
+    // const ref = thumbRefs.current[id];
+    setShowVideoReply(true);
+
+    // console.log(ref, "this is davi");
+  };
+
+  const anim = useRef(new Animated.Value(0)).current; // 0 → 1
+
   const renderTabSelector = () => {
     return (
       <View
@@ -225,7 +240,8 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
     return (
       <TouchableOpacity
         key={video.id}
-        className="rounded-[21px]  aspect-[1/1.5] overflow-hidden mb-2"
+        ref={(r: any) => (thumbRefs.current[video.id] = r)} // 👈 save ref
+        className="rounded-[21px]   aspect-[1/1.5] overflow-hidden mb-2"
         style={{ width: cardWidth }}
         activeOpacity={0.8}
       >
@@ -244,16 +260,18 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
           />
 
           <Feather name="heart" size={12} color="white" className="" />
-          <Text className="text-white text-[13px] font-sfpro-medium ml-1">
+          <Text className="text-white text-[12px] font-sfpro-medium ml-1">
             {video.likes}
           </Text>
         </View>
 
         {/* Play button */}
         <TouchableOpacity
-          onPress={() =>
-            router.replace(RouterConstantUtil.posts.videoReply as any)
-          }
+          // onPress={() => {
+          //   setActiveIndex(index);
+          //   setShowVideoReply(true);
+          // }}
+          onPress={() => handleOpenVideo(index, video.id)} // 👈 open with scale
           className="absolute inset-0 items-center justify-center"
         >
           <View className=" overflow-hidden rounded-full p-3">
@@ -272,11 +290,11 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
         </TouchableOpacity>
 
         {/* Title overlay */}
-        <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+        {/* <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
           <Text className="text-white text-[12px] font-bold" numberOfLines={2}>
             {video.title}
           </Text>
-        </View>
+        </View> */}
       </TouchableOpacity>
     );
   };
@@ -293,26 +311,36 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
         </View>
 
         {/* Video Grid */}
-        <ScrollView className="" showsVerticalScrollIndicator={false}>
+        {/* <ScrollView className="" showsVerticalScrollIndicator={false}>
           <View className="flex-row flex-wrap justify-between  ">
             {displayedVideos.map((video, index) =>
               renderVideoCard(video, index)
             )}
           </View>
-        </ScrollView>
+        </ScrollView> */}
+
+        <FlatList
+          data={videoComments}
+          keyExtractor={(item) => item.id}
+          numColumns={3}
+          columnWrapperStyle={{ justifyContent: "space-between" }}
+          renderItem={({ item, index }) => renderVideoCard(item, index)}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
     );
   };
 
   const renderTextComments = () => {
     return (
-      <ScrollView
+      <FlatList
+        data={textComments}
+        keyExtractor={(item, index) => item.id ?? index.toString()}
         contentContainerStyle={{ paddingBottom: insets.bottom + 90 }}
         showsVerticalScrollIndicator={false}
-      >
-        {renderVideosPreview()}
-        {textComments.map((comment, index) => (
-          <React.Fragment key={index}>
+        ListHeaderComponent={renderVideosPreview()} // 👈 your preview stays at the top
+        renderItem={({ item: comment }) => (
+          <React.Fragment>
             <View className="px-5">
               <View className="mb-6 ">
                 <View className="flex-row items-center mb-3 pt-10">
@@ -394,14 +422,14 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
             <View className="border-b border-b-[#D9D9D9]/[20%] w-full" />
           </React.Fragment>
-        ))}
-      </ScrollView>
+        )}
+      />
     );
   };
 
   const renderBottomActions = () => {
     return (
-      <View className="px-4">
+      <View className="px-4 ">
         <View className="flex-row items-center bg-[#454545] rounded-full p-2">
           <View className="w-12 ml-1.5 h-12 rounded-full overflow-hidden">
             <Image
@@ -542,14 +570,14 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
                   />
                 </View>
               </TouchableOpacity>
-              <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+              {/* <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                 <Text
                   className="text-white text-[12px] font-bold"
                   numberOfLines={2}
                 >
                   {video.title}
                 </Text>
-              </View>
+              </View> */}
             </View>
           ))}
         </View>
@@ -558,80 +586,105 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <View style={{ flex: 1, justifyContent: "flex-end" }}>
-        {/* Dimmed / blur background overlay */}
-        <TouchableOpacity
-          activeOpacity={1}
-          style={StyleSheet.absoluteFill}
-          onPress={closeWithSlide}
-        >
-          <FadingBlurBackground opacity={blurOpacity} />
-        </TouchableOpacity>
+    <>
+      <Modal
+        visible={visible}
+        transparent
+        animationType="none"
+        onRequestClose={onClose}
+      >
+        {/* <VideoReply
+          videos={videoComments} // 👈 pass down
+          visible={showVideoReply}
+          onClose={() => setShowVideoReply(false)}
+          startIndex={activeIndex ?? 0}
+        /> */}
+        {showVideoReply && (
+          <View style={StyleSheet.absoluteFill}>
+            <VideoReply
+              videos={videoComments}
+              startIndex={activeIndex ?? 0}
+              onClose={() => setShowVideoReply(false)}
+            />
+          </View>
+        )}
 
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={insets.bottom}
-        >
-          <Animated.View
-            style={{
-              transform: [{ translateY: sheetY }],
-              width: "100%",
-            }}
-            className="w-full max-w-lg self-center"
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          {/* Dimmed / blur background overlay */}
+          <TouchableOpacity
+            activeOpacity={1}
+            style={StyleSheet.absoluteFill}
+            onPress={closeWithSlide}
           >
-            <View
-              {...responder.panHandlers}
-              className="bg-[#1C1C1C]   w-full rounded-t-[30px] overflow-hidden"
+            <FadingBlurBackground opacity={blurOpacity} />
+          </TouchableOpacity>
+
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={insets.bottom}
+          >
+            <Animated.View
+              style={{
+                transform: [{ translateY: sheetY }],
+                width: "100%",
+              }}
+              className="w-full max-w-lg self-center"
             >
-              <DragToClose translateY={sheetY} onClose={onClose} />
+              <View className="bg-[#1C1C1C]   w-full rounded-t-[30px] overflow-hidden ">
+                <View {...responder.panHandlers} className="">
+                  <DragToClose translateY={sheetY} onClose={onClose} />
 
-              {/* Tab Selector */}
-              {renderTabSelector()}
-
-              <Animated.ScrollView
-                ref={pagerRef}
-                // nestedScrollEnabled
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                scrollEventThrottle={16}
-                style={{ maxHeight: height * 0.55 }}
-                onScroll={Animated.event(
-                  [{ nativeEvent: { contentOffset: { x: pagerX } } }],
-                  { useNativeDriver: false }
-                )}
-                onMomentumScrollEnd={(e) => {
-                  const page = Math.round(
-                    e.nativeEvent.contentOffset.x / width
-                  );
-                  setTabMode(page === 0 ? "videos" : "replies");
-                }}
-              >
-                {/* Page 0: full Videos grid (keeps your existing render) */}
-                <View style={{ width }}>{renderVideosView()}</View>
-
-                {/* Page 1: Replies + 3-video preview */}
-                <View style={{ width, height: height * 0.75 }}>
-                  {renderTextComments()}
+                  {/* Tab Selector */}
+                  {renderTabSelector()}
                 </View>
-              </Animated.ScrollView>
-              <View
-                style={{ bottom: insets.bottom, zIndex: 10 }}
-                className="left-0 absolute right-0"
-              >
-                {renderBottomActions()}
+
+                <Animated.ScrollView
+                  ref={pagerRef}
+                  // nestedScrollEnabled
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  scrollEventThrottle={16}
+                  style={{ maxHeight: height * 0.65 }}
+                  onScroll={Animated.event(
+                    [{ nativeEvent: { contentOffset: { x: pagerX } } }],
+                    { useNativeDriver: false }
+                  )}
+                  onMomentumScrollEnd={(e) => {
+                    const page = Math.round(
+                      e.nativeEvent.contentOffset.x / width
+                    );
+                    setTabMode(page === 0 ? "videos" : "replies");
+                  }}
+                  contentContainerStyle={{
+                    paddingBottom:
+                      Platform.OS == "android" ? 145 : insets.bottom + 120,
+                  }}
+                  className={" "}
+                >
+                  {/* Page 0: full Videos grid (keeps your existing render) */}
+                  <View style={{ width }}>{renderVideosView()}</View>
+
+                  {/* Page 1: Replies + 3-video preview */}
+                  <View style={{ width, height: height * 0.75 }}>
+                    {renderTextComments()}
+                  </View>
+                </Animated.ScrollView>
+                <View
+                  style={{
+                    bottom: Platform.OS == "android" ? 5 : insets.bottom,
+                    zIndex: 10,
+                  }}
+                  className="left-0  absolute right-0"
+                >
+                  {renderBottomActions()}
+                </View>
               </View>
-            </View>
-          </Animated.View>
-        </KeyboardAvoidingView>
-      </View>
-    </Modal>
+            </Animated.View>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
+    </>
   );
 };
 
