@@ -4,8 +4,9 @@ import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
+  Animated,
   Dimensions,
   FlatList,
   Image,
@@ -21,6 +22,7 @@ import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoCommentsModal from "../modals/VideoComments";
+import SwipeableCard from "./SwipeableCard";
 
 const { width } = Dimensions.get("window");
 
@@ -29,6 +31,7 @@ interface PostCardProps {
   setIsOpen: (val: boolean) => void;
   setOpenComments: (val: boolean) => void;
   setShowRecordModal: (val: boolean) => void;
+  onImageScrollStateChange?: (isScrolling: boolean) => void; // Add this
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -36,12 +39,14 @@ const PostCard: React.FC<PostCardProps> = ({
   setIsOpen,
   setOpenComments,
   setShowRecordModal,
+  onImageScrollStateChange, // Add this
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = React.useRef<any[]>([]).current;
 
   return (
-    <View className="bg-[#1C1C1C] rounded-[30px]  mb-4 overflow-hidden">
+    // <View className="px-[10px] py-[8px] bg-[#121212] ">
+    <Animated.View className="bg-[#1C1C1C] rounded-[30px]  overflow-hidden">
       <View className="flex-row  justify-between  items-center px-6 pt-6  pb-3">
         <TouchableOpacity
           onPress={() => setIsOpen(true)}
@@ -100,7 +105,7 @@ const PostCard: React.FC<PostCardProps> = ({
       {post.type === "image" && post.images && post.images.length > 0 && (
         <View className=" px-6">
           <View className="mb-3   w-full  aspect-[1/1.1]  rounded-[25px] overflow-hidden">
-            <FlatList
+            {/* <FlatList
               data={post.images}
               horizontal
               pagingEnabled
@@ -121,7 +126,33 @@ const PostCard: React.FC<PostCardProps> = ({
                 setActiveIndex(index);
               }}
               scrollEventThrottle={16}
-            />
+            /> */}
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScrollBeginDrag={() => onImageScrollStateChange?.(true)}
+              onScrollEndDrag={() => onImageScrollStateChange?.(false)}
+              onScroll={(event: NativeSyntheticEvent<NativeScrollEvent>) => {
+                const index = Math.round(
+                  event.nativeEvent.contentOffset.x / (width - 42)
+                );
+                setActiveIndex(index);
+              }}
+              onMomentumScrollEnd={() => onImageScrollStateChange?.(false)} // 👈 extra safety
+              scrollEventThrottle={16}
+              contentContainerStyle={{ alignItems: "center" }}
+            >
+              {post.images?.map((item, index) => (
+                <Image
+                  key={index}
+                  source={typeof item === "string" ? { uri: item } : item}
+                  style={{ width: width - 42 }}
+                  resizeMode="cover"
+                  className="h-full"
+                />
+              ))}
+            </ScrollView>
 
             {/* Dots Pagination */}
             <View className="absolute bottom-8 w-full flex-row justify-center">
@@ -292,7 +323,8 @@ const PostCard: React.FC<PostCardProps> = ({
           </ScrollView>
         </View>
       )}
-    </View>
+    </Animated.View>
+    // </View>
   );
 };
 
@@ -310,11 +342,15 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   simulateUpload,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
+
   const [openComponent, setOpenComments] = useState(false);
   const [videoModalVisible, setVideoModalVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
+  // In your PostCard component, add state
+  const [isScrollingImages, setIsScrollingImages] = useState(false);
 
   const handleRecordComment = (video: any) => {
     setVideoData(video);
@@ -338,7 +374,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     }, 100);
   };
 
-  if (!posts || posts.length === 0) {
+  if (!feedPosts || feedPosts.length === 0) {
     return (
       <View className="px-6 pb-20 items-center justify-center flex-1">
         {/* Overlapping Cards with Shadow Effect */}
@@ -447,26 +483,113 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     );
   }
 
+  // New state for managing card removal
+  const [removingCards, setRemovingCards] = useState<Set<string>>(new Set());
+
+  const removePost = (id: string) => {
+    console.log("Removing post:", id);
+    setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+  };
+  const [scrollEnabled, setScrollEnabled] = useState<boolean>(true);
+  const [imageScrollingStates, setImageScrollingStates] = useState<{
+    [key: string]: boolean;
+  }>({});
+
+  const handleImageScrollStateChange = (
+    postId: string,
+    isScrolling: boolean
+  ) => {
+    console.log("is scroling", isScrolling);
+    setImageScrollingStates((prev) => ({
+      ...prev,
+      [postId]: isScrolling,
+    }));
+  };
+
+  // Add this to your AllFeeds component state
+  const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
+
+  // Update your handleSwipeProgress function
+  const handleSwipeProgress = (
+    postId: string,
+    progress: number,
+    isActive: boolean
+  ) => {
+    console.log(`Swipe progress for ${postId}:`, progress, isActive);
+
+    if (isActive) {
+      // Find the index of the post being swiped
+      const swipeIndex = feedPosts.findIndex((post) => post.id === postId);
+      if (swipeIndex !== -1) {
+        setActiveSwipeIndex(swipeIndex);
+        // console.log(`Now swiping on index: ${swipeIndex}`);
+      }
+    } else {
+      // Clear the active swipe index when swipe ends
+      setActiveSwipeIndex(null);
+      // console.log("Swipe ended, cleared active index");
+    }
+  };
+  // Add this to your AllFeeds component state
+  const cardRefs = useRef<{ [key: string]: View | null }>({});
+
   return (
     <View className="relative">
       <FlatList
-        data={posts}
+        data={feedPosts}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <PostCard
-            post={item}
-            setIsOpen={setIsOpen}
-            setOpenComments={setOpenComments}
-            setShowRecordModal={setShowRecordModal}
-          />
+        // renderItem={({ item }) => (
+        //   <PostCard
+        //     post={item}
+        //     setIsOpen={setIsOpen}
+        //     setOpenComments={setOpenComments}
+        //     setShowRecordModal={setShowRecordModal}
+        //   />
+        // )}
+        renderItem={({ item, index }) => (
+          <View
+            ref={(ref) => {
+              cardRefs.current[item.id] = ref;
+            }}
+            collapsable={false} // Important for Android
+          >
+            <SwipeableCard
+              onSwipeLeft={() => removePost(item.id)}
+              onSwipeRight={() => removePost(item.id)}
+              index={index}
+              activeSwipeIndex={activeSwipeIndex}
+              disabled={imageScrollingStates[item.id] || false} // Pass the state here
+              onSwipeProgress={(progress, isActive) =>
+                handleSwipeProgress(item.id, progress, isActive)
+              }
+              onGestureStateChange={(isActive) => setScrollEnabled(!isActive)}
+              // isRemoving={removingCards.has(item.id)} // Pass removal state
+            >
+              <PostCard
+                post={item}
+                setIsOpen={setIsOpen}
+                setOpenComments={setOpenComments}
+                setShowRecordModal={setShowRecordModal}
+                onImageScrollStateChange={(isScrolling) =>
+                  handleImageScrollStateChange(item.id, isScrolling)
+                }
+              />
+            </SwipeableCard>
+          </View>
         )}
         showsVerticalScrollIndicator={false}
-        scrollEnabled={false}
+        // scrollEnabled={false}
         contentContainerStyle={{
           paddingBottom: 20,
           paddingTop: 10,
         }}
-        ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
+        // Optimize for better performance
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={5}
+        windowSize={10}
+        scrollEnabled={scrollEnabled}
+
+        // ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
       />
       <UserProfileModal
         visible={isOpen}
