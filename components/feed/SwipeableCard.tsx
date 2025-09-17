@@ -50,7 +50,7 @@ export default function SwipeableCard({
   const collapseElement = () => {
     Animated.timing(maxHeightAnim, {
       toValue: 0,
-      duration: 0,
+      duration: 500,
       useNativeDriver: false, // Height animations can't use native driver
     }).start();
   };
