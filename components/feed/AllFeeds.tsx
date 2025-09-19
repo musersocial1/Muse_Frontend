@@ -366,14 +366,14 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   // Enhanced removePost functions with puff animations
   const removePostWithLike = (id: string) => {
-    console.log("Removing post with LIKE:", id);
+    // console.log("Removing post with LIKE:", id);
     // Show dislike puff animation
     setShowDislikePuff(true);
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
   const removePostWithDislike = (id: string) => {
-    console.log("Removing post with DISLIKE:", id);
+    // console.log("Removing post with DISLIKE:", id);
 
     // Show like puff animation
     setShowLikePuff(true);
@@ -383,10 +383,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   // Smooth gesture state management
   const handleGestureStateChange = (postId: string, isActive: boolean) => {
-    console.log(
-      `AllFeeds: Gesture ${isActive ? "started" : "ended"} for ${postId}`
-    );
-
     setActiveSwipeStates((prev) => {
       const newState = { ...prev, [postId]: isActive };
 

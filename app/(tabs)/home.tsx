@@ -219,16 +219,6 @@ const Home: React.FC = () => {
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollOffset = event.nativeEvent.contentOffset.y;
 
-    // Console log the scroll value from 0 to 150
-    if (scrollOffset >= 0 && scrollOffset <= 150) {
-      console.log(`Scroll value: ${scrollOffset}`);
-    }
-
-    // // Slice stories to 6 when scrolling starts
-    // if (scrollOffset > 0 && visibleStoriesCount !== 5) {
-    //   setVisibleStoriesCount(5);
-    // }
-
     // Reset to full stories when back to top
     if (scrollOffset === 0 && visibleStoriesCount !== stories.length) {
       setVisibleStoriesCount(stories.length);
