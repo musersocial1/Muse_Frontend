@@ -101,7 +101,7 @@ export default function SwipeableCard({
         // Call swipe callback after a short delay
         setTimeout(() => {
           onSwipeLeft?.();
-        }, 300);
+        }, 10);
       } else if (isScrollingRight && !hasVibratedRightRef.current) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         hasVibratedRightRef.current = true;
@@ -116,7 +116,7 @@ export default function SwipeableCard({
         // Call swipe callback after a short delay
         setTimeout(() => {
           onSwipeRight?.();
-        }, 300);
+        }, 10);
       }
     } else {
       // Reset vibration flags when back within threshold

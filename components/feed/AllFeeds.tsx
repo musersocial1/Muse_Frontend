@@ -1,4 +1,4 @@
-// AllFeeds.tsx - Updated for react-native-gesture-handler
+// AllFeeds.tsx - Updated with PuffySmoke animations
 import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { Post } from "@/types/community";
@@ -20,19 +20,12 @@ import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoCommentsModal from "../modals/VideoComments";
+import PuffySmoke from "../ui/PuffySmoke";
 import SwipeableCard from "./SwipeableCard";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
-interface PostCardProps {
-  post: Post;
-  setIsOpen: (val: boolean) => void;
-  setOpenComments: (val: boolean) => void;
-  setShowRecordModal: (val: boolean) => void;
-  onImageScrollStateChange?: (isScrolling: boolean) => void;
-  scrollEnabled?: boolean;
-}
-
+// PostCard component remains the same
 const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
@@ -294,6 +287,15 @@ const PostCard: React.FC<PostCardProps> = ({
   );
 };
 
+interface PostCardProps {
+  post: Post;
+  setIsOpen: (val: boolean) => void;
+  setOpenComments: (val: boolean) => void;
+  setShowRecordModal: (val: boolean) => void;
+  onImageScrollStateChange?: (isScrolling: boolean) => void;
+  scrollEnabled?: boolean;
+}
+
 interface AllFeedsProps {
   posts?: Post[];
   addPost?: () => void;
@@ -318,6 +320,15 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
+
+  // Puff animation states
+  const [showLikePuff, setShowLikePuff] = useState(false);
+  const [showDislikePuff, setShowDislikePuff] = useState(false);
+
+  // Calculate center positions for puff animations
+  const centerY = height / 2 - 100; // Center vertically, offset up a bit
+  const likePosition = { x: (width * 3.6) / 4 - 50, y: centerY }; // Right side (75% of screen width)
+  const dislikePosition = { x: (width * 0.3) / 4 - 50, y: centerY }; // Left side (25% of screen width)
 
   // Gesture state management
   const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
@@ -353,8 +364,20 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     }, 100);
   };
 
-  const removePost = (id: string) => {
-    console.log("Removing post:", id);
+  // Enhanced removePost functions with puff animations
+  const removePostWithLike = (id: string) => {
+    console.log("Removing post with LIKE:", id);
+    // Show dislike puff animation
+    setShowDislikePuff(true);
+    setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const removePostWithDislike = (id: string) => {
+    console.log("Removing post with DISLIKE:", id);
+
+    // Show like puff animation
+    setShowLikePuff(true);
+
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -553,8 +576,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   // Determine effective scroll enabled state
   const effectiveScrollEnabled = externalScrollEnabled ?? true;
-  const shouldDisableInternalScrolling =
-    Object.values(activeSwipeStates).some(Boolean);
 
   return (
     <View className="relative">
@@ -571,8 +592,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
             collapsable={false}
           >
             <SwipeableCard
-              onSwipeLeft={() => removePost(item.id)}
-              onSwipeRight={() => removePost(item.id)}
+              onSwipeLeft={() => removePostWithDislike(item.id)} // LEFT = DISLIKE
+              onSwipeRight={() => removePostWithLike(item.id)} // RIGHT = LIKE
               index={index}
               activeSwipeIndex={activeSwipeIndex}
               disabled={imageScrollingStates[item.id] || false}
@@ -588,7 +609,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
                 setIsOpen={setIsOpen}
                 setOpenComments={setOpenComments}
                 setShowRecordModal={setShowRecordModal}
-                scrollEnabled={!shouldDisableInternalScrolling}
                 onImageScrollStateChange={(isScrolling) =>
                   handleImageScrollStateChange(item.id, isScrolling)
                 }
@@ -608,6 +628,24 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         initialNumToRender={3}
       />
 
+      {/* Absolutely Positioned Puff Animations - Centered on Screen */}
+      <PuffySmoke
+        type="like"
+        visible={showLikePuff}
+        x={likePosition.x}
+        y={likePosition.y}
+        onComplete={() => setShowLikePuff(false)}
+      />
+
+      <PuffySmoke
+        type="dislike"
+        visible={showDislikePuff}
+        x={dislikePosition.x}
+        y={dislikePosition.y}
+        onComplete={() => setShowDislikePuff(false)}
+      />
+
+      {/* Existing Modals */}
       <UserProfileModal
         visible={isOpen}
         onClose={() => setIsOpen(false)}
