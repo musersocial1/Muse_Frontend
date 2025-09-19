@@ -327,8 +327,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   // Calculate center positions for puff animations
   const centerY = height / 2 - 100; // Center vertically, offset up a bit
-  const likePosition = { x: (width * 3.6) / 4 - 50, y: centerY }; // Right side (75% of screen width)
-  const dislikePosition = { x: (width * 0.3) / 4 - 50, y: centerY }; // Left side (25% of screen width)
+  const likePosition = { x: (width * 3.3) / 4 - 50, y: centerY }; // Right side (75% of screen width)
+  const dislikePosition = { x: (width * 0.45) / 4 - 50, y: centerY }; // Left side (25% of screen width)
 
   // Gesture state management
   const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
