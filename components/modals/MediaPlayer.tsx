@@ -60,7 +60,6 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   author,
   thumbnail,
 }) => {
-  // Animation values
   const slideAnim = useRef(new Animated.Value(height)).current;
   const commentSlideAnim = useRef(new Animated.Value(height)).current;
   const speedSlideAnim = useRef(new Animated.Value(height)).current;
