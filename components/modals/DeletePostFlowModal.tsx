@@ -3,10 +3,12 @@ import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Dimensions,
   Easing,
   Image,
   ImageSourcePropType,
   Modal,
+  PanResponder,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -62,9 +64,11 @@ const DeletePostFlowModal: React.FC<DeletePostModalProps> = ({
   post,
   onClose,
 }) => {
+  const { width, height } = Dimensions.get("window");
+
   const [deleteState, setDeleteState] = useState<DeleteState>("confirm");
   const insets = useSafeAreaInsets();
-  const HIDE_OFFSET = 300;
+  const HIDE_OFFSET = height;
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
   useEffect(() => {
@@ -88,6 +92,31 @@ const DeletePostFlowModal: React.FC<DeletePostModalProps> = ({
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
+
+  // inside your component
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        if (gestureState.dy > 0) {
+          sheetY.setValue(gestureState.dy); // follow finger only downward
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dy > HIDE_OFFSET / 3) {
+          // dragged far enough → close
+          closeWithSlide();
+        } else {
+          // not enough → snap back
+          Animated.spring(sheetY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
@@ -127,14 +156,15 @@ const DeletePostFlowModal: React.FC<DeletePostModalProps> = ({
         <View
           pointerEvents="box-none"
           style={{ marginBottom: insets.bottom }}
-          className="flex-1 pb-3 px-3 items-center justify-end"
+          className="flex-1 pb-3 px-3 items-center border2 justify-end"
         >
           <Animated.View
             style={{
               transform: [{ translateY: sheetY }],
               width: "100%",
             }}
-            className="w-full max-w-lg"
+            {...panResponder.panHandlers} // 👈 attach pan responder
+            className="w-full border2 max-w-lg"
           >
             <View className="bg-[#231f1e]/90 w-full border border-white/10 rounded-[38px] overflow-hidden">
               {deleteState !== "success" && (

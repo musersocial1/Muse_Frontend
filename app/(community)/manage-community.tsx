@@ -496,8 +496,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#121212",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    // borderTopLeftRadius: 20,
+    // borderTopRightRadius: 20,
     // maxHeight: height * 0.95,
     // minHeight: height * 0.5,
     height: 800,

@@ -1,4 +1,5 @@
 import { LongFormContent, Post } from "@/types/community";
+import { VideoComment } from "@/types/post";
 import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
@@ -232,78 +233,246 @@ export const user = {
   ],
 };
 
-export const videoComments = [
+export const videoComments: VideoComment[] = [
   {
     id: "1",
-    thumbnail: "https://picsum.photos/id/1011/400/600", // smiling woman
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1080&h=1920&fit=crop&q=80",
+    likes: 3400,
+    comments: 156,
+    description: "New season, new slay! 🔥 Whether it's street style...",
+    user: {
+      name: "sarah_smith",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
+    replyingTo: {
+      name: "john_doe",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    },
   },
   {
     id: "2",
-    thumbnail: "https://picsum.photos/id/1012/400/600", // couple laughing
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1080&h=1920&fit=crop&q=80",
+    likes: 3100,
+    comments: 89,
+    description: "Couple goals ✨ spreading joy together.",
+    user: {
+      name: "mike_johnson",
+      avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+    },
+    replyingTo: {
+      name: "sarah_smith",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    },
   },
   {
     id: "3",
-    thumbnail: "https://picsum.photos/id/1015/400/600", // outdoor portrait
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=1080&h=1920&fit=crop&q=80",
+    likes: 2800,
+    comments: 120,
+    description: "Nature vibes 🌿 living the moment.",
+    user: {
+      name: "lisa_brown",
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+    },
+    replyingTo: {
+      name: "mike_johnson",
+      avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+    },
   },
   {
     id: "4",
-    thumbnail: "https://picsum.photos/id/1016/400/600", // group shot
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=1080&h=1920&fit=crop&q=80",
+    likes: 4500,
+    comments: 210,
+    description: "Squad energy 💯 nothing beats friendship.",
+    user: {
+      name: "groupie_gang",
+      avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    },
+    replyingTo: {
+      name: "lisa_brown",
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+    },
   },
   {
     id: "5",
-    thumbnail: "https://picsum.photos/id/1021/400/600", // food shot
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1080&h=1920&fit=crop&q=80",
+    likes: 1900,
+    comments: 74,
+    description: "Food is love ❤️ comfort on a plate.",
+    user: {
+      name: "foodie_queen",
+      avatar: "https://randomuser.me/api/portraits/women/14.jpg",
+    },
+    replyingTo: {
+      name: "groupie_gang",
+      avatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    },
   },
   {
     id: "6",
-    thumbnail: "https://picsum.photos/id/1027/400/600", // portrait close-up
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=1080&h=1920&fit=crop&q=80",
+    likes: 3600,
+    comments: 98,
+    description: "Eyes tell a thousand stories 👀.",
+    user: {
+      name: "james_clark",
+      avatar: "https://randomuser.me/api/portraits/men/36.jpg",
+    },
+    replyingTo: {
+      name: "foodie_queen",
+      avatar: "https://randomuser.me/api/portraits/women/14.jpg",
+    },
   },
   {
     id: "7",
-    thumbnail: "https://picsum.photos/id/1035/400/600", // candid laughing
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=1080&h=1920&fit=crop&q=80",
+    likes: 2200,
+    comments: 64,
+    description: "Laughter is contagious 😂✨.",
+    user: {
+      name: "laughing_lucy",
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+    },
+    replyingTo: {
+      name: "james_clark",
+      avatar: "https://randomuser.me/api/portraits/men/36.jpg",
+    },
   },
   {
     id: "8",
-    thumbnail: "https://picsum.photos/id/1040/400/600", // stylish outdoor
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=1080&h=1920&fit=crop&q=80",
+    likes: 5100,
+    comments: 342,
+    description: "Streetwear season 🖤 keep it bold.",
+    user: {
+      name: "style_master",
+      avatar: "https://randomuser.me/api/portraits/men/51.jpg",
+    },
+    replyingTo: {
+      name: "laughing_lucy",
+      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+    },
   },
   {
     id: "9",
-    thumbnail: "https://picsum.photos/id/1052/400/600", // lifestyle scene
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1080&h=1920&fit=crop&q=80",
+    likes: 3900,
+    comments: 201,
+    description: "Daily hustle, daily shine 💪.",
+    user: {
+      name: "grace_hopper",
+      avatar: "https://randomuser.me/api/portraits/women/19.jpg",
+    },
+    replyingTo: {
+      name: "style_master",
+      avatar: "https://randomuser.me/api/portraits/men/51.jpg",
+    },
   },
   {
     id: "10",
-    thumbnail: "https://picsum.photos/id/1062/400/600", // portrait close-up
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1080&h=1920&fit=crop&q=80",
+    likes: 4000,
+    comments: 110,
+    description: "Confidence is the best outfit 👗.",
+    user: {
+      name: "sophia_turner",
+      avatar: "https://randomuser.me/api/portraits/women/67.jpg",
+    },
+    replyingTo: {
+      name: "grace_hopper",
+      avatar: "https://randomuser.me/api/portraits/women/19.jpg",
+    },
   },
   {
     id: "11",
-    thumbnail: "https://picsum.photos/id/1074/400/600", // joyful group
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=1080&h=1920&fit=crop&q=80",
+    likes: 6200,
+    comments: 540,
+    description: "Joy shared is joy multiplied 🎉.",
+    user: {
+      name: "party_people",
+      avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+    },
+    replyingTo: {
+      name: "sophia_turner",
+      avatar: "https://randomuser.me/api/portraits/women/67.jpg",
+    },
   },
   {
     id: "12",
-    thumbnail: "https://picsum.photos/id/1084/400/600", // cheerful vibe
-    likes: "3.4k",
-    title: "New season, new slay! 🔥 Whether it's street style...",
+    thumbnail:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=600&fit=crop&q=80",
+    posterUri:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=1200&fit=crop&q=80",
+    videoUri:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=1080&h=1920&fit=crop&q=80",
+    likes: 2700,
+    comments: 97,
+    description: "Choose happiness every day ☀️.",
+    user: {
+      name: "emma_watson",
+      avatar: "https://randomuser.me/api/portraits/women/24.jpg",
+    },
+    replyingTo: {
+      name: "party_people",
+      avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+    },
   },
 ];
 

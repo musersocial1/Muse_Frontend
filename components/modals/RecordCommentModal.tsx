@@ -1,7 +1,7 @@
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
-import { Video } from "expo-av";
+import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
 import {
   CameraType,
@@ -214,6 +214,7 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
     setPermissionsRequested(true);
   };
 
+  // const insets = useSafeAreaInsets()
   // Permissions loading
   if (!cameraPermission || !microphonePermission) {
     return (
@@ -332,8 +333,11 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
 
         {/* PREVIEW */}
         {flow === "preview" && recordedUri && (
-          <View className="flex-1 bg-primary justify-center items-center">
-            <View className="absolute top-10 left-0 right-0 flex-row items-center justify-between px-5 pt-5 z-10">
+          <View className="flex-1  bg-primary justify-center items-center">
+            <View
+              style={{ top: insets.top }}
+              className="absolute top-0  left-0 right-0 flex-row items-center justify-between px-5  z-10"
+            >
               <TouchableOpacity
                 onPress={onClose}
                 className="w-14 h-14 rounded-full bg-[#70707082]/[51%] items-center justify-center"
@@ -356,9 +360,10 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
               style={{ flex: 1, height: 500, width: 500 }}
               useNativeControls={true}
               shouldPlay={false}
+              resizeMode={ResizeMode.COVER} // 👈 use enum instead of string
               isLooping
             />
-            <View className="absolute bottom-20 left-0 right-0 flex-row items-center justify-around">
+            <View className="absolute  bottom-4 left-0 right-0 flex-row items-center justify-around">
               <TouchableOpacity
                 onPress={onRetry}
                 className="w-16 h-16 rounded-full bg-white items-center justify-center"
@@ -382,12 +387,15 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
         {flow === "comment" && (
           <KeyboardAvoidingView
             className="flex-1"
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : "padding"}
             keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
           >
-            <View className="flex-1 bg-primary">
+            <View
+              style={{ paddingTop: insets.top + 10 }}
+              className="flex-1    bg-primary"
+            >
               {/* Top bar */}
-              <View className="flex-row items-center pt-20 px-5">
+              <View className="flex-row items-center  px-5">
                 <TouchableOpacity
                   className="w-14 h-14 rounded-full items-center justify-center bg-[#70707082]/[51%]"
                   onPress={() => setFlow("preview")}
@@ -435,62 +443,49 @@ const RecordCommentModal: React.FC<RecordCommentModalProps> = ({
 
               {/* Comment Bubble */}
               <View
-                className={`px-7 ${
-                  isKeyboardVisible ? "mt-6" : "mt-10"
-                } flex-1`}
+                className={`px-7  ${isKeyboardVisible ? "mt-6" : "mt-10"} `}
               >
-                <View className="overflow-hidden rounded-[20px] px-6 py-8 relative">
-                  <BlurView
-                    intensity={10}
-                    tint="light"
-                    style={StyleSheet.absoluteFill}
-                    className="bg-[rgba(28, 28, 28, 0.7)]"
-                    experimentalBlurMethod="dimezisBlurView"
-                  />
-                  <View className="flex-row items-start">
+                <View className=" bg-[#1C1C1C] rounded-[37px] overflow-hidden">
+                  <View className="flex-row    items-start gap-3  p-6">
+                    {/* Avatar */}
                     <Image
-                      source={icons.user}
-                      className="w-10 h-10 rounded-full mr-4"
+                      source={{ uri: "https://i.pravatar.cc/100" }}
+                      className="w-12 h-12 rounded-full"
                     />
+
+                    {/* Input */}
                     <TextInput
+                      className="flex-1 text-white   min-h-28 font-sfpro-medium text-lg leading-5"
+                      placeholder="Start typing"
+                      placeholderTextColor="#888"
+                      returnKeyType="default"
                       ref={textInputRef}
                       value={comment}
                       onChangeText={setComment}
                       onFocus={handleInputFocus}
                       onBlur={handleInputBlur}
-                      placeholder="Start typing..."
-                      placeholderTextColor="white"
-                      className="flex-1 text-white text-[16px] font-neutral-regular tracking-widest leading-6 min-h-[100px]"
                       multiline
-                      maxLength={500}
-                      textAlignVertical="top"
-                      style={{ padding: 0 }}
-                      returnKeyType="default"
-                      blurOnSubmit={false}
+                      textAlignVertical="top" // ✅ fixes Android vertical centering issue
                     />
                   </View>
                 </View>
               </View>
 
               {/* Post Button - Only show when not typing */}
-              {!isKeyboardVisible && !isInputFocused && (
-                <View className="px-7 pb-9">
-                  <TouchableOpacity
-                    disabled={comment.trim().length === 0}
-                    onPress={handlePost}
-                    className={`h-16 rounded-full items-center justify-center ${
-                      comment.trim().length > 0
-                        ? "bg-[#0368FF]"
-                        : "bg-[#232833]"
-                    }`}
-                    activeOpacity={comment.trim().length > 0 ? 0.9 : 1}
-                  >
-                    <Text className="text-white text-lg font-semibold">
-                      Post
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              )}
+              {/* {!isKeyboardVisible && !isInputFocused && ( */}
+              <View className="px-7 absolute bottom-0 left-0 right-0  ">
+                <TouchableOpacity
+                  disabled={comment.trim().length === 0}
+                  onPress={handlePost}
+                  className={`h-16 rounded-full items-center justify-center ${
+                    comment.trim().length > 0 ? "bg-[#0368FF]" : "bg-[#232833]"
+                  }`}
+                  activeOpacity={comment.trim().length > 0 ? 0.9 : 1}
+                >
+                  <Text className="text-white text-lg font-semibold">Post</Text>
+                </TouchableOpacity>
+              </View>
+              {/* )} */}
             </View>
           </KeyboardAvoidingView>
         )}

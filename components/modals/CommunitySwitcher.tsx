@@ -73,10 +73,10 @@ const CommunityCard: React.FC<{
       className="items-center mb-10 w-[47%] "
       activeOpacity={0.9}
       onPress={() => {
-        router.replace(RouterConstantUtil.community.user as any);
-        // setTimeout(() => {
-        //   onClose();
-        // }, 1000);
+        router.push(RouterConstantUtil.community.user as any);
+        setTimeout(() => {
+          onClose();
+        }, 1000);
       }}
       // onPress={() => onClose()}
     >

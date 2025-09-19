@@ -16,6 +16,14 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     bundleIdentifier: "com.moseleydev.muse",
     buildNumber: "20",
+    infoPlist: {
+      NSCameraUsageDescription:
+        "Muse requires access to your camera so you can take and upload photos/videos.",
+      NSPhotoLibraryUsageDescription:
+        "Muse requires access to your photo library so you can select and upload images/videos.",
+      NSMicrophoneUsageDescription:
+        "Muse requires access to your microphone so you can record audio for posts and AI transcription.",
+    },
   },
   android: {
     package: "com.moseley.muse",
