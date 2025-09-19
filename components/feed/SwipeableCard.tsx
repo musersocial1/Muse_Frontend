@@ -1,10 +1,12 @@
-// SwipeableCard.tsx - Simple version without translateY
-import * as Haptics from "expo-haptics"; // 👈 add this
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Dimensions, PanResponder, StyleSheet } from "react-native";
+// SwipeableCard.tsx - Horizontal-only swipe with smooth height animation
+import * as Haptics from "expo-haptics";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, StyleSheet } from "react-native";
+import { View } from "react-native-animatable";
+import { FlatList } from "react-native-gesture-handler";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
-const SWIPE_THRESHOLD = 0.4 * width;
 
 interface SwipeableCardProps {
   children: React.ReactNode;
@@ -13,8 +15,8 @@ interface SwipeableCardProps {
   style?: any;
   onGestureStateChange?: (isActive: boolean) => void;
   disabled?: boolean;
-  onSwipeProgress?: (progress: number, isActive: boolean) => void; // For swipe progress
-  index: Number;
+  onSwipeProgress?: (progress: number, isActive: boolean) => void;
+  index: number;
   activeSwipeIndex: any;
 }
 
@@ -29,234 +31,147 @@ export default function SwipeableCard({
   index,
   activeSwipeIndex,
 }: SwipeableCardProps) {
-  const position = useRef(new Animated.ValueXY()).current;
-  const [isDragging, setIsDragging] = useState(false);
-  const [isHorizontalGesture, setIsHorizontalGesture] = useState(false);
-  const [elementHeight, setElementHeight] = useState<number | null>(null); // Add this
+  // Add rotation animation value and height state
+  const scrollRotation = useRef(new Animated.Value(0)).current;
+  const [initialHeight, setInitialHeight] = useState<number | null>(null);
+  const [currentHeight, setCurrentHeight] = useState<number | null>(null);
 
-  // To this:
-  const maxHeightAnim = useRef(new Animated.Value(1000)).current; // Start high
+  // Convert children to array for FlatList and create 3-item array
+  const childrenArray = React.Children.toArray(children);
+  const threeItemArray = [
+    <View style={{ width: width - 20 }} />, // 1st item: empty space with full width
+    <View style={{ width: width - 20 }}>{childrenArray}</View>, // 2nd item: main children
+    <View style={{ width: width - 20 }} />, // 3rd item: empty space with full width
+  ];
 
-  // And completely remove or simplify handleLayout:
-  const handleLayout = (event: any) => {
-    const { height } = event.nativeEvent.layout;
-    if (!elementHeight && height > 0) {
-      setElementHeight(height);
-      // Don't do any animation here - just store the height
+  const insets = useSafeAreaInsets();
+
+  // Add these refs and threshold at the top of your component:
+  const hasVibratedLeftRef = useRef(false);
+  const hasVibratedRightRef = useRef(false);
+  const scrollThreshold = width * 0.5; // 30% of screen width as threshold
+  const flatListRef = useRef<FlatList>(null);
+
+  // Enhanced scroll handler with rotation and height animation
+  const handleScroll = (event: any) => {
+    const scrollX = event.nativeEvent.contentOffset.x;
+    const centerPosition = width; // Middle item position
+
+    // Calculate distance from center for rotation
+    const distanceFromCenter = scrollX - centerPosition;
+
+    // Calculate rotation progress (-1 to 1, where -1 is full left, 1 is full right)
+    const maxScrollDistance = width * 0.8; // Maximum distance for full rotation
+    const rotationProgress = Math.max(
+      -1,
+      Math.min(1, distanceFromCenter / maxScrollDistance)
+    );
+
+    // Update rotation animation value
+    scrollRotation.setValue(rotationProgress);
+
+    // Calculate height based on absolute rotation progress
+    if (initialHeight !== null) {
+      const absoluteRotationProgress = Math.abs(rotationProgress);
+      // Height goes from initialHeight to 0 as rotation increases
+      const heightProgress = Math.max(0, 1 - absoluteRotationProgress * 1.2); // 1.2 for slightly faster collapse
+      const newHeight = initialHeight * heightProgress;
+      setCurrentHeight(newHeight);
+    }
+
+    // Existing vibration logic with auto-scroll
+    const absoluteDistance = Math.abs(distanceFromCenter);
+    if (absoluteDistance > scrollThreshold) {
+      // Determine direction
+      const isScrollingLeft = scrollX < centerPosition;
+      const isScrollingRight = scrollX > centerPosition;
+
+      // Vibrate and auto-scroll when threshold is crossed
+      if (isScrollingLeft && !hasVibratedLeftRef.current) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        hasVibratedLeftRef.current = true;
+        hasVibratedRightRef.current = false; // Reset opposite direction
+
+        // Auto-scroll to left item (index 0)
+        flatListRef.current?.scrollToIndex({
+          index: 0,
+          animated: true,
+        });
+
+        // Call swipe callback after a short delay
+        setTimeout(() => {
+          onSwipeLeft?.();
+        }, 300);
+      } else if (isScrollingRight && !hasVibratedRightRef.current) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        hasVibratedRightRef.current = true;
+        hasVibratedLeftRef.current = false; // Reset opposite direction
+
+        // Auto-scroll to right item (index 2)
+        flatListRef.current?.scrollToIndex({
+          index: 2,
+          animated: true,
+        });
+
+        // Call swipe callback after a short delay
+        setTimeout(() => {
+          onSwipeRight?.();
+        }, 300);
+      }
+    } else {
+      // Reset vibration flags when back within threshold
+      hasVibratedLeftRef.current = false;
+      hasVibratedRightRef.current = false;
     }
   };
 
-  // Add this collapse function - you can call it when you want to collapse
-  const collapseElement = () => {
-    Animated.timing(maxHeightAnim, {
-      toValue: 0,
-      duration: 500,
-      useNativeDriver: false, // Height animations can't use native driver
-    }).start();
+  // Reset rotation and height when scroll ends
+  const handleScrollEnd = (event: any) => {
+    flatListRef.current?.scrollToIndex({
+      index: 1, // 👈 always back to center
+      animated: true,
+    });
+
+    console.log("thi just siope");
+    const scrollX = event.nativeEvent.contentOffset.x;
+    const centerPosition = width;
+
+    // If we're back at center, animate rotation back and reset height
+    if (Math.abs(scrollX - centerPosition) < 50) {
+      // Small threshold for "center"
+      Animated.timing(scrollRotation, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+
+      // Reset height back to full
+      setCurrentHeight(initialHeight);
+    }
   };
 
-  // Add a ref to track if we've already vibrated for this gesture
-  const hasVibratedRef = useRef(false);
-  const disabledRef = useRef(disabled);
+  // Measure initial height of the content
+  const handleLayout = (event: any) => {
+    if (initialHeight === null) {
+      const { height } = event.nativeEvent.layout;
+      setInitialHeight(height);
+      setCurrentHeight(height);
+    }
+  };
 
+  // Scroll-based rotation interpolation (0 to -30 degrees, rotating downward)
+  const scrollBasedRotation = scrollRotation.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: ["20deg", "0deg", "-20deg"],
+    extrapolate: "clamp",
+  });
+
+  // Cleanup on unmount
   useEffect(() => {
-    disabledRef.current = disabled;
-  }, [disabled]);
-
-  useEffect(() => {
-    onGestureStateChange?.(isHorizontalGesture);
-  }, [isHorizontalGesture, onGestureStateChange]);
-
-  const panResponder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => {
-          if (disabledRef.current) {
-            return false;
-          }
-          return false;
-        },
-
-        onMoveShouldSetPanResponder: (_, gesture) => {
-          if (disabledRef.current) {
-            return false;
-          }
-
-          const { dx, dy } = gesture;
-          const isHorizontal = Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10;
-          return isHorizontal;
-        },
-
-        onPanResponderGrant: () => {
-          console.log("Pan responder granted");
-          setIsDragging(true);
-          setIsHorizontalGesture(true);
-          position.setOffset({
-            x: (position.x as any)._value,
-            y: (position.y as any)._value,
-          });
-          position.setValue({ x: 0, y: 0 });
-          hasVibratedRef.current = false; // Reset vibration flag
-
-          // Notify parent that swipe started
-          onSwipeProgress?.(0, true);
-        },
-
-        // In your onPanResponderMove handler, add this:
-        onPanResponderMove: (_, gesture) => {
-          if (disabledRef.current) {
-            return;
-          }
-
-          // Update position
-          position.setValue({ x: gesture.dx, y: 0 });
-
-          // Calculate swipe progress (0 to 1)
-          const progress = Math.min(Math.abs(gesture.dx) / SWIPE_THRESHOLD, 1);
-
-          // Vibrate when threshold is reached
-          if (progress >= 1 && !hasVibratedRef.current) {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-            hasVibratedRef.current = true;
-          }
-
-          // Animate height based on swipe progress
-          if (elementHeight) {
-            const newHeight = elementHeight * (1 - progress); // Height decreases as progress increases
-            Animated.timing(maxHeightAnim, {
-              toValue: newHeight,
-              duration: 0, // Immediate response to gesture
-              useNativeDriver: false,
-            }).start();
-          }
-
-          onSwipeProgress?.(progress, true);
-        },
-
-        onPanResponderRelease: (_, gesture) => {
-          console.log("Pan responder released");
-          position.flattenOffset();
-          setIsDragging(false);
-
-          // Reset swipe progress
-          onSwipeProgress?.(0, false);
-          setTimeout(() => setIsHorizontalGesture(false), 100);
-
-          if (disabledRef.current) {
-            Animated.spring(position, {
-              toValue: { x: 0, y: 0 },
-              tension: 100,
-              friction: 8,
-              useNativeDriver: true,
-            }).start();
-            return;
-          }
-
-          const { dx, vx } = gesture;
-          const shouldSwipeRight =
-            dx > SWIPE_THRESHOLD || (dx > 50 && vx > 0.5);
-          const shouldSwipeLeft =
-            dx < -SWIPE_THRESHOLD || (dx < -50 && vx < -0.5);
-
-          if (shouldSwipeRight) {
-            // Swipe right - remove card
-            Animated.timing(position, {
-              toValue: { x: width + 100, y: 0 },
-              duration: 250,
-              useNativeDriver: true,
-            }).start(() => {
-              //   onSwipeRight?.();
-              collapseElement();
-              position.setValue({ x: 0, y: 0 });
-            });
-          } else if (shouldSwipeLeft) {
-            // Swipe left - remove card
-            Animated.timing(position, {
-              toValue: { x: -width - 100, y: 0 },
-              duration: 250,
-              useNativeDriver: true,
-            }).start(() => {
-              //   onSwipeLeft?.();
-              collapseElement();
-              position.setValue({ x: 0, y: 0 });
-            });
-          } else {
-            // Snap back - restore full height
-            if (elementHeight) {
-              Animated.timing(maxHeightAnim, {
-                toValue: elementHeight,
-                duration: 0,
-                useNativeDriver: false,
-              }).start();
-            }
-            // Snap back to center
-            Animated.spring(position, {
-              toValue: { x: 0, y: 0 },
-              tension: 100,
-              friction: 8,
-              useNativeDriver: true,
-            }).start();
-          }
-        },
-
-        onPanResponderTerminationRequest: () => {
-          if (disabledRef.current) {
-            return true;
-          }
-          return false;
-        },
-
-        onPanResponderTerminate: () => {
-          console.log("Pan responder terminated");
-          setIsDragging(false);
-          setIsHorizontalGesture(false);
-          onSwipeProgress?.(0, false);
-          Animated.spring(position, {
-            toValue: { x: 0, y: 0 },
-            tension: 100,
-            friction: 8,
-            useNativeDriver: true,
-          }).start();
-        },
-      }),
-    [onSwipeProgress]
-  );
-
-  const rotate = position.x.interpolate({
-    inputRange: [-width / 2, 0, width / 2],
-    outputRange: ["-15deg", "0deg", "15deg"],
-    extrapolate: "clamp",
-  });
-
-  const opacity = position.x.interpolate({
-    inputRange: [-width, 0, width],
-    outputRange: [0.7, 1, 0.7],
-    extrapolate: "clamp",
-  });
-
-  const scale = position.x.interpolate({
-    inputRange: [-width / 2, 0, width / 2],
-    outputRange: [0.95, 1, 0.95],
-    extrapolate: "clamp",
-  });
-
-  const overlayOpacity = position.x.interpolate({
-    inputRange: [-width / 3, 0, width / 3],
-    outputRange: [0.3, 0, 0.3],
-    extrapolate: "clamp",
-  });
-
-  const overlayColor = position.x.interpolate({
-    inputRange: [-width / 3, 0, width / 3],
-    outputRange: [
-      "rgba(239, 68, 68, 0.8)",
-      "transparent",
-      "rgba(34, 197, 94, 0.8)",
-    ],
-    extrapolate: "clamp",
-  });
-  console.log(maxHeightAnim);
-  // Add this layout handler
+    return () => {
+      scrollRotation.removeAllListeners();
+    };
+  }, []);
 
   return (
     <Animated.View
@@ -264,65 +179,50 @@ export default function SwipeableCard({
         styles.container,
         style,
         {
-          maxHeight: maxHeightAnim,
           //   overflow: "hidden",
+          maxHeight: currentHeight ?? undefined, // Use the calculated height directly
+          transform: [
+            { rotate: scrollBasedRotation }, // Apply scroll-based rotation
+          ],
         },
       ]}
-      className={`${index == activeSwipeIndex ? "z-[10000]" : ""}`}
-      onLayout={handleLayout} // Add this>
+      className={`${index === activeSwipeIndex ? "z-[10000]" : ""}   `}
+      onLayout={handleLayout} // Measure the initial height
     >
-      <Animated.View
-        className={"my-[10px]"}
-        style={{
-          opacity: index == activeSwipeIndex ? 0 : 1, // Add this line
-        }}
-        {...panResponder.panHandlers}
-      >
-        {children}
-      </Animated.View>
-
-      {index == activeSwipeIndex && (
-        <Animated.View
-          style={[
-            styles.card,
-            {
-              transform: [
-                ...position.getTranslateTransform(),
-                { rotate },
-                // { scale },
-              ],
-              opacity,
-            },
-          ]}
-          className={"  absolute"}
-        >
-          {/* Swipe feedback overlay */}
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                backgroundColor: overlayColor,
-                opacity: overlayOpacity,
-                borderRadius: 30,
-              },
-            ]}
-          />
-          {children}
-        </Animated.View>
-      )}
+      <FlatList
+        ref={flatListRef}
+        data={threeItemArray}
+        renderItem={({ item }) => <View className="">{item}</View>}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        contentContainerClassName="gap-[30px] "
+        initialScrollIndex={1} // Start at middle item
+        getItemLayout={(data, index) => ({
+          length: width,
+          offset: width * index,
+          index,
+        })}
+        pagingEnabled={true} // Enable paging
+        snapToInterval={width - 20} // Snap to each screen width
+        snapToAlignment="start" // Snap to start of each item
+        decelerationRate={1}
+        bounces={false} // Disable bouncing at edges
+        onScroll={handleScroll}
+        onMomentumScrollEnd={handleScrollEnd}
+        onScrollEndDrag={handleScrollEnd}
+        scrollEventThrottle={16}
+        initialNumToRender={3}
+      />
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 10,
-    // marginVertical: 8,
+    // marginHorizontal: 10,
   },
   card: {
     width: "100%",
-    // borderRadius: 30,
-    // overflow: "hidden",
   },
 });
