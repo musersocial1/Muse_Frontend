@@ -105,13 +105,13 @@ const PostCard: React.FC<PostCardProps> = ({
                 showsHorizontalScrollIndicator={false}
                 onScrollBeginDrag={() => onImageScrollStateChange?.(true)}
                 onScrollEndDrag={() => onImageScrollStateChange?.(false)}
-                onScroll={(event) => {
-                  const index = Math.round(
-                    event.nativeEvent.contentOffset.x / (width - 42)
-                  );
-                  setActiveIndex(index);
-                }}
-                onMomentumScrollEnd={() => onImageScrollStateChange?.(false)}
+                // onScroll={(event) => {
+                //   const index = Math.round(
+                //     event.nativeEvent.contentOffset.x / (width - 42)
+                //   );
+                //   setActiveIndex(index);
+                // }}
+                // onMomentumScrollEnd={() => onImageScrollStateChange?.(false)}
                 scrollEventThrottle={16}
                 contentContainerStyle={{ alignItems: "center" }}
               >

@@ -1,12 +1,19 @@
 // SwipeableCard.tsx - Horizontal-only swipe with smooth height animation
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, StyleSheet } from "react-native";
+import {
+  Animated,
+  Dimensions,
+  Platform,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { View } from "react-native-animatable";
-import { FlatList } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
+const ITEM_WIDTH = width - 20;
+const GAP_SIZE = 20;
 
 interface SwipeableCardProps {
   children: React.ReactNode;
@@ -36,12 +43,17 @@ export default function SwipeableCard({
   const [initialHeight, setInitialHeight] = useState<number | null>(null);
   const [currentHeight, setCurrentHeight] = useState<number | null>(null);
 
+  // Add state to track if we should auto-return to center
+  const [shouldReturnToCenter, setShouldReturnToCenter] = useState(false);
+  const isScrollingRef = useRef(false);
+  const [hasTriggeredSwipe, setHasTriggeredSwipe] = useState(false);
+
   // Convert children to array for FlatList and create 3-item array
   const childrenArray = React.Children.toArray(children);
   const threeItemArray = [
-    <View style={{ width: width - 20 }} />, // 1st item: empty space with full width
-    <View style={{ width: width - 20 }}>{childrenArray}</View>, // 2nd item: main children
-    <View style={{ width: width - 20 }} />, // 3rd item: empty space with full width
+    <View style={{ width: ITEM_WIDTH }} />, // 1st item: empty space
+    <View style={{ width: ITEM_WIDTH }}>{childrenArray}</View>, // 2nd item: main children
+    <View style={{ width: ITEM_WIDTH }} />, // 3rd item: empty space
   ];
 
   const insets = useSafeAreaInsets();
@@ -49,13 +61,13 @@ export default function SwipeableCard({
   // Add these refs and threshold at the top of your component:
   const hasVibratedLeftRef = useRef(false);
   const hasVibratedRightRef = useRef(false);
-  const scrollThreshold = width * 0.5; // 30% of screen width as threshold
-  const flatListRef = useRef<FlatList>(null);
+  const scrollThreshold = width * 0.5;
+  const flatListRef = useRef<ScrollView>(null);
 
   // Enhanced scroll handler with rotation and height animation
   const handleScroll = (event: any) => {
     const scrollX = event.nativeEvent.contentOffset.x;
-    const centerPosition = width; // Middle item position
+    const centerPosition = ITEM_WIDTH + GAP_SIZE; // Account for gap in center position
 
     // Calculate distance from center for rotation
     const distanceFromCenter = scrollX - centerPosition;
@@ -81,7 +93,7 @@ export default function SwipeableCard({
 
     // Existing vibration logic with auto-scroll
     const absoluteDistance = Math.abs(distanceFromCenter);
-    if (absoluteDistance > scrollThreshold) {
+    if (absoluteDistance > scrollThreshold && !hasTriggeredSwipe) {
       // Determine direction
       const isScrollingLeft = scrollX < centerPosition;
       const isScrollingRight = scrollX > centerPosition;
@@ -90,13 +102,17 @@ export default function SwipeableCard({
       if (isScrollingLeft && !hasVibratedLeftRef.current) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         hasVibratedLeftRef.current = true;
-        hasVibratedRightRef.current = false; // Reset opposite direction
+        hasVibratedRightRef.current = false;
+        setHasTriggeredSwipe(true);
 
         // Auto-scroll to left item (index 0)
-        flatListRef.current?.scrollToIndex({
-          index: 0,
-          animated: true,
-        });
+
+        if (Platform.OS == "android") {
+          flatListRef.current?.scrollTo({
+            x: (ITEM_WIDTH + GAP_SIZE) * 0, // index 0 → left
+            animated: true,
+          });
+        }
 
         // Call swipe callback after a short delay
         setTimeout(() => {
@@ -105,20 +121,23 @@ export default function SwipeableCard({
       } else if (isScrollingRight && !hasVibratedRightRef.current) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         hasVibratedRightRef.current = true;
-        hasVibratedLeftRef.current = false; // Reset opposite direction
+        hasVibratedLeftRef.current = false;
+        setHasTriggeredSwipe(true);
 
         // Auto-scroll to right item (index 2)
-        flatListRef.current?.scrollToIndex({
-          index: 2,
-          animated: true,
-        });
+        if (Platform.OS == "android") {
+          flatListRef.current?.scrollTo({
+            x: (ITEM_WIDTH + GAP_SIZE) * 2, // index * item width
+            animated: true,
+          });
+        }
 
         // Call swipe callback after a short delay
         setTimeout(() => {
           onSwipeRight?.();
         }, 10);
       }
-    } else {
+    } else if (absoluteDistance <= scrollThreshold) {
       // Reset vibration flags when back within threshold
       hasVibratedLeftRef.current = false;
       hasVibratedRightRef.current = false;
@@ -127,14 +146,19 @@ export default function SwipeableCard({
 
   // Reset rotation and height when scroll ends
   const handleScrollEnd = (event: any) => {
-    flatListRef.current?.scrollToIndex({
-      index: 1, // 👈 always back to center
-      animated: true,
-    });
-
-    console.log("thi just siope");
     const scrollX = event.nativeEvent.contentOffset.x;
-    const centerPosition = width;
+    const centerPosition = ITEM_WIDTH + GAP_SIZE;
+
+    // Only scroll back to center if no swipe was triggered
+    if (!hasTriggeredSwipe && Platform.OS == "android") {
+      flatListRef.current?.scrollTo({
+        x: ITEM_WIDTH + GAP_SIZE, // center position
+        animated: true,
+      });
+    }
+
+    // Reset swipe trigger flag
+    setHasTriggeredSwipe(false);
 
     // If we're back at center, animate rotation back and reset height
     if (Math.abs(scrollX - centerPosition) < 50) {
@@ -159,7 +183,7 @@ export default function SwipeableCard({
     }
   };
 
-  // Scroll-based rotation interpolation (0 to -30 degrees, rotating downward)
+  // Scroll-based rotation interpolation (0 to -20 degrees, rotating downward)
   const scrollBasedRotation = scrollRotation.interpolate({
     inputRange: [-1, 0, 1],
     outputRange: ["20deg", "0deg", "-20deg"],
@@ -179,41 +203,41 @@ export default function SwipeableCard({
         styles.container,
         style,
         {
-          //   overflow: "hidden",
           maxHeight: currentHeight ?? undefined, // Use the calculated height directly
           transform: [
             { rotate: scrollBasedRotation }, // Apply scroll-based rotation
           ],
         },
       ]}
-      className={`${index === activeSwipeIndex ? "z-[10000]" : ""}   `}
+      className={`${index === activeSwipeIndex ? "z-[10000]" : ""}  `}
       onLayout={handleLayout} // Measure the initial height
     >
-      <FlatList
+      <ScrollView
         ref={flatListRef}
-        data={threeItemArray}
-        renderItem={({ item }) => <View className="">{item}</View>}
-        keyExtractor={(item, index) => index.toString()}
         horizontal={true}
         showsHorizontalScrollIndicator={false}
-        contentContainerClassName="gap-[30px] "
-        initialScrollIndex={1} // Start at middle item
-        getItemLayout={(data, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
-        pagingEnabled={true} // Enable paging
-        snapToInterval={width - 20} // Snap to each screen width
-        snapToAlignment="start" // Snap to start of each item
-        decelerationRate={1}
-        bounces={false} // Disable bouncing at edges
+        pagingEnabled={true}
+        bounces={false}
+        decelerationRate="fast"
+        snapToInterval={ITEM_WIDTH + GAP_SIZE}
+        snapToAlignment="start"
+        contentOffset={{ x: ITEM_WIDTH + GAP_SIZE, y: 0 }} // Start at center
         onScroll={handleScroll}
         onMomentumScrollEnd={handleScrollEnd}
         onScrollEndDrag={handleScrollEnd}
         scrollEventThrottle={16}
-        initialNumToRender={3}
-      />
+        contentContainerStyle={{
+          flexDirection: "row",
+          gap: GAP_SIZE,
+          paddingLeft: 7,
+        }}
+      >
+        {threeItemArray.map((item, index) => (
+          <View key={index} style={{ width: ITEM_WIDTH }}>
+            {item}
+          </View>
+        ))}
+      </ScrollView>
     </Animated.View>
   );
 }

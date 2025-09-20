@@ -4,7 +4,6 @@ import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import * as Haptics from "expo-haptics";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -40,6 +39,11 @@ const Home: React.FC = () => {
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
+  // Track scroll start position for dynamic interpolation
+  const scrollStartPosition = useRef(0);
+  const lastScrollY = useRef(0);
+  const isScrollingDown = useRef(false);
+
   // Communities data for dropdown - "All" is default
   const communities = [
     { id: 0, name: "All", icon: "globe" },
@@ -67,14 +71,12 @@ const Home: React.FC = () => {
     images.img12,
   ];
 
-  // Add debug logging to see when scroll state changes
   useEffect(() => {
     console.log("HOME: feedScrollEnabled changed to:", feedScrollEnabled);
   }, [feedScrollEnabled]);
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Simulate API call
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
@@ -99,26 +101,23 @@ const Home: React.FC = () => {
     outputRange: [150, 0],
     extrapolate: "clamp",
   });
+
   const progress = pull.interpolate({
     inputRange: [0, 150],
     outputRange: [0, 1],
   });
 
-  const circleScale = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.6, 1],
-  });
   const headerTranslateY = pull.interpolate({
     inputRange: [0, 150],
     outputRange: [-30, 0],
   });
+
   // spinning refresh icon
   const spin = useRef(new Animated.Value(0)).current;
   const spinLoopRef = useRef<Animated.CompositeAnimation | null>(null);
 
   useEffect(() => {
     if (refreshing) {
-      // start infinite spin
       spinLoopRef.current = Animated.loop(
         Animated.timing(spin, {
           toValue: 1,
@@ -129,7 +128,6 @@ const Home: React.FC = () => {
       );
       spinLoopRef.current.start();
     } else {
-      // stop & reset
       if (spinLoopRef.current) {
         spinLoopRef.current.stop();
         spinLoopRef.current = null;
@@ -143,16 +141,13 @@ const Home: React.FC = () => {
     outputRange: ["0deg", "360deg"],
   });
 
-  const headerOpacity = refreshing
-    ? 1 // stay visible while refreshing
-    : progress;
+  const headerOpacity = refreshing ? 1 : progress;
   const [canTrigger, setCanTrigger] = useState(false);
 
   const { triggerUpload } = useLocalSearchParams();
   const [uploadVisible, setUploadVisible] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Simulate a 5s upload
   const simulateUpload = () => {
     setUploadVisible(true);
     setUploadProgress(0);
@@ -170,99 +165,99 @@ const Home: React.FC = () => {
     }, 100);
   };
 
-  const [hasStartedScrolling, setHasStartedScrolling] = useState(false);
-  const [hasScrolled70, setHasScrolled70] = useState(false);
-  // Add these animation interpolations after your existing interpolations
-  const hasVibratedRef = useRef(false);
-  // Stories animations based on scroll (0 to 150)
+  // Dynamic stories animations based on scroll start position + 60px range
   const storiesScale = scrollY.interpolate({
-    inputRange: [0, 130],
-    outputRange: [1, 0.5], // Scale from 100% to 30%
+    inputRange: [scrollStartPosition.current, scrollStartPosition.current + 60],
+    outputRange: [1, 0.5],
     extrapolate: "clamp",
   });
 
   const storiesTranslateX = scrollY.interpolate({
-    inputRange: [0, 130],
-    outputRange: [0, 220], // Move right by 30px
+    inputRange: [scrollStartPosition.current, scrollStartPosition.current + 60],
+    outputRange: [0, 220],
     extrapolate: "clamp",
   });
 
   const storiesMaxHeight = scrollY.interpolate({
-    inputRange: [0, 80],
-    outputRange: [140, 60], // Height from 400px to 200px
+    inputRange: [scrollStartPosition.current, scrollStartPosition.current + 60],
+    outputRange: [140, 60],
     extrapolate: "clamp",
   });
 
+  // Opacity animations - dynamic range
   const opacity = scrollY.interpolate({
-    inputRange: [0, 2], // scroll range
-    outputRange: [1, 0], // 👈 numbers (1 = visible, 0 = hidden)
+    inputRange: [
+      scrollStartPosition.current,
+      scrollStartPosition.current + 2,
+      scrollStartPosition.current + 60,
+    ],
+    outputRange: [1, 0, 0],
     extrapolate: "clamp",
   });
+
   const AbsoluteOpacity = scrollY.interpolate({
-    inputRange: [0, 2], // scroll range
-    outputRange: [0, 1], // 👈 numbers (1 = visible, 0 = hidden)
+    inputRange: [
+      scrollStartPosition.current,
+      scrollStartPosition.current + 2,
+      scrollStartPosition.current + 60,
+    ],
+    outputRange: [0, 1, 1],
     extrapolate: "clamp",
   });
 
-  const storiesTranslateY = scrollY.interpolate({
-    inputRange: [0, 130],
-    outputRange: [0, -150], // Move up by 20px
-    extrapolate: "clamp",
-  });
-
-  // State for stories count
   const [visibleStoriesCount, setVisibleStoriesCount] = useState(
     stories.length
   );
 
-  // Update the handleScroll function to include stories slicing logic
+  // Function to handle clicking on compact stories - just reset to 0
+  const handleStoriesClick = () => {
+    // Just reset scroll position to 0 (no animation scaling)
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+    // Reset tracking variables
+    scrollStartPosition.current = 0;
+    lastScrollY.current = 0;
+    isScrollingDown.current = false;
+  };
+
+  // Enhanced scroll handler with dynamic start position tracking
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const scrollOffset = event.nativeEvent.contentOffset.y;
+    const currentScrollY = event.nativeEvent.contentOffset.y;
 
-    // Reset to full stories when back to top
-    if (scrollOffset === 0 && visibleStoriesCount !== stories.length) {
-      setVisibleStoriesCount(stories.length);
-    }
-    // Vibrate when stories start collapsing
-    if (scrollOffset >= 30 && !hasVibratedRef.current) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      hasVibratedRef.current = true;
+    // Track scroll direction
+    if (currentScrollY > lastScrollY.current) {
+      // Scrolling down - update start position if we weren't scrolling down before
+      if (!isScrollingDown.current) {
+        scrollStartPosition.current = currentScrollY;
+        isScrollingDown.current = true;
+      }
+    } else if (currentScrollY < lastScrollY.current) {
+      isScrollingDown.current = false;
     }
 
-    // Reset vibration flag when back to top
-    if (scrollOffset === 0) {
-      hasVibratedRef.current = false;
+    // Reset everything when back to top
+    if (currentScrollY === 0) {
+      scrollStartPosition.current = 0;
+      isScrollingDown.current = false;
       if (visibleStoriesCount !== stories.length) {
         setVisibleStoriesCount(stories.length);
       }
     }
+
+    lastScrollY.current = currentScrollY;
   };
 
   const [visibleIds, setVisibleIds] = useState<any[]>([]);
-
-  // const viewabilityConfig = useRef({
-  //   itemVisiblePercentThreshold: 50, // item is "visible" if >=50% of it is on screen
-  // });
-
-  // const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
-  //   const ids = viewableItems.map((vi: any) => vi.item.id);
-  //   setVisibleIds(ids);
-  //   console.log("Currently visible stories:", ids);
-  // });
-
   const scrollRef = useRef<any>(null);
   const [flatListScrollEnabled, setFlatListScrollEnabled] = useState(true);
 
   return (
-    <SafeAreaView className="flex-1  bg-[#121212]">
-      <Animated.View className="flex-1 ">
-        {/* Custom pull-to-refresh header */}
+    <SafeAreaView className="flex-1 bg-[#121212]">
+      <Animated.View className="flex-1">
         {/* Custom pull-to-refresh header */}
         <Animated.View
           pointerEvents="none"
           style={{
             position: "absolute",
-            // top: insets.top, // let the gradient fill under the status bar
             left: 0,
             top: 0,
             right: 0,
@@ -271,33 +266,29 @@ const Home: React.FC = () => {
             transform: [{ translateY: headerTranslateY }],
           }}
         >
-          {/* Rounded gradient cap */}
           <View
             style={{
               width: "100%",
-              height: insets.top * 7, // adjust 100–140 to taste
+              height: insets.top * 7,
             }}
           >
             <LinearGradient
-              // teal → deep blue (center) → teal
               colors={["#27D3C0", "#2E6BFF", "#27D3C0"]}
               locations={[0, 0.5, 1]}
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }} // horizontal sweep
+              end={{ x: 1, y: 0 }}
               style={{ flex: 1, opacity: 0.95 }}
             />
           </View>
 
-          {/* Label + spinning refresh icon */}
           <View
             style={{
               position: "absolute",
-              top: 40, // below the notch
+              top: 40,
               flexDirection: "row",
               alignItems: "center",
               gap: 8,
             }}
-            className=""
           >
             <Text className="text-white font-semibold">
               {refreshing
@@ -315,14 +306,12 @@ const Home: React.FC = () => {
 
         {/* Scrollable Content */}
         <Animated.ScrollView
-          stickyHeaderIndices={[0]} // 👈 make the first child sticky
+          stickyHeaderIndices={[0]}
           className="flex-1"
-          // nestedScrollEnabled={true}
           scrollEnabled={feedScrollEnabled}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
-            // top: insets.top + 0,
             zIndex: 99,
             backgroundColor: "#121212",
             borderTopRightRadius: 30,
@@ -334,7 +323,6 @@ const Home: React.FC = () => {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              // hide default spinner (we overlay our own)
               tintColor="transparent"
               colors={["transparent"]}
               progressBackgroundColor="transparent"
@@ -347,10 +335,10 @@ const Home: React.FC = () => {
               useNativeDriver: false,
               listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
                 const y = e.nativeEvent.contentOffset.y;
-                const pulled = Math.max(0, -y); // positive while pulling down
+                const pulled = Math.max(0, -y);
                 setCanTrigger(pulled > THRESHOLD && !refreshing);
                 handleScroll(e);
-                // 🔑 Toggle FlatList scroll
+
                 if (y > 30 && flatListScrollEnabled) {
                   setFlatListScrollEnabled(false);
                 } else if (y <= 0 && !flatListScrollEnabled) {
@@ -365,35 +353,22 @@ const Home: React.FC = () => {
             if (-y > THRESHOLD && !refreshing) {
               onRefresh();
             }
-
-            if (y > 0 && y < 30) {
-              scrollRef.current?.scrollTo({ y: 0, animated: true });
-            } else if (y >= 30 && y < 100) {
-              scrollRef.current?.scrollTo({ y: 100, animated: true });
-            }
           }}
           scrollEventThrottle={16}
         >
-          <Animated.View
-            style={{
-              zIndex: 100,
-              // height: storiesMaxHeight, // Add this line
-            }}
-            className="  bg-[#121212] "
-          >
+          <Animated.View style={{ zIndex: 100 }} className="bg-[#121212]">
             <Animated.View
               style={{
                 zIndex: 100,
-                maxHeight: storiesMaxHeight, // Add this line
+                maxHeight: storiesMaxHeight,
               }}
-              className=" relative    "
+              className="relative"
             >
-              <View className="w-full mb-4 flex-row  px-4  items-center justify-between">
-                {/* Logo */}
-
+              {/* Header with Logo and Navigation */}
+              <View className="w-full mb-4 flex-row px-4 items-center justify-between">
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  className="items-center  justify-center z-20"
+                  className="items-center justify-center z-20"
                 >
                   <Image
                     source={images.logo_white}
@@ -403,30 +378,23 @@ const Home: React.FC = () => {
                   />
                 </TouchableOpacity>
 
-                <View className="flex-row space-x-3  gap-2">
+                <View className="flex-row space-x-3 gap-2">
                   <View className="relative">
                     <TouchableOpacity
-                      // onPress={() =>
-                      //   router.replace(RouterConstantUtil.tabs.communities as any)
-                      // }
-                      // onPress={() => setDropdownVisible(!dropdownVisible)}
-                      className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm  z-20"
+                      className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
                       activeOpacity={0.7}
                       style={{ minWidth: 80, maxWidth: 160 }}
                     >
                       <BlurView
                         intensity={10}
                         style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                        // experimentalBlurMethod="dimezisBlurView"
                       />
-
                       <Text
-                        className="text-white  font-medium text-[16px] flex-1"
+                        className="text-white font-medium text-[16px] flex-1"
                         numberOfLines={1}
                       >
                         {selectedCommunity}
                       </Text>
-
                       <Feather
                         name="server"
                         size={16}
@@ -492,7 +460,6 @@ const Home: React.FC = () => {
                     )}
                   </View>
 
-                  {/* Notification Bell */}
                   <TouchableOpacity
                     onPress={() => console.log("bell pressed")}
                     activeOpacity={0.7}
@@ -501,7 +468,6 @@ const Home: React.FC = () => {
                     <BlurView
                       intensity={10}
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                      // experimentalBlurMethod="dimezisBlurView"
                     />
                     <Feather
                       name="bell"
@@ -512,109 +478,57 @@ const Home: React.FC = () => {
                   </TouchableOpacity>
                 </View>
               </View>
-              <Animated.View
+
+              {/* Compact Stories (Absolute positioned) - with click handler */}
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={handleStoriesClick}
                 style={{
-                  transformOrigin: "left center", // Scale from left side
-                  transform: [
-                    { scale: storiesScale },
-                    { translateX: storiesTranslateX },
-                    // { translateY: storiesTranslateY },
-                  ],
-                  opacity: AbsoluteOpacity,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                 }}
-                className=" bottom-0  absolute"
               >
-                <Animated.View className=" ">
+                <Animated.View
+                  style={{
+                    transformOrigin: "left center",
+                    transform: [
+                      { scale: storiesScale },
+                      { translateX: storiesTranslateX },
+                    ],
+                    opacity: AbsoluteOpacity,
+                  }}
+                >
                   <FlatList
                     data={visibleIds}
-                    contentContainerClassName=""
-                    scrollEnabled={flatListScrollEnabled} // 👈 controlled here
+                    scrollEnabled={flatListScrollEnabled}
                     viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
                     horizontal
                     keyExtractor={(_, index) => index.toString()}
                     showsHorizontalScrollIndicator={false}
-                    snapToInterval={80 + 8} // 👈 item width + gap
-                    decelerationRate="fast" // 👈 makes snapping quick
+                    snapToInterval={88}
+                    decelerationRate="fast"
                     contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
-                    renderItem={({ item, index }) => {
-                      // const isVisible = visibleIds.includes(index.toString());
-                      // console.log(visibleIds);
-
-                      // if (!isVisible) {
-                      //   return null; // 👈 don't render if not visible
-                      // }
-                      return (
-                        <Animated.View
-                          style={{
-                            transform: [
-                              {
-                                translateX:
-                                  index > 0
-                                    ? scrollY.interpolate({
-                                        inputRange: [0, 100],
-                                        outputRange: [0, -30 * index],
-                                        extrapolate: "clamp",
-                                      })
-                                    : 0,
-                              },
-                            ],
-                          }}
-                          className="relative"
-                        >
-                          <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
-                            <Image
-                              source={item}
-                              className="w-full h-full rounded-full"
-                              resizeMode="cover"
-                            />
-                          </View>
-                        </Animated.View>
-                      );
-                    }}
-                  />
-                </Animated.View>
-              </Animated.View>
-              <Animated.View
-                style={{
-                  opacity: opacity,
-                }}
-                className=""
-              >
-                <FlatList
-                  data={stories}
-                  contentContainerClassName=""
-                  onViewableItemsChanged={({ viewableItems }) => {
-                    const visibleItems = viewableItems
-                      .map((vi) => vi.item) // 👈 store the actual story (image) not index
-                      .slice(0, 4); // limit to 4
-
-                    setVisibleIds(visibleItems);
-                    console.log("Currently visible stories:", visibleItems);
-                  }}
-                  viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-                  horizontal
-                  keyExtractor={(_, index) => index.toString()}
-                  showsHorizontalScrollIndicator={false}
-                  snapToInterval={80 + 8} // 👈 item width + gap
-                  decelerationRate="fast" // 👈 makes snapping quick
-                  contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
-                  renderItem={({ item, index }) => {
-                    return (
+                    renderItem={({ item, index }) => (
                       <Animated.View
-                        // style={{
-                        //   transform: [
-                        //     {
-                        //       translateX:
-                        //         index > 0
-                        //           ? scrollY.interpolate({
-                        //               inputRange: [0, 100],
-                        //               outputRange: [0, -30 * index],
-                        //               extrapolate: "clamp",
-                        //             })
-                        //           : 0,
-                        //     },
-                        //   ],
-                        // }}
+                        style={{
+                          transform: [
+                            {
+                              translateX:
+                                index > 0
+                                  ? scrollY.interpolate({
+                                      inputRange: [
+                                        scrollStartPosition.current,
+                                        scrollStartPosition.current + 60,
+                                      ],
+                                      outputRange: [0, -30 * index],
+                                      extrapolate: "clamp",
+                                    })
+                                  : 0,
+                            },
+                          ],
+                        }}
                         className="relative"
                       >
                         <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
@@ -625,21 +539,52 @@ const Home: React.FC = () => {
                           />
                         </View>
                       </Animated.View>
-                    );
+                    )}
+                  />
+                </Animated.View>
+              </TouchableOpacity>
+
+              {/* Regular Stories */}
+              <Animated.View style={{ opacity: opacity }}>
+                <FlatList
+                  data={stories}
+                  onViewableItemsChanged={({ viewableItems }) => {
+                    const visibleItems = viewableItems
+                      .map((vi) => vi.item)
+                      .slice(0, 5);
+                    setVisibleIds(visibleItems);
                   }}
+                  viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+                  horizontal
+                  keyExtractor={(_, index) => index.toString()}
+                  showsHorizontalScrollIndicator={false}
+                  snapToInterval={88}
+                  decelerationRate="fast"
+                  contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
+                  renderItem={({ item, index }) => (
+                    <Animated.View className="relative">
+                      <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
+                        <Image
+                          source={item}
+                          className="w-full h-full rounded-full"
+                          resizeMode="cover"
+                        />
+                      </View>
+                    </Animated.View>
+                  )}
                 />
               </Animated.View>
             </Animated.View>
           </Animated.View>
 
-          <View className="flex-row   flex-1 justify-center items-center gap-3">
+          <View className="flex-row flex-1 justify-center items-center gap-3">
             <AllFeeds
               posts={posts}
               addPost={() => setShowUpload(true)}
               setUploadVisible={setUploadVisible}
               simulateUpload={simulateUpload}
               externalScrollEnabled={feedScrollEnabled}
-              setExternalScrollEnabled={setFeedScrollEnabled} // This is the key prop
+              setExternalScrollEnabled={setFeedScrollEnabled}
             />
           </View>
         </Animated.ScrollView>
@@ -653,7 +598,6 @@ const Home: React.FC = () => {
         )}
       </Animated.View>
 
-      {/* Upload Toast */}
       {uploadVisible && (
         <UploadToast
           visible={uploadVisible}
