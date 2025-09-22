@@ -12,7 +12,7 @@ import { View } from "react-native-animatable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = width - 20;
+const ITEM_WIDTH = width - 15;
 const GAP_SIZE = 20;
 
 interface SwipeableCardProps {

@@ -1,5 +1,6 @@
 import AllFeeds from "@/components/feed/AllFeeds";
 import UploadToast from "@/components/feed/UploadToast";
+import PuffySmoke from "@/components/ui/PuffySmoke";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
@@ -27,7 +28,7 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const Home: React.FC = () => {
   const [posts] = useState(dummyAllPosts);
@@ -249,7 +250,9 @@ const Home: React.FC = () => {
   const [visibleIds, setVisibleIds] = useState<any[]>([]);
   const scrollRef = useRef<any>(null);
   const [flatListScrollEnabled, setFlatListScrollEnabled] = useState(true);
-
+  // Add these state variables near the top of your Home component
+  const [showLikePuff, setShowLikePuff] = useState(false);
+  const [showDislikePuff, setShowDislikePuff] = useState(false);
   return (
     <SafeAreaView className="flex-1 bg-[#121212]">
       <Animated.View className="flex-1">
@@ -585,6 +588,8 @@ const Home: React.FC = () => {
               simulateUpload={simulateUpload}
               externalScrollEnabled={feedScrollEnabled}
               setExternalScrollEnabled={setFeedScrollEnabled}
+              onShowLikePuff={() => setShowDislikePuff(true)}
+              onShowDislikePuff={() => setShowLikePuff(true)}
             />
           </View>
         </Animated.ScrollView>
@@ -610,6 +615,23 @@ const Home: React.FC = () => {
           onCancel={() => setUploadVisible(false)}
         />
       )}
+
+      {/* Fixed Position Puff Animations */}
+      <PuffySmoke
+        type="like"
+        visible={showLikePuff}
+        x={width - 140} // Right side for like
+        y={height * 0.45}
+        onComplete={() => setShowLikePuff(false)}
+      />
+
+      <PuffySmoke
+        type="dislike"
+        visible={showDislikePuff}
+        x={20} // Left side for dislike
+        y={height * 0.45}
+        onComplete={() => setShowDislikePuff(false)}
+      />
     </SafeAreaView>
   );
 };

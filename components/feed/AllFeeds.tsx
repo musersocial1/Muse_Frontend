@@ -20,7 +20,6 @@ import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoCommentsModal from "../modals/VideoComments";
-import PuffySmoke from "../ui/PuffySmoke";
 import SwipeableCard from "./SwipeableCard";
 
 const { width, height } = Dimensions.get("window");
@@ -103,8 +102,8 @@ const PostCard: React.FC<PostCardProps> = ({
                 pagingEnabled
                 scrollEnabled={scrollEnabled}
                 showsHorizontalScrollIndicator={false}
-                onScrollBeginDrag={() => onImageScrollStateChange?.(true)}
-                onScrollEndDrag={() => onImageScrollStateChange?.(false)}
+                // onScrollBeginDrag={() => onImageScrollStateChange?.(true)}
+                // onScrollEndDrag={() => onImageScrollStateChange?.(false)}
                 // onScroll={(event) => {
                 //   const index = Math.round(
                 //     event.nativeEvent.contentOffset.x / (width - 42)
@@ -119,7 +118,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   <Image
                     key={index}
                     source={typeof item === "string" ? { uri: item } : item}
-                    style={{ width: width - 62 }}
+                    style={{ width: width - 57 }}
                     resizeMode="cover"
                     className="h-full"
                   />
@@ -303,6 +302,9 @@ interface AllFeedsProps {
   simulateUpload?: any;
   externalScrollEnabled?: boolean;
   setExternalScrollEnabled?: (val: boolean) => void;
+  // Add these new props
+  onShowLikePuff?: () => void;
+  onShowDislikePuff?: () => void;
 }
 
 const AllFeeds: React.FC<AllFeedsProps> = ({
@@ -312,6 +314,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   simulateUpload,
   setExternalScrollEnabled,
   externalScrollEnabled,
+  onShowLikePuff,
+  onShowDislikePuff,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
@@ -320,10 +324,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
-
-  // Puff animation states
-  const [showLikePuff, setShowLikePuff] = useState(false);
-  const [showDislikePuff, setShowDislikePuff] = useState(false);
 
   // Calculate center positions for puff animations
   const centerY = height / 2 - 100; // Center vertically, offset up a bit
@@ -364,20 +364,14 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     }, 100);
   };
 
-  // Enhanced removePost functions with puff animations
+  // Update these functions
   const removePostWithLike = (id: string) => {
-    // console.log("Removing post with LIKE:", id);
-    // Show dislike puff animation
-    setShowDislikePuff(true);
+    onShowLikePuff?.(); // Trigger like animation in parent
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
   const removePostWithDislike = (id: string) => {
-    // console.log("Removing post with DISLIKE:", id);
-
-    // Show like puff animation
-    setShowLikePuff(true);
-
+    onShowDislikePuff?.(); // Trigger dislike animation in parent
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -624,22 +618,22 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         initialNumToRender={3}
       />
 
-      {/* Absolutely Positioned Puff Animations - Centered on Screen */}
+      {/* Absolutely Positioned Puff Animations - Centered on Screen
       <PuffySmoke
         type="like"
         visible={showLikePuff}
-        x={likePosition.x}
+        x={width}
         y={likePosition.y}
         onComplete={() => setShowLikePuff(false)}
-      />
+      /> */}
 
-      <PuffySmoke
+      {/* <PuffySmoke
         type="dislike"
         visible={showDislikePuff}
         x={dislikePosition.x}
         y={dislikePosition.y}
         onComplete={() => setShowDislikePuff(false)}
-      />
+      /> */}
 
       {/* Existing Modals */}
       <UserProfileModal

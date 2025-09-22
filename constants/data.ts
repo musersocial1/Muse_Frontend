@@ -107,6 +107,189 @@ export const dummyAllPosts: Post[] = [
     comments: 893,
     type: "text",
   },
+  {
+    id: "12",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    vComments: [
+      images.feed4,
+      images.feed5,
+      images.feed6,
+      images.feed1,
+      images.feed2,
+      images.feed3,
+    ],
+
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
+  {
+    id: "13",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
+  {
+    id: "14",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    videos: [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
+    ],
+    timestamp: "2h",
+    likes: 2678,
+    thumbnail: images.latest2,
+    comments: 893,
+    type: "video",
+  },
+  {
+    id: "15",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    images: [
+      images.feed4,
+      images.feed5,
+      images.feed6,
+      images.feed1,
+      images.feed2,
+      images.feed3,
+    ],
+
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "16",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
+  {
+    id: "23",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
+  {
+    id: "24",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    videos: [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
+    ],
+    timestamp: "2h",
+    likes: 2678,
+    thumbnail: images.latest2,
+    comments: 893,
+    type: "video",
+  },
+  {
+    id: "25",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    images: [
+      images.feed4,
+      images.feed5,
+      images.feed6,
+      images.feed1,
+      images.feed2,
+      images.feed3,
+    ],
+
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "26",
+    author: {
+      name: "beyonce",
+      username: "@beyonceknow",
+      avatar:
+        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      verified: true,
+    },
+    content:
+      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+    timestamp: "2h",
+    likes: 2678,
+    comments: 893,
+    type: "text",
+  },
 ];
 
 export const dummyLongFormContent: LongFormContent[] = [

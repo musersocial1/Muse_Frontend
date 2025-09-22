@@ -447,6 +447,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1000,
+    top: 0,
   },
   mainIcon: {
     position: "absolute",
