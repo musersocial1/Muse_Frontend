@@ -245,23 +245,23 @@ const PostCard: React.FC<PostCardProps> = ({
                         borderRadius: 999,
                       }}
                       resizeMode={ResizeMode.COVER}
-                      shouldPlay
+                      shouldPlay={false}
                       isLooping={false}
                       isMuted
-                      onLoad={() => {
-                        const loop = async () => {
-                          try {
-                            await videoRefs[index]?.playFromPositionAsync(0);
-                            setTimeout(async () => {
-                              await videoRefs[index]?.pauseAsync();
-                              loop();
-                            }, 3000);
-                          } catch (e) {
-                            console.log("Video loop error", e);
-                          }
-                        };
-                        loop();
-                      }}
+                      // onLoad={() => {
+                      //   const loop = async () => {
+                      //     try {
+                      //       await videoRefs[index]?.playFromPositionAsync(0);
+                      //       setTimeout(async () => {
+                      //         await videoRefs[index]?.pauseAsync();
+                      //         loop();
+                      //       }, 3000);
+                      //     } catch (e) {
+                      //       console.log("Video loop error", e);
+                      //     }
+                      //   };
+                      //   loop();
+                      // }}
                       ref={(ref) => {
                         if (!videoRefs[index]) videoRefs[index] = ref;
                       }}
@@ -612,28 +612,11 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
           paddingBottom: 20,
           paddingTop: 10,
         }}
+        maxToRenderPerBatch={5} // Reduce from 5 to 3
+        windowSize={5} // Reduce from 10 to 5
+        initialNumToRender={2} // Reduce from 3 to 2
         removeClippedSubviews={true}
-        maxToRenderPerBatch={5}
-        windowSize={10}
-        initialNumToRender={3}
       />
-
-      {/* Absolutely Positioned Puff Animations - Centered on Screen
-      <PuffySmoke
-        type="like"
-        visible={showLikePuff}
-        x={width}
-        y={likePosition.y}
-        onComplete={() => setShowLikePuff(false)}
-      /> */}
-
-      {/* <PuffySmoke
-        type="dislike"
-        visible={showDislikePuff}
-        x={dislikePosition.x}
-        y={dislikePosition.y}
-        onComplete={() => setShowDislikePuff(false)}
-      /> */}
 
       {/* Existing Modals */}
       <UserProfileModal

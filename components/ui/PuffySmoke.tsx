@@ -118,7 +118,7 @@ const PuffySmoke: React.FC<PuffySmokeProps> = ({
       ]);
 
       // Particle burst animations - NOTICEABLE BUT BALANCED
-      const particleAnimations = Animated.stagger(60, [
+      const particleAnimations = Animated.stagger(30, [
         // Reduced from 75 to 60
         // Particle 1 - top right
         Animated.parallel([
@@ -282,15 +282,15 @@ const PuffySmoke: React.FC<PuffySmokeProps> = ({
       ]);
 
       // Run all animations
+      // Run all animations
       Animated.parallel([
         mainIconAnimation,
         Animated.sequence([
-          Animated.delay(150), // Increased delay from 100 to 150
-          particleAnimations,
+          particleAnimations, // Remove the delay too
           particleFadeOut,
         ]),
       ]).start(() => {
-        onComplete?.();
+        onComplete?.(); // Only call once, after everything is done
       });
     }
   }, [visible]);
@@ -309,7 +309,11 @@ const PuffySmoke: React.FC<PuffySmokeProps> = ({
   });
 
   return (
-    <View style={[styles.container, { left: x, top: y }]} pointerEvents="none">
+    <View
+      style={[styles.container, { left: x, top: y }]}
+      pointerEvents="none"
+      // className="border2"
+    >
       {/* Main Icon - BIGGER */}
       <Animated.View
         style={[

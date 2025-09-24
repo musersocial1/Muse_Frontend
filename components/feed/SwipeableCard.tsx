@@ -162,16 +162,16 @@ export default function SwipeableCard({
 
     // If we're back at center, animate rotation back and reset height
     if (Math.abs(scrollX - centerPosition) < 50) {
-      // Small threshold for "center"
-      Animated.timing(scrollRotation, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-
-      // Reset height back to full
-      setCurrentHeight(initialHeight);
     }
+    // Small threshold for "center"
+    Animated.timing(scrollRotation, {
+      toValue: 0,
+      duration: 50,
+      useNativeDriver: true,
+    }).start();
+
+    // Reset height back to full
+    setCurrentHeight(initialHeight);
   };
 
   // Measure initial height of the content
