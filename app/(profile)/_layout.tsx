@@ -30,6 +30,12 @@ const ProfileLayout = () => {
         <Stack.Screen name="tags" options={{ headerShown: false }} />
         <Stack.Screen name="privacy" options={{ headerShown: false }} />
         <Stack.Screen name="termsofuse" options={{ headerShown: false }} />
+        <Stack.Screen name="analytics" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="amount-generated"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="cashflow" options={{ headerShown: false }} />
       </Stack>
     </>
   );

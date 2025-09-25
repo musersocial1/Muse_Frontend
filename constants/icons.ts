@@ -3,10 +3,12 @@ import asana from "@/assets/icons/asana.png";
 import back from "@/assets/icons/back.png";
 import back_2 from "@/assets/icons/back_2.png";
 import back_3 from "@/assets/icons/back_3.png";
+import badge from "@/assets/icons/badge.png";
 import star from "@/assets/icons/bright-star.png";
 import bubbling from "@/assets/icons/bubbling.png";
 import camera from "@/assets/icons/camera.webp";
 import cardinfo from "@/assets/icons/cardinfo.png";
+import cash from "@/assets/icons/cash.png";
 import chat_message from "@/assets/icons/chat_comment.webp";
 import comment from "@/assets/icons/comment.png";
 import communities from "@/assets/icons/communities.png";
@@ -21,6 +23,7 @@ import eyeclose from "@/assets/icons/eyeclose.png";
 import gallery from "@/assets/icons/gallery.webp";
 import gif from "@/assets/icons/gif.webp";
 import google from "@/assets/icons/google.png";
+import groups from "@/assets/icons/groups.png";
 import helpdesk from "@/assets/icons/helpdesk.png";
 import home from "@/assets/icons/home.png";
 import lock from "@/assets/icons/lock.png";
@@ -102,4 +105,7 @@ export const icons = {
   playback_left,
   playback_right,
   chat_message,
+  cash,
+  badge,
+  groups,
 };
