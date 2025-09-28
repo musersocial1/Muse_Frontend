@@ -14,6 +14,7 @@ import {
   Dimensions,
   GestureResponderEvent,
   Image,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -31,6 +32,7 @@ interface VideoReplyModalProps {
   // visible: boolean;
   onClose: () => void;
   startIndex?: number;
+  showVideoReply: boolean; // 👈 control visibility from parent
   videos: any[]; // 👈 pass videos from parent
 }
 
@@ -39,6 +41,7 @@ export default function VideoReply({
   onClose,
   startIndex = 0,
   videos,
+  showVideoReply,
 }: VideoReplyModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
@@ -284,7 +287,12 @@ export default function VideoReply({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }} className="z-[1000]">
+    <Modal
+      visible={showVideoReply} // or whatever state controls visibility
+      animationType="slide" // or "fade", "none"
+      presentationStyle="fullScreen" // for full screen modal
+      onRequestClose={() => onClose()} // Android back button handling
+    >
       {/* Top bar */}
       <View
         style={{ top: Platform.OS == "android" ? 10 : insets.top }}
@@ -473,7 +481,6 @@ export default function VideoReply({
           </View>
         </TouchableOpacity>
       )}
-
       <ScrollView
         ref={scrollViewRef}
         pagingEnabled
@@ -488,7 +495,6 @@ export default function VideoReply({
       >
         {videos.map((item, index) => renderVideoItem(item, index))}
       </ScrollView>
-
       <DeletePostFlowModal
         visible={deletePost}
         post={{
@@ -514,6 +520,6 @@ export default function VideoReply({
         }}
         onClose={() => setFlagMember(false)}
       />
-    </View>
+    </Modal>
   );
 }

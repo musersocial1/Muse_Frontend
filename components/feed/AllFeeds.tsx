@@ -19,6 +19,7 @@ import { FlatList, ScrollView } from "react-native-gesture-handler";
 import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
+import VideoReply from "../modals/video-reply";
 import VideoCommentsModal from "../modals/VideoComments";
 import SwipeableCard from "./SwipeableCard";
 
@@ -32,12 +33,58 @@ const PostCard: React.FC<PostCardProps> = ({
   setShowRecordModal,
   onImageScrollStateChange,
   scrollEnabled = true,
+  isVisible,
+  handleVideoCommentPress,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = React.useRef<any[]>([]).current;
 
+  // Add this state to track which video is playing
+  const [playingVideoIndex, setPlayingVideoIndex] = useState<number | null>(
+    null
+  );
+
+  // Add this function to handle video playback timing
+  const handleVideoPlayback = (videoRef: any, index: number) => {
+    if (videoRef && index === 0) {
+      // Only for the first video
+      // Start playing
+      videoRef.playAsync();
+      setPlayingVideoIndex(0);
+
+      // Stop after 3 seconds and restart
+      setTimeout(() => {
+        videoRef.setPositionAsync(0); // Reset to beginning
+        videoRef.playAsync(); // Play again
+      }, 3000);
+    }
+  };
+
+  // Add this state for text expansion
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
+  const [shouldShowReadMore, setShouldShowReadMore] = useState(false);
+
+  // Add this function to check if text should be truncated
+  const checkTextLength = (text: string) => {
+    // Rough estimation: ~50 characters per line, 5 lines = 250 characters
+    return text.length > 250;
+  };
+
+  // Add useEffect to check text length on mount
+  useEffect(() => {
+    setShouldShowReadMore(checkTextLength(post.content));
+  }, [post.content]);
+
+  // Add function to get display text
+  const getDisplayText = () => {
+    if (!shouldShowReadMore || isTextExpanded) {
+      return post.content;
+    }
+    // Truncate to approximately 5 lines (250 characters)
+    return post.content.substring(0, 200) + "...";
+  };
   return (
-    <View className="my-[10px] ">
+    <View className="my-[4px] ">
       <Animated.View className="bg-[#1C1C1C] rounded-[30px] overflow-hidden">
         <View className="flex-row justify-between items-center px-6 pt-6 pb-3">
           <TouchableOpacity
@@ -46,7 +93,7 @@ const PostCard: React.FC<PostCardProps> = ({
           >
             <View className="w-12 h-12 rounded-full overflow-hidden mr-2">
               <Image
-                source={icons.user}
+                source={{ uri: post.author.avatar }}
                 className="w-full h-full"
                 resizeMode="cover"
               />
@@ -70,9 +117,13 @@ const PostCard: React.FC<PostCardProps> = ({
             </View>
           </TouchableOpacity>
           <View className="flex-row gap-1 items-center">
-            <View className="bg-[#FFFFFF]/[6%] px-4 py-3 rounded-full">
-              <Text className="text-white/80 font-sfpro-bold text-[13px]">
-                TBD Podcast
+            <View className="bg-[#FFFFFF]/[6%] px-4 py-3  max-w-[100px] rounded-full">
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                className="text-white/80 font-sfpro-bold text-[13px]"
+              >
+                {post.communityName || "TBD Podcast"}
               </Text>
             </View>
             <Text className="text-white/50 ml-2 font-sfpro-medium text-[16px]">
@@ -85,17 +136,25 @@ const PostCard: React.FC<PostCardProps> = ({
         </View>
 
         <View className="pb-3 px-6">
-          <Text className="text-white text-[17px] font-sfpro-medium leading-[20px]">
-            {post.content}
-          </Text>
-          <Text className="text-white/50 font-sfpro-bold text-[13px] pt-2">
-            {post.likes.toLocaleString()} likes
-          </Text>
+          <View className="flex-row flex-wrap items-baseline">
+            <Text className="text-white  text-[17px] inline-flex items-baseline font-sfpro-medium leading-[20px] ">
+              {getDisplayText()}
+              {shouldShowReadMore && (
+                <TouchableOpacity
+                  onPress={() => setIsTextExpanded(!isTextExpanded)}
+                >
+                  <Text className="text-[#0368FF] ml-3 inline-flex items-baseline   text-[15px] -mb-1 leading-[15px] font-sfpro-medium">
+                    {isTextExpanded ? "Read less" : "Read more"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </Text>
+          </View>
         </View>
 
         {/* Post Image (if exists) */}
         {post.type === "image" && post.images && post.images.length > 0 && (
-          <View className="px-6">
+          <View className="px-6 mt-2">
             <View className="mb-3 w-full aspect-[1/1.1] rounded-[25px] overflow-hidden">
               <ScrollView
                 horizontal
@@ -126,16 +185,18 @@ const PostCard: React.FC<PostCardProps> = ({
               </ScrollView>
 
               {/* Dots Pagination */}
-              <View className="absolute bottom-8 w-full flex-row justify-center">
-                {post.images.map((_, i) => (
-                  <View
-                    key={i}
-                    className={`h-2 mx-1 rounded-full ${
-                      i === activeIndex ? "bg-white w-6" : "bg-white/40 w-2"
-                    }`}
-                  />
-                ))}
-              </View>
+              {post.images.length > 1 && (
+                <View className="absolute bottom-8 w-full flex-row justify-center">
+                  {post.images.map((_, i) => (
+                    <View
+                      key={i}
+                      className={`h-2 mx-1 rounded-full ${
+                        i === activeIndex ? "bg-white w-6" : "bg-white/40 w-2"
+                      }`}
+                    />
+                  ))}
+                </View>
+              )}
             </View>
           </View>
         )}
@@ -187,7 +248,7 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {/* Post Actions */}
-        <View className="flex-row px-6 items-center pb-4 justify-between pt-4">
+        <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
           <View className="flex-row gap-2">
             <TouchableOpacity
               onPress={() => setOpenComments(true)}
@@ -226,8 +287,8 @@ const PostCard: React.FC<PostCardProps> = ({
           </View>
         </View>
 
-        {post.vComments && post.vComments.length > 0 && (
-          <View className="pb-6">
+        {/* {post.vComments && post.vComments.length > 0 && (
+          <View className="pb-6 ">
             <ScrollView
               horizontal
               scrollEnabled={scrollEnabled}
@@ -248,26 +309,104 @@ const PostCard: React.FC<PostCardProps> = ({
                       shouldPlay={false}
                       isLooping={false}
                       isMuted
-                      // onLoad={() => {
-                      //   const loop = async () => {
-                      //     try {
-                      //       await videoRefs[index]?.playFromPositionAsync(0);
-                      //       setTimeout(async () => {
-                      //         await videoRefs[index]?.pauseAsync();
-                      //         loop();
-                      //       }, 3000);
-                      //     } catch (e) {
-                      //       console.log("Video loop error", e);
-                      //     }
-                      //   };
-                      //   loop();
-                      // }}
                       ref={(ref) => {
                         if (!videoRefs[index]) videoRefs[index] = ref;
                       }}
                     />
                   </View>
                 </View>
+              ))}
+              {post.vComments.length > 6 && (
+                <TouchableOpacity className="items-center">
+                  <View className="w-20 h-20 rounded-full border-4 border-white/40 bg-[#2c2c2c] items-center justify-center">
+                    <Text className="text-white text-base font-neutral-medium">
+                      See alljjdjd
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+          </View>
+        )} */}
+        {post.vComments && post.vComments.length > 0 && (
+          <View className="pb-6 ">
+            <ScrollView
+              horizontal
+              scrollEnabled={scrollEnabled}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
+            >
+              {post.vComments.slice(0, 6).map((commentItem, index) => (
+                <TouchableOpacity
+                  key={index}
+                  className="relative"
+                  onPress={handleVideoCommentPress}
+                >
+                  <View className="relative">
+                    <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
+                      {commentItem.type === "video" ? (
+                        <Video
+                          source={{ uri: commentItem.url }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 999,
+                          }}
+                          resizeMode={ResizeMode.COVER}
+                          shouldPlay={index === 0 && isVisible} // Only play if first video AND post is visible
+                          isLooping={index === 0 && isVisible} // Only loop if first video AND post is visible
+                          isMuted
+                          ref={(ref) => {
+                            if (!videoRefs[index]) {
+                              videoRefs[index] = ref;
+                              // Auto-start the first video when ref is set, only if visible
+                              if (index === 0 && ref && isVisible) {
+                                setTimeout(() => {
+                                  handleVideoPlayback(ref, index);
+                                }, 500);
+                              }
+                            }
+                          }}
+                          onLoad={() => {
+                            // When video loads, start playback only if visible and first video
+                            if (index === 0 && isVisible) {
+                              handleVideoPlayback(videoRefs[index], index);
+                            }
+                          }}
+                          onPlaybackStatusUpdate={(status) => {
+                            // Handle the 5-second loop for first video, only if visible
+                            if (
+                              index === 0 &&
+                              isVisible && // Add this check
+                              status.isLoaded &&
+                              status.positionMillis >= 10000
+                            ) {
+                              const videoRef = videoRefs[index];
+                              if (videoRef) {
+                                videoRef.setPositionAsync(0); // Reset to start
+                              }
+                            }
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          source={
+                            typeof commentItem.url === "string" &&
+                            commentItem.url.startsWith("http")
+                              ? { uri: commentItem.url } // Remote image
+                              : (commentItem.url as any) // Local image (imported asset)
+                          }
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: 999,
+                          }}
+                          resizeMode="cover"
+                        />
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
               ))}
               {post.vComments.length > 6 && (
                 <TouchableOpacity className="items-center">
@@ -293,6 +432,8 @@ interface PostCardProps {
   setShowRecordModal: (val: boolean) => void;
   onImageScrollStateChange?: (isScrolling: boolean) => void;
   scrollEnabled?: boolean;
+  isVisible?: boolean; // 👈 new
+  handleVideoCommentPress?: () => void; // 👈 new
 }
 
 interface AllFeedsProps {
@@ -458,6 +599,24 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     };
   }, []);
 
+  const [visiblePostIds, setVisiblePostIds] = useState<string[]>([]);
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    const ids = viewableItems.map((v: any) => v.item.id);
+    setVisiblePostIds(ids);
+  }).current;
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 80, // % of item that must be visible
+  };
+
+  const [showVideoReply, setShowVideoReply] = useState(false);
+  const handleVideoCommentPress = () => {
+    setShowVideoReply(true);
+    console.log("good on there ");
+  };
+
+  // Add these state variables and refs at the top of your component
+
   // Empty state
   if (!feedPosts || feedPosts.length === 0) {
     return (
@@ -573,6 +732,9 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         data={feedPosts}
         nestedScrollEnabled={true}
         keyExtractor={(item) => item.id}
+        onViewableItemsChanged={onViewableItemsChanged}
+        contentContainerClassName="pb-24"
+        viewabilityConfig={viewabilityConfig}
         renderItem={({ item, index }) => (
           <View
             key={item.id}
@@ -582,8 +744,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
             collapsable={false}
           >
             <SwipeableCard
-              onSwipeLeft={() => removePostWithDislike(item.id)} // LEFT = DISLIKE
-              onSwipeRight={() => removePostWithLike(item.id)} // RIGHT = LIKE
+              onSwipeLeft={() => removePostWithDislike(item.id)}
+              onSwipeRight={() => removePostWithLike(item.id)}
               index={index}
               activeSwipeIndex={activeSwipeIndex}
               disabled={imageScrollingStates[item.id] || false}
@@ -602,22 +764,28 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
                 onImageScrollStateChange={(isScrolling) =>
                   handleImageScrollStateChange(item.id, isScrolling)
                 }
+                handleVideoCommentPress={handleVideoCommentPress}
+                isVisible={visiblePostIds.includes(item.id)} // 👈 new
               />
             </SwipeableCard>
           </View>
         )}
         scrollEnabled={effectiveScrollEnabled}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 20,
-          paddingTop: 10,
-        }}
-        maxToRenderPerBatch={5} // Reduce from 5 to 3
-        windowSize={5} // Reduce from 10 to 5
-        initialNumToRender={2} // Reduce from 3 to 2
+        // 🔥 KEY CHANGES HERE:
+        maxToRenderPerBatch={2} // Only render 1 item at a time
+        windowSize={2} // Only keep 1 screen height worth of items (0.5 above + 0.5 below)
+        initialNumToRender={1} // Start with just 1 item
         removeClippedSubviews={true}
       />
-
+      {showVideoReply && (
+        <VideoReply
+          videos={videoComments}
+          showVideoReply={showVideoReply}
+          startIndex={0}
+          onClose={() => setShowVideoReply(false)}
+        />
+      )}
       {/* Existing Modals */}
       <UserProfileModal
         visible={isOpen}

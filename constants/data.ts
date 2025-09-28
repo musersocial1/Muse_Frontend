@@ -6,732 +6,403 @@ export const dummyAllPosts: Post[] = [
   {
     id: "1",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+      name: "Sarah Chen",
+      username: "@sarahc_tech",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
       verified: true,
     },
+    images: [images.mainpost1],
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+      "Friedberg should have his own podcast, along with Chamath ... and Sacks. hm.. What am I trying to say here?",
     vComments: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
     ],
-
-    timestamp: "2h",
+    timestamp: "3h",
     likes: 2678,
     comments: 893,
-    type: "text",
+    type: "image",
   },
   {
     id: "2",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Marcus Johnson",
+      username: "@marcusj_dev",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
+    images: [images.mainpost2],
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
+      "Jason's arguments on the Kimmel situation no different from his apology to Palmer Luckey for getting him fired…not the truth but just a token gesture which has clearly been rejected by him…",
+    timestamp: "45m",
+    likes: 1542,
+    comments: 234,
+    type: "image",
   },
   {
     id: "3",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Elena Rodriguez",
+      username: "@elena_writes",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
+    images: [images.mainpost3],
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
+      "Would Elon Musk have been able to do his first start up if there was a $100k fee for H1-B? Elon promised to go to war over H1-B but I don't think he has said anything about the new rules.",
+    timestamp: "1h",
+    likes: 3421,
     thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
+    comments: 567,
+    type: "image",
   },
   {
     id: "4",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "David Kim",
+      username: "@davidk_startup",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
+      "I missed the H1B lottery 5 times. There are 60 days of grace period on H1B, not 30. Funny how you guys didn't discuss that Trump came on your pod and promised green cards to international students. What is an average wage out of college?",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
     ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
+    timestamp: "6h",
+    likes: 892,
+    comments: 156,
+    type: "text",
   },
-
   {
     id: "5",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Alex Thompson",
+      username: "@alexthompson",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
+      'Jason needs to watch the Kimmel clip again, this time very carefully. Kimmel DID say the kid was MAGA, perhaps not directly, but it was heavily implied. Seriously, why does Jason think the FCC was so annoyed at Kimmel"s comments?',
+    videos: [images.mainpost5],
+    thumbnail: images.mainpost5,
+    timestamp: "12m",
+    likes: 4567,
+    comments: 1023,
+    type: "video",
   },
   {
     id: "6",
+    communityName: "Chef Valentina",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Isabella Martinez",
+      username: "@chef_bella",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    vComments: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
+    content: "Be honest, what's the best drink for this meal ?",
+    images: [images.mainpost6],
     timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
+    likes: 2156,
+    comments: 445,
+    type: "image",
   },
   {
     id: "7",
+    communityName: "Mentors united",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "James Wilson",
+      username: "@jameswilson_mentor",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
+    images: [images.mainpost7],
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
+      "Bro to bro: If you can grind 18 hours a day, 7 days a week. No days off. Just God, hustle, eat, sleep. You will find a way out from your messed up life",
+    timestamp: "4h",
+    likes: 1789,
+    comments: 334,
+    type: "image",
   },
   {
     id: "8",
+    communityName: "Tesla Super Owners",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Ryan Parker",
+      username: "@ryanp_tesla",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
+    content: "Elon with optimus Caption this",
+    videos: [images.mainpost5],
+    thumbnail: images.mainpost8,
+    timestamp: "30m",
+    likes: 5234,
+    comments: 876,
     type: "video",
   },
   {
     id: "9",
+    communityName: "Tesla Super Owners",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Sophia Lee",
+      username: "@sophialee_tech",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
+    content: "LiDAR is absolutely game-changing technology",
+    videos: [images.mainpost9],
+    thumbnail: images.mainpost9,
+    timestamp: "1h",
+    likes: 3456,
+    comments: 567,
+    type: "video",
   },
-
   {
     id: "10",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Priya Patel",
+      username: "@priya_immigrant",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
+      "This is heartbreaking. Many folks are waiting for green cards for decades but unfortunately they have to be on non immigrant visa because USA doesn't have an intermediary status. There hasn't been discussion on this in the podcast, very disappointing...",
+    timestamp: "8h",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
+    ],
+    likes: 1234,
+    comments: 445,
     type: "text",
   },
   {
     id: "11",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Michael Roberts",
+      username: "@mikeroberts_media",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
+      "Last week Chamath and Sacks say no one watches Kimmel and cited his poor ratings but this week say Kimmel was the leading voice? How does that math make sense if no one watches him? Let's try to stay consistent here.",
+    timestamp: "5h",
+    likes: 2890,
+    comments: 678,
     type: "text",
   },
   {
     id: "12",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Jennifer Chang",
+      username: "@jenchang_policy",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
+      "While your analysis of H1B problems was good, it completely ignores the rampant corruption by those processing applicants. The average applicant nets only about half the salary after kickbacks and fraud. Indenture servitude is a very real issue.",
+    timestamp: "3h",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
     ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
+    likes: 1567,
+    comments: 289,
+    type: "text",
   },
   {
     id: "13",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Carlos Mendez",
+      username: "@carlosm_business",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
+      "Thank you for exposing the abusive practices by Wipro, Infosys, HCLTech and Cognizant. Don't forget how big US companies leverage them with a two-tiered contractor system allowing zero notice terminations.",
+    timestamp: "7h",
+    likes: 3245,
+    comments: 567,
+    type: "text",
   },
-
   {
     id: "14",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Amanda Foster",
+      username: "@amandaf_observer",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
+        "https://images.unsplash.com/photo-1464863979621-258859e62245?w=100&h=100&fit=crop&crop=face",
+      verified: false,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
+      'I like how these guys said they dont do ads on the pod, but every episode starts with a subtle "commentary ad" about a brand or product. Today was Emirates Airlines. You can fool everyone, but not me! Still a smart move though!',
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
+    ],
     timestamp: "2h",
-    likes: 2678,
-    comments: 893,
+    likes: 1456,
+    comments: 234,
     type: "text",
   },
   {
     id: "15",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Taylor Swift",
+      username: "@taylorswift13",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
+      "New season, new day! Whether it's street style, high fashion, or effortless chic, your outfit should always tell a story. Today I'm serving \"bold neutrals with a pop of color\" because confidence is the best accessory!",
+    timestamp: "15m",
+    likes: 45678,
+    comments: 8923,
     type: "text",
   },
   {
     id: "16",
     author: {
-      name: "beyonce",
-      username: "@beyonceknow",
+      name: "Raj Sharma",
+      username: "@rajsharma_analyst",
       avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        "https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
-  },
-  {
-    id: "17",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-
-  {
-    id: "18",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "19",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
     vComments: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: images.post1,
+      },
+      {
+        type: "image",
+        url: images.post2,
+      },
+      {
+        type: "image",
+        url: images.post3,
+      },
+      {
+        type: "image",
+        url: images.post4,
+      },
     ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "20",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
     content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "21",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
+      "Sacks hit the nail on the head. If the H-1B fee rises to $100,000 and registrations drop 80%, all 85,000 visas will still be used. The selection rate would jump from 19% to 94%, so I don't see why there's a meltdown over the fee.",
+    timestamp: "4h",
+    likes: 2789,
     thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
-  },
-  {
-    id: "22",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-
-  {
-    id: "23",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
+    comments: 445,
     type: "text",
-  },
-  {
-    id: "24",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "25",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
-  },
-  {
-    id: "26",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-
-  {
-    id: "27",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "28",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "29",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    vComments: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "30",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "31",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
-  },
-  {
-    id: "32",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-
-  {
-    id: "33",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "34",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "text",
-  },
-  {
-    id: "35",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    videos: [
-      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      "https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=400&h=300&fit=crop",
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    thumbnail: images.latest2,
-    comments: 893,
-    type: "video",
-  },
-  {
-    id: "36",
-    author: {
-      name: "beyonce",
-      username: "@beyonceknow",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      verified: true,
-    },
-    content:
-      'New season, new day! 💫 Whether it\'s street style, high fashion, or effortless chic, your outfit should always tell a story ✨ Today I\'m serving "bold neutrals with a pop of color" or "classic elegance with a modern twist"], because confidence is the best accessory! 💛',
-    images: [
-      images.feed4,
-      images.feed5,
-      images.feed6,
-      images.feed1,
-      images.feed2,
-      images.feed3,
-    ],
-    timestamp: "2h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
   },
 ];
 

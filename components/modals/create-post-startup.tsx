@@ -26,7 +26,11 @@ export type MediaItem = {
   uri: string;
   type: "image" | "video";
 };
-export default function CreatePostStart({ showModal, onClose }: any) {
+export default function CreatePostStart({
+  showModal,
+  onClose,
+  showCommunities: shouldShowCommunities = true, // 👈 Add this prop with default true
+}: any) {
   const router = useRouter();
 
   const [text, setText] = useState("");
@@ -330,6 +334,23 @@ export default function CreatePostStart({ showModal, onClose }: any) {
               onPost={() => {
                 Keyboard.dismiss();
 
+                // 👇 Check the prop first
+                if (!shouldShowCommunities) {
+                  // ✅ Go straight to feed if showCommunities is false
+                  console.log("Going straight to feed");
+                  router.replace({
+                    pathname: "/(tabs)/home",
+                    params: {
+                      triggerUpload: "1",
+                      // You might want to use default communities or none
+                      communities: "", // or some default
+                    },
+                  });
+                  handleClose();
+                  return;
+                }
+
+                // 👇 Original logic for when showCommunities is true
                 if (selectedCommunityIds.length > 0) {
                   // ✅ If already selected → go straight home
                   console.log("Posting to:", selectedCommunityIds);
@@ -340,11 +361,9 @@ export default function CreatePostStart({ showModal, onClose }: any) {
                       communities: selectedCommunityIds.join(","),
                     },
                   });
-
                   handleClose();
                 } else {
                   // ✅ If nothing selected → open modal
-
                   setTimeout(() => {
                     setShowCommunities(true);
                   }, 60);
@@ -353,16 +372,17 @@ export default function CreatePostStart({ showModal, onClose }: any) {
             />
           </Animated.View>
 
-          <PostCommunities
-            visible={showCommunities}
-            onClose={() => setShowCommunities(false)}
-            onNudge={() => console.log("Nudge pressed")}
-            // 👇 whenever communities are chosen, update state
-            onDone={(ids) => {
-              setSelectedCommunityIds(ids);
-            }}
-            user={user}
-          />
+          {shouldShowCommunities && (
+            <PostCommunities
+              visible={showCommunities}
+              onClose={() => setShowCommunities(false)}
+              onNudge={() => console.log("Nudge pressed")}
+              onDone={(ids) => {
+                setSelectedCommunityIds(ids);
+              }}
+              user={user}
+            />
+          )}
         </KeyboardAvoidingView>
       </Animated.View>
     </Modal>

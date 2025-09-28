@@ -16,7 +16,6 @@ import {
   Image,
   NativeScrollEvent,
   NativeSyntheticEvent,
-  RefreshControl,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -308,9 +307,9 @@ const Home: React.FC = () => {
         </Animated.View>
 
         {/* Scrollable Content */}
-        <Animated.ScrollView
-          stickyHeaderIndices={[0]}
-          className="flex-1"
+        {/* <Animated.ScrollView
+          // stickyHeaderIndices={[0]}
+          // className="flex-1"
           scrollEnabled={feedScrollEnabled}
           nestedScrollEnabled={true}
           showsVerticalScrollIndicator={false}
@@ -358,205 +357,151 @@ const Home: React.FC = () => {
             }
           }}
           scrollEventThrottle={16}
-        >
-          <Animated.View style={{ zIndex: 100 }} className="bg-[#121212]">
-            <Animated.View
-              style={{
-                zIndex: 100,
-                maxHeight: storiesMaxHeight,
-              }}
-              className="relative"
-            >
-              {/* Header with Logo and Navigation */}
-              <View className="w-full mb-4 flex-row px-4 items-center justify-between">
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  className="items-center justify-center z-20"
-                >
-                  <Image
-                    source={images.logo_white}
-                    className="w-28 h-14"
-                    resizeMode="contain"
-                    style={{ opacity: 0.9 }}
-                  />
-                </TouchableOpacity>
+        ></Animated.ScrollView> */}
+        <Animated.View style={{ zIndex: 100 }} className="bg-[#121212] pb-2">
+          <Animated.View
+            style={{
+              zIndex: 100,
+              maxHeight: storiesMaxHeight,
+            }}
+            className="relative"
+          >
+            {/* Header with Logo and Navigation */}
+            <View className="w-full mb-4 flex-row px-4 items-center justify-between">
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="items-center justify-center z-20"
+              >
+                <Image
+                  source={images.logo_white}
+                  className="w-28 h-14"
+                  resizeMode="contain"
+                  style={{ opacity: 0.9 }}
+                />
+              </TouchableOpacity>
 
-                <View className="flex-row space-x-3 gap-2">
-                  <View className="relative">
-                    <TouchableOpacity
-                      className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
-                      activeOpacity={0.7}
-                      style={{ minWidth: 80, maxWidth: 160 }}
-                    >
-                      <BlurView
-                        intensity={10}
-                        style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                      />
-                      <Text
-                        className="text-white font-medium text-[16px] flex-1"
-                        numberOfLines={1}
-                      >
-                        {selectedCommunity}
-                      </Text>
-                      <Feather
-                        name="server"
-                        size={16}
-                        color="#fff"
-                        style={{ opacity: 0.7, marginLeft: 4 }}
-                      />
-                    </TouchableOpacity>
-
-                    {dropdownVisible && (
-                      <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
-                        <BlurView
-                          intensity={20}
-                          style={[
-                            StyleSheet.absoluteFill,
-                            { borderRadius: 16 },
-                          ]}
-                          experimentalBlurMethod="dimezisBlurView"
-                        />
-                        <View className="p-2">
-                          <Text className="text-white/60 text-xs font-medium px-3 py-2 uppercase tracking-wider">
-                            Communities
-                          </Text>
-                          {communities.map((community) => (
-                            <TouchableOpacity
-                              key={community.id}
-                              onPress={() => handleCommunitySelect(community)}
-                              className={`flex-row items-center px-3 py-3 rounded-xl ${
-                                selectedCommunity === community.name
-                                  ? "bg-white/20"
-                                  : "active:bg-white/10"
-                              }`}
-                              activeOpacity={0.7}
-                            >
-                              <View
-                                className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
-                                  selectedCommunity === community.name
-                                    ? "bg-white/20"
-                                    : "bg-white/10"
-                                }`}
-                              >
-                                <Feather
-                                  name={community.icon as any}
-                                  size={14}
-                                  color="#fff"
-                                />
-                              </View>
-                              <Text
-                                className={`font-medium flex-1 ${
-                                  selectedCommunity === community.name
-                                    ? "text-white"
-                                    : "text-white/80"
-                                }`}
-                              >
-                                {community.name}
-                              </Text>
-                              {selectedCommunity === community.name && (
-                                <Feather name="check" size={16} color="#fff" />
-                              )}
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      </Animated.View>
-                    )}
-                  </View>
-
+              <View className="flex-row space-x-3 gap-2">
+                <View className="relative">
                   <TouchableOpacity
-                    onPress={() => console.log("bell pressed")}
+                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
                     activeOpacity={0.7}
-                    className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
+                    style={{ minWidth: 80, maxWidth: 160 }}
                   >
                     <BlurView
                       intensity={10}
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
                     />
+                    <Text
+                      className="text-white font-medium text-[16px] flex-1"
+                      numberOfLines={1}
+                    >
+                      {selectedCommunity}
+                    </Text>
                     <Feather
-                      name="bell"
-                      size={20}
+                      name="server"
+                      size={16}
                       color="#fff"
-                      style={{ opacity: 0.9 }}
+                      style={{ opacity: 0.7, marginLeft: 4 }}
                     />
                   </TouchableOpacity>
-                </View>
-              </View>
 
-              {/* Compact Stories (Absolute positioned) - with click handler */}
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={handleStoriesClick}
+                  {dropdownVisible && (
+                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
+                      <BlurView
+                        intensity={20}
+                        style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
+                        experimentalBlurMethod="dimezisBlurView"
+                      />
+                      <View className="p-2">
+                        <Text className="text-white/60 text-xs font-medium px-3 py-2 uppercase tracking-wider">
+                          Communities
+                        </Text>
+                        {communities.map((community) => (
+                          <TouchableOpacity
+                            key={community.id}
+                            onPress={() => handleCommunitySelect(community)}
+                            className={`flex-row items-center px-3 py-3 rounded-xl ${
+                              selectedCommunity === community.name
+                                ? "bg-white/20"
+                                : "active:bg-white/10"
+                            }`}
+                            activeOpacity={0.7}
+                          >
+                            <View
+                              className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
+                                selectedCommunity === community.name
+                                  ? "bg-white/20"
+                                  : "bg-white/10"
+                              }`}
+                            >
+                              <Feather
+                                name={community.icon as any}
+                                size={14}
+                                color="#fff"
+                              />
+                            </View>
+                            <Text
+                              className={`font-medium flex-1 ${
+                                selectedCommunity === community.name
+                                  ? "text-white"
+                                  : "text-white/80"
+                              }`}
+                            >
+                              {community.name}
+                            </Text>
+                            {selectedCommunity === community.name && (
+                              <Feather name="check" size={16} color="#fff" />
+                            )}
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </Animated.View>
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => console.log("bell pressed")}
+                  activeOpacity={0.7}
+                  className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
+                >
+                  <BlurView
+                    intensity={10}
+                    style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                  />
+                  <Feather
+                    name="bell"
+                    size={20}
+                    color="#fff"
+                    style={{ opacity: 0.9 }}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Compact Stories (Absolute positioned) - with click handler */}
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={handleStoriesClick}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+            >
+              <Animated.View
                 style={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
+                  transformOrigin: "left center",
+                  transform: [
+                    { scale: storiesScale },
+                    { translateX: storiesTranslateX },
+                  ],
+                  opacity: AbsoluteOpacity,
                 }}
               >
-                <Animated.View
-                  style={{
-                    transformOrigin: "left center",
-                    transform: [
-                      { scale: storiesScale },
-                      { translateX: storiesTranslateX },
-                    ],
-                    opacity: AbsoluteOpacity,
-                  }}
-                >
-                  <FlatList
-                    data={visibleIds}
-                    scrollEnabled={flatListScrollEnabled}
-                    viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-                    horizontal
-                    keyExtractor={(_, index) => index.toString()}
-                    showsHorizontalScrollIndicator={false}
-                    snapToInterval={88}
-                    decelerationRate="fast"
-                    contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
-                    renderItem={({ item, index }) => (
-                      <Animated.View
-                        style={{
-                          transform: [
-                            {
-                              translateX:
-                                index > 0
-                                  ? scrollY.interpolate({
-                                      inputRange: [
-                                        scrollStartPosition.current,
-                                        scrollStartPosition.current + 60,
-                                      ],
-                                      outputRange: [0, -30 * index],
-                                      extrapolate: "clamp",
-                                    })
-                                  : 0,
-                            },
-                          ],
-                        }}
-                        className="relative"
-                      >
-                        <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
-                          <Image
-                            source={item}
-                            className="w-full h-full rounded-full"
-                            resizeMode="cover"
-                          />
-                        </View>
-                      </Animated.View>
-                    )}
-                  />
-                </Animated.View>
-              </TouchableOpacity>
-
-              {/* Regular Stories */}
-              <Animated.View style={{ opacity: opacity }}>
                 <FlatList
-                  data={stories}
-                  onViewableItemsChanged={({ viewableItems }) => {
-                    const visibleItems = viewableItems
-                      .map((vi) => vi.item)
-                      .slice(0, 5);
-                    setVisibleIds(visibleItems);
-                  }}
+                  data={visibleIds}
+                  scrollEnabled={flatListScrollEnabled}
                   viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
                   horizontal
                   keyExtractor={(_, index) => index.toString()}
@@ -565,7 +510,26 @@ const Home: React.FC = () => {
                   decelerationRate="fast"
                   contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
                   renderItem={({ item, index }) => (
-                    <Animated.View className="relative">
+                    <Animated.View
+                      style={{
+                        transform: [
+                          {
+                            translateX:
+                              index > 0
+                                ? scrollY.interpolate({
+                                    inputRange: [
+                                      scrollStartPosition.current,
+                                      scrollStartPosition.current + 60,
+                                    ],
+                                    outputRange: [0, -30 * index],
+                                    extrapolate: "clamp",
+                                  })
+                                : 0,
+                          },
+                        ],
+                      }}
+                      className="relative"
+                    >
                       <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
                         <Image
                           source={item}
@@ -577,22 +541,52 @@ const Home: React.FC = () => {
                   )}
                 />
               </Animated.View>
+            </TouchableOpacity>
+
+            {/* Regular Stories */}
+            <Animated.View style={{ opacity: opacity }}>
+              <FlatList
+                data={stories}
+                onViewableItemsChanged={({ viewableItems }) => {
+                  const visibleItems = viewableItems
+                    .map((vi) => vi.item)
+                    .slice(0, 5);
+                  setVisibleIds(visibleItems);
+                }}
+                viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+                horizontal
+                keyExtractor={(_, index) => index.toString()}
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={88}
+                decelerationRate="fast"
+                contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
+                renderItem={({ item, index }) => (
+                  <Animated.View className="relative">
+                    <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
+                      <Image
+                        source={item}
+                        className="w-full h-full rounded-full"
+                        resizeMode="cover"
+                      />
+                    </View>
+                  </Animated.View>
+                )}
+              />
             </Animated.View>
           </Animated.View>
-
-          <View className="flex-row flex-1 justify-center items-center gap-3">
-            <AllFeeds
-              posts={posts}
-              addPost={() => setShowUpload(true)}
-              setUploadVisible={setUploadVisible}
-              simulateUpload={simulateUpload}
-              externalScrollEnabled={feedScrollEnabled}
-              setExternalScrollEnabled={setFeedScrollEnabled}
-              onShowLikePuff={() => setShowDislikePuff(true)}
-              onShowDislikePuff={() => setShowLikePuff(true)}
-            />
-          </View>
-        </Animated.ScrollView>
+        </Animated.View>
+        <View className="flex-row flex-1 justify-center items-center gap-3">
+          <AllFeeds
+            posts={posts}
+            addPost={() => setShowUpload(true)}
+            setUploadVisible={setUploadVisible}
+            simulateUpload={simulateUpload}
+            externalScrollEnabled={feedScrollEnabled}
+            setExternalScrollEnabled={setFeedScrollEnabled}
+            onShowLikePuff={() => setShowDislikePuff(true)}
+            onShowDislikePuff={() => setShowLikePuff(true)}
+          />
+        </View>
 
         {dropdownVisible && (
           <TouchableOpacity

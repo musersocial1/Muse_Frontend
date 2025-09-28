@@ -41,7 +41,7 @@ import logo from "@/assets/images/muse-logo2.png";
 import logo_white from "@/assets/images/muse-white-logo.png";
 import otpmodalbg from "@/assets/images/otpmodalbg.png";
 import postIcon from "@/assets/images/postIcon.webp";
-import splash from "@/assets/images/splash.jpg";
+import splash from "@/assets/images/splash.webp";
 import Xpod1 from "@/assets/images/Xcontent/Xpod1.webp";
 import Xpod2 from "@/assets/images/Xcontent/Xpod2.webp";
 
@@ -67,6 +67,20 @@ import feed3 from "@/assets/images/feed/feed3.webp";
 import feed4 from "@/assets/images/feed/feed4.webp";
 import feed5 from "@/assets/images/feed/feed5.webp";
 import feed6 from "@/assets/images/feed/feed6.webp";
+
+// Import demo images from the demoimages folder
+import mainpost1 from "@/assets/demoImages/mainpost1.webp";
+import mainpost2 from "@/assets/demoImages/mainpost2.gif";
+import mainpost3 from "@/assets/demoImages/mainpost3.jpg";
+import mainpost5 from "@/assets/demoImages/mainpost5.jpg";
+import mainpost6 from "@/assets/demoImages/mainpost6.jpg";
+import mainpost7 from "@/assets/demoImages/mainpost7.jpg";
+import mainpost8 from "@/assets/demoImages/mainpost8.png";
+import mainpost9 from "@/assets/demoImages/mainpost9.png";
+import post1 from "@/assets/demoImages/post1.png";
+import post2 from "@/assets/demoImages/post2.webp";
+import post3 from "@/assets/demoImages/post3.jpg";
+import post4 from "@/assets/demoImages/post4.jpg";
 export const images = {
   splash,
   logo,
@@ -135,4 +149,18 @@ export const images = {
   feed4,
   feed5,
   feed6,
+
+  // 👇 New demo images
+  post1,
+  post2,
+  post3,
+  post4,
+  mainpost1,
+  mainpost2,
+  mainpost3,
+  mainpost5,
+  mainpost6,
+  mainpost7,
+  mainpost8,
+  mainpost9,
 };
