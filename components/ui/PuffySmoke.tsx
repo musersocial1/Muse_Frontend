@@ -309,11 +309,7 @@ const PuffySmoke: React.FC<PuffySmokeProps> = ({
   });
 
   return (
-    <View
-      style={[styles.container, { left: x, top: y }]}
-      pointerEvents="none"
-      // className="border2"
-    >
+    <View style={[styles.container, { left: x, top: y }]} pointerEvents="none">
       {/* Main Icon - BIGGER */}
       <Animated.View
         style={[

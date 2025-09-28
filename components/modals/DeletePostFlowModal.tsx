@@ -156,7 +156,7 @@ const DeletePostFlowModal: React.FC<DeletePostModalProps> = ({
         <View
           pointerEvents="box-none"
           style={{ marginBottom: insets.bottom }}
-          className="flex-1 pb-3 px-3 items-center border2 justify-end"
+          className="flex-1 pb-3 px-3 items-center  justify-end"
         >
           <Animated.View
             style={{
