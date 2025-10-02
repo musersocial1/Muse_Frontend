@@ -63,7 +63,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
-          className="flex-row shrink bg-[#36363666]/[40%] rounded-full p-1.5  "
+          className="flex-row shrink bg-[#36363666]/[40%] rounded-full px-2 py-1  "
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -83,7 +83,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
 
           <View>
             <View className="flex-col">
-              <View className="flex-row items-center">
+              <View className="flex-row items-center pt-1">
                 <Text className="text-white capitalize font-semibold text-[14px] mr-1.5">
                   {post.author.username}
                 </Text>
