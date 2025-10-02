@@ -1,4 +1,3 @@
-// MiniPlayer.tsx - Persistent bottom player when modal is closed
 import { images } from "@/constants/images";
 import { usePlayer } from "@/context/PlayerContext";
 import { Ionicons } from "@expo/vector-icons";
@@ -13,15 +12,12 @@ import {
 } from "react-native";
 
 interface MiniPlayerProps {
-  onPress: () => void; // Callback to open full modal
+  onPress: () => void;
 }
-
 const { width } = Dimensions.get("window");
 
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
   const { currentTrack, isPlaying, togglePlayPause } = usePlayer();
-
-  // Don't show mini player if no track is loaded
   if (!currentTrack) return null;
 
   return (
@@ -31,7 +27,6 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
         onPress={onPress}
         activeOpacity={0.8}
       >
-        {/* Album Art */}
         <Image
           source={
             currentTrack.artwork ? { uri: currentTrack.artwork } : images.media
@@ -39,22 +34,18 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
           style={styles.albumArt}
           resizeMode="cover"
         />
-
-        {/* Track Info */}
         <View style={styles.trackInfo}>
           <Text style={styles.title} numberOfLines={1}>
             {currentTrack.title}
           </Text>
           <Text style={styles.artist} numberOfLines={1}>
-            {currentTrack.artist}
+            {currentTrack.artist ?? ""}
           </Text>
         </View>
-
-        {/* Play/Pause Button */}
         <TouchableOpacity
           style={styles.playButton}
           onPress={(e) => {
-            e.stopPropagation(); // Prevent opening modal when tapping play/pause
+            e.stopPropagation();
             togglePlayPause();
           }}
         >
@@ -79,7 +70,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a1a1a",
     borderTopWidth: 1,
     borderTopColor: "rgba(255, 255, 255, 0.1)",
-    paddingBottom: 34, // Account for safe area on newer iPhones
+    paddingBottom: 34,
   },
   playerContainer: {
     flexDirection: "row",
@@ -88,22 +79,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     height: 64,
   },
-  albumArt: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    marginRight: 12,
-  },
-  trackInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  title: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 2,
-  },
+  albumArt: { width: 40, height: 40, borderRadius: 8, marginRight: 12 },
+  trackInfo: { flex: 1, marginRight: 12 },
+  title: { color: "white", fontSize: 14, fontWeight: "600", marginBottom: 2 },
   artist: {
     color: "rgba(255, 255, 255, 0.7)",
     fontSize: 12,

@@ -1,4 +1,5 @@
 import Podcasts from "@/components/discover/podcasts";
+import { categories } from "@/constants/data";
 import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { discoverAPI } from "@/lib/api/discover";
@@ -11,6 +12,7 @@ import {
   Animated,
   Image,
   ScrollView,
+  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -104,24 +106,21 @@ interface StoryCardProps {
   index: number;
 }
 
-const categories: Category[] = [
+const playlists: Category[] = [
   {
     id: 1,
-    name: "Food",
-    color: "bg-gradient-to-br from-red-500 to-teal-400",
-    img: images.food,
+    name: "The weekend playlist for chilled",
+    img: images.playlis1,
   },
   {
     id: 2,
-    name: "Entertainment",
-    color: "bg-gradient-to-br from-green-300 to-yellow-200",
-    img: images.ent,
+    name: "The weekend playlist for chilled",
+    img: images.playlis2,
   },
   {
     id: 3,
-    name: "Comedy",
-    color: "bg-gradient-to-br from-yellow-400 to-green-400",
-    img: images.Comedy,
+    name: "The weekend playlist for chilled",
+    img: images.playlis1,
   },
 ];
 
@@ -158,7 +157,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         opacity,
         marginRight: 12,
       }}
-      className="w-[180px] aspect-square rounded-[24px] bg-white overflow-hidden relative"
+      className="w-[180px] aspect-square rounded-full bg-white overflow-hidden relative"
     >
       <Image
         source={category.img}
@@ -192,6 +191,82 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         </View>
       </TouchableOpacity>
     </Animated.View>
+  );
+};
+
+const CARD_W = 200;
+const CARD_H = 180;
+const RADIUS = 16;
+
+const styles = StyleSheet.create({
+  card: {
+    width: CARD_W,
+    height: CARD_H,
+    borderRadius: RADIUS,
+    overflow: "hidden",
+    marginRight: 12,
+  },
+  image: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
+
+const PlaylistCard: React.FC<CategoryCardProps> = ({
+  category,
+  index,
+  setModalVisible,
+}) => {
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(animatedValue, {
+      toValue: 1,
+      duration: 600,
+      delay: index * 200,
+      useNativeDriver: true,
+    }).start();
+  }, [animatedValue, index]);
+
+  const translateY = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [50, 0],
+  });
+  const opacity = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+  });
+
+  return (
+    <View className=" w-[200px] h-[220px] rounded-2xl overflow-hidden mr-4">
+      <Animated.View
+        style={[styles.card, { transform: [{ translateY }], opacity }]}
+      >
+        <Image
+          source={category.img}
+          resizeMode="cover"
+          style={[
+            styles.image,
+            { transform: [{ scale: 1.34 }], width: "100%", height: "100%" },
+          ]}
+        />
+
+        {/* Overlay press */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => setModalVisible(true)}
+          style={StyleSheet.absoluteFillObject}
+        />
+      </Animated.View>
+      {/* Text at bottom */}
+      <View className="w-[80%] p-1 mb-4 ">
+        <Text
+          className="text-white/60 font-bold text-[18px]  "
+          numberOfLines={3}
+        >
+          {category.name}
+        </Text>
+      </View>
+    </View>
   );
 };
 
@@ -352,7 +427,7 @@ const Search: React.FC = () => {
       useNativeDriver: true,
     }).start();
 
-    loadFeed();
+    // loadFeed();
   }, []);
 
   const transformToStory = (item: any, index: number): Story => ({
@@ -736,7 +811,7 @@ const Search: React.FC = () => {
                 scrollEventThrottle={16}
               >
                 <View className="mt-6 pb-1 ">
-                  <Text className="text-white text-[18px] tracking-wider font-sfpro-bold px-3 mb-6">
+                  <Text className="text-white text-[20px] tracking-wider font-sfpro-medium px-3 mb-6">
                     Categories
                   </Text>
                   <ScrollView
@@ -755,9 +830,29 @@ const Search: React.FC = () => {
                   </ScrollView>
                 </View>
 
+                <View className="mt-6 pb-1 ">
+                  <Text className="text-white text-[20px] tracking-wider font-sfpro-medium px-3 mb-6">
+                    Playlist of the day
+                  </Text>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ paddingHorizontal: 20, gap: 2 }}
+                  >
+                    {playlists.map((playlist, index) => (
+                      <PlaylistCard
+                        key={playlist.id}
+                        category={playlist}
+                        index={index}
+                        setModalVisible={setModalVisible}
+                      />
+                    ))}
+                  </ScrollView>
+                </View>
+
                 <View className="mt-8">
                   <View className="flex-row justify-between items-center px-3 mb-6">
-                    <Text className="text-[#FFFFFF] text-[18px] font-sfpro-bold tracking-wider">
+                    <Text className="text-[#FFFFFF] text-[20px] font-sfpro-medium tracking-wider">
                       Today's best for you
                     </Text>
                     <TouchableOpacity>

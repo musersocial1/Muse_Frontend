@@ -166,12 +166,10 @@ const BalanceCard = () => {
         </Text>
 
         <View className="flex-row items-center mt-2 mb-6 text-center justify-center">
-          <Text className="text-[#2AD05A] text-[15px] font-sfpro-semibold mr-1">
+          <Text className="text-[#2AD05A] text-[15px] font-bold mr-1">
             {growthPct}%
           </Text>
-          <Text className="text-[#2AD05A] text-[15px] font-sfpro-medium mr-2">
-            up
-          </Text>
+          <Text className="text-[#2AD05A] text-[15px] font-bold mr-2">up</Text>
           <Text className="text-white/55 text-[15px] font-sfpro-medium">
             • This month
           </Text>

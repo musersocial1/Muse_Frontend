@@ -1,11 +1,16 @@
-// AllFeeds.tsx - Updated with PuffySmoke animations
 import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Animated,
   Dimensions,
@@ -15,7 +20,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import {
+  FlatList as GHFlatList,
+  ScrollView,
+} from "react-native-gesture-handler";
 import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
@@ -25,7 +33,99 @@ import SwipeableCard from "./SwipeableCard";
 
 const { width, height } = Dimensions.get("window");
 
-// PostCard component remains the same
+// Wrap RNGH FlatList so native onScroll works with useNativeDriver
+const AnimatedGHFlatList = Animated.createAnimatedComponent(GHFlatList as any);
+
+type PostHeaderProps = {
+  post: any; // Replace with your Post type
+  onAuthorPress?: () => void;
+  onMenuPress?: () => void;
+  variant?: "default" | "overlay";
+  containerClassName?: string;
+};
+
+export const PostHeader: React.FC<PostHeaderProps> = ({
+  post,
+  onAuthorPress,
+  onMenuPress,
+  variant = "default",
+  containerClassName = "",
+}) => {
+  const baseRow = "flex-row justify-between items-center px-2 pt-3.5 pb-3 ";
+  const overlayWrap =
+    variant === "overlay" ? "absolute top-0 left-0 right-0 z-10" : "";
+
+  return (
+    <View
+      pointerEvents="box-none"
+      className={[overlayWrap, containerClassName].filter(Boolean).join(" ")}
+    >
+      <View className={baseRow}>
+        <TouchableOpacity
+          onPress={onAuthorPress}
+          className="flex-row shrink bg-[#36363666]/[40%] rounded-full p-1.5  "
+          style={{
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 12 },
+            shadowOpacity: 0.25,
+            shadowRadius: 94.13,
+            elevation: 16,
+          }}
+          activeOpacity={0.8}
+        >
+          <View className="w-12 h-12 rounded-full overflow-hidden mr-2">
+            <Image
+              source={{ uri: post.author.avatar }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+          </View>
+
+          <View>
+            <View className="flex-col">
+              <View className="flex-row items-center">
+                <Text className="text-white capitalize font-semibold text-[14px] mr-1.5">
+                  {post.author.username}
+                </Text>
+                {post.author.verified && (
+                  <View className="w-4 h-4 bg-[#0368FF] rounded-full items-center justify-center mr-2">
+                    <Feather name="check" size={8} color="white" />
+                  </View>
+                )}
+              </View>
+
+              <Text className="text-white font-sfpro-medium text-[13px] pt-1">
+                TBD Podcast
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        <View className="flex-row gap-1 items-center">
+          <Text className="text-white/50 ml-2 font-sfpro-medium text-[16px]">
+            {post.timestamp}
+          </Text>
+
+          <TouchableOpacity onPress={onMenuPress} hitSlop={8}>
+            <Ionicons name="ellipsis-vertical" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+interface PostCardProps {
+  post: Post;
+  setIsOpen: (val: boolean) => void;
+  setOpenComments: (val: boolean) => void;
+  setShowRecordModal: (val: boolean) => void;
+  onImageScrollStateChange?: (isScrolling: boolean) => void;
+  scrollEnabled?: boolean;
+  isVisible?: boolean;
+  handleVideoCommentPress?: () => void;
+}
+
 const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
@@ -39,137 +139,76 @@ const PostCard: React.FC<PostCardProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = React.useRef<any[]>([]).current;
 
-  // Add this state to track which video is playing
   const [playingVideoIndex, setPlayingVideoIndex] = useState<number | null>(
     null
   );
 
-  // Add this function to handle video playback timing
   const handleVideoPlayback = (videoRef: any, index: number) => {
     if (videoRef && index === 0) {
-      // Only for the first video
-      // Start playing
       videoRef.playAsync();
       setPlayingVideoIndex(0);
-
-      // Stop after 3 seconds and restart
       setTimeout(() => {
-        videoRef.setPositionAsync(0); // Reset to beginning
-        videoRef.playAsync(); // Play again
+        videoRef.setPositionAsync(0);
+        videoRef.playAsync();
       }, 3000);
     }
   };
 
-  // Add this state for text expansion
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [shouldShowReadMore, setShouldShowReadMore] = useState(false);
 
-  // Add this function to check if text should be truncated
   const checkTextLength = (text: string) => {
-    // Rough estimation: ~50 characters per line, 5 lines = 250 characters
     return text.length > 250;
   };
 
-  // Add useEffect to check text length on mount
   useEffect(() => {
     setShouldShowReadMore(checkTextLength(post.content));
   }, [post.content]);
 
-  // Add function to get display text
   const getDisplayText = () => {
     if (!shouldShowReadMore || isTextExpanded) {
       return post.content;
     }
-    // Truncate to approximately 5 lines (250 characters)
     return post.content.substring(0, 200) + "...";
   };
+
+  const hasMedia = useMemo(
+    () =>
+      (post.type === "image" &&
+        Array.isArray(post.images) &&
+        post.images.length > 0) ||
+      (post.type === "video" &&
+        Array.isArray(post.videos) &&
+        post.videos.length > 0),
+    [post]
+  );
+
   return (
-    <View className="my-[4px] ">
-      <Animated.View className="bg-[#1C1C1C] rounded-[30px] overflow-hidden">
-        <View className="flex-row justify-between items-center px-6 pt-6 pb-3">
-          <TouchableOpacity
-            onPress={() => setIsOpen(true)}
-            className="flex-row shrink"
-          >
-            <View className="w-12 h-12 rounded-full overflow-hidden mr-2">
-              <Image
-                source={{ uri: post.author.avatar }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-            <View>
-              <View className="flex-col">
-                <View className="flex-row items-center">
-                  <Text className="text-white capitalize font-semibold text-[16px] mr-1">
-                    {post.author.name}
-                  </Text>
-                  {post.author.verified && (
-                    <View className="w-4 h-4 bg-[#0368FF] rounded-full items-center justify-center mr-2">
-                      <Feather name="check" size={8} color="white" />
-                    </View>
-                  )}
-                </View>
-                <Text className="text-white/50 font-sfpro-medium text-[15px]">
-                  {post.author.username}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <View className="flex-row gap-1 items-center">
-            <View className="bg-[#FFFFFF]/[6%] px-4 py-3  max-w-[100px] rounded-full">
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                className="text-white/80 font-sfpro-bold text-[13px]"
-              >
-                {post.communityName || "TBD Podcast"}
-              </Text>
-            </View>
-            <Text className="text-white/50 ml-2 font-sfpro-medium text-[16px]">
-              {post.timestamp}
-            </Text>
-            <TouchableOpacity className="">
-              <Ionicons name="ellipsis-vertical" size={20} color="#9CA3AF" />
-            </TouchableOpacity>
-          </View>
-        </View>
+    <View className="my-[4px]">
+      <Animated.View className="bg-[#1C1C1C] rounded-[30px] overflow-hidden relative">
+        {!hasMedia && (
+          <PostHeader
+            post={post}
+            onAuthorPress={() => setIsOpen(true)}
+            onMenuPress={() => {}}
+            variant="default"
+          />
+        )}
 
-        <View className="pb-3 px-6">
-          <View className="flex-row flex-wrap items-baseline">
-            <Text className="text-white  text-[17px] inline-flex items-baseline font-sfpro-medium leading-[20px] ">
-              {getDisplayText()}
-              {shouldShowReadMore && (
-                <TouchableOpacity
-                  onPress={() => setIsTextExpanded(!isTextExpanded)}
-                >
-                  <Text className="text-[#0368FF] ml-3 inline-flex items-baseline   text-[15px] -mb-1 leading-[15px] font-sfpro-medium">
-                    {isTextExpanded ? "Read less" : "Read more"}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </Text>
-          </View>
-        </View>
-
-        {/* Post Image (if exists) */}
         {post.type === "image" && post.images && post.images.length > 0 && (
-          <View className="px-6 mt-2">
-            <View className="mb-3 w-full aspect-[1/1.1] rounded-[25px] overflow-hidden">
+          <View className="px-2 mt-2">
+            <View className="relative mb-3 w-full aspect-[1/1.1] rounded-[25px] overflow-hidden">
+              <PostHeader
+                post={post}
+                onAuthorPress={() => setIsOpen(true)}
+                onMenuPress={() => {}}
+                variant="overlay"
+              />
               <ScrollView
                 horizontal
                 pagingEnabled
                 scrollEnabled={scrollEnabled}
                 showsHorizontalScrollIndicator={false}
-                // onScrollBeginDrag={() => onImageScrollStateChange?.(true)}
-                // onScrollEndDrag={() => onImageScrollStateChange?.(false)}
-                // onScroll={(event) => {
-                //   const index = Math.round(
-                //     event.nativeEvent.contentOffset.x / (width - 42)
-                //   );
-                //   setActiveIndex(index);
-                // }}
-                // onMomentumScrollEnd={() => onImageScrollStateChange?.(false)}
                 scrollEventThrottle={16}
                 contentContainerStyle={{ alignItems: "center" }}
               >
@@ -177,14 +216,13 @@ const PostCard: React.FC<PostCardProps> = ({
                   <Image
                     key={index}
                     source={typeof item === "string" ? { uri: item } : item}
-                    style={{ width: width - 57 }}
+                    style={{ width: width - 30 }}
                     resizeMode="cover"
                     className="h-full"
                   />
                 ))}
               </ScrollView>
 
-              {/* Dots Pagination */}
               {post.images.length > 1 && (
                 <View className="absolute bottom-8 w-full flex-row justify-center">
                   {post.images.map((_, i) => (
@@ -202,10 +240,16 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "video" && post.videos && post.videos.length > 0 && (
-          <View className="px-5">
-            <View className="rounded-[20px] w-full gap-5 overflow-hidden bg-[#242424] p-3">
+          <View className="px-2">
+            <View className="relative rounded-[20px] w-full gap-5 overflow-hidden bg-[#242424] p-2">
+              <PostHeader
+                post={post}
+                onAuthorPress={() => setIsOpen(true)}
+                onMenuPress={() => {}}
+                variant="overlay"
+              />
               <View className="overflow-hidden">
-                <View className="relative overflow-hidden aspect-[16/9] rounded-[15px] w-full">
+                <View className="relative overflow-hidden aspect-[16/14] rounded-[15px] w-full">
                   <Image
                     source={post.thumbnail}
                     className="h-full w-full"
@@ -247,194 +291,141 @@ const PostCard: React.FC<PostCardProps> = ({
           </View>
         )}
 
-        {/* Post Actions */}
-        <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
-          <View className="flex-row gap-2">
-            <TouchableOpacity
-              onPress={() => setOpenComments(true)}
-              className="flex-row items-center bg-[#363636]/40 rounded-full p-3"
-            >
-              <View className="w-6 h-6 rounded-full items-center justify-center mr-1">
-                <Ionicons
-                  name="chatbubble-ellipses-outline"
-                  size={20}
-                  color="#D1D5DB"
-                />
-              </View>
-              <Text className="text-white text-sm">{post.likes}</Text>
-            </TouchableOpacity>
+        {hasMedia && (
+          <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setOpenComments(true)}
+                className="flex-row items-center rounded-full"
+              >
+                <View className="w-8 h-8 rounded-full items-center justify-center mr-1">
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={27}
+                    color="#D1D5DB"
+                  />
+                </View>
+                <Text className="text-white text-sm">{post.likes}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="rounded-full">
+                <Feather name="send" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity
-              onPress={() => setShowRecordModal(true)}
-              className="flex-row items-center bg-[#363636]/[40%] rounded-full p-3"
-            >
-              <View className="w-5 h-5 rounded-full items-center justify-center mr-2">
-                <Image source={icons.record} className="h-full w-full" />
-              </View>
-              <Text className="text-white font-sfpro-regular text-sm">
-                Record a comment
-              </Text>
-            </TouchableOpacity>
+            <View className="flex-row gap-1">
+              <TouchableOpacity className="rounded-full">
+                <Feather name="bookmark" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
+        )}
 
-          <View className="flex-row gap-1">
-            <TouchableOpacity className="bg-[#363636]/[40%] p-3 rounded-full">
-              <Feather name="send" size={18} color="white" />
-            </TouchableOpacity>
-            <TouchableOpacity className="bg-[#363636]/[40%] p-3 rounded-full">
-              <Feather name="bookmark" size={18} color="white" />
-            </TouchableOpacity>
+        <View className="pb-3 px-6">
+          <View className="flex-row flex-wrap items-baseline">
+            <Text className="text-white text-[17px] inline-flex items-baseline font-sfpro-medium leading-[20px]">
+              {getDisplayText()}
+              {shouldShowReadMore && (
+                <TouchableOpacity
+                  onPress={() => setIsTextExpanded(!isTextExpanded)}
+                >
+                  <Text className="text-[#0368FF] ml-3 inline-flex items-baseline text-[15px] -mb-1 leading-[15px] font-sfpro-medium">
+                    {isTextExpanded ? "Read less" : "Read more"}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </Text>
           </View>
         </View>
 
-        {/* {post.vComments && post.vComments.length > 0 && (
-          <View className="pb-6 ">
-            <ScrollView
-              horizontal
-              scrollEnabled={scrollEnabled}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
-            >
-              {post.vComments.slice(0, 6).map((commentUri, index) => (
-                <View key={index} className="relative">
-                  <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
-                    <Video
-                      source={{ uri: commentUri }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: 999,
-                      }}
-                      resizeMode={ResizeMode.COVER}
-                      shouldPlay={false}
-                      isLooping={false}
-                      isMuted
-                      ref={(ref) => {
-                        if (!videoRefs[index]) videoRefs[index] = ref;
-                      }}
-                    />
-                  </View>
+        {!hasMedia && (
+          <View className="flex-row px-6 items-center pb-4 justify-between pt-1">
+            <View className="flex-row gap-3">
+              <TouchableOpacity
+                onPress={() => setOpenComments(true)}
+                className="flex-row items-center rounded-full"
+              >
+                <View className="w-8 h-8 rounded-full items-center justify-center mr-1">
+                  <Ionicons
+                    name="chatbubble-ellipses-outline"
+                    size={27}
+                    color="#D1D5DB"
+                  />
                 </View>
-              ))}
-              {post.vComments.length > 6 && (
-                <TouchableOpacity className="items-center">
-                  <View className="w-20 h-20 rounded-full border-4 border-white/40 bg-[#2c2c2c] items-center justify-center">
-                    <Text className="text-white text-base font-neutral-medium">
-                      See alljjdjd
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </ScrollView>
-          </View>
-        )} */}
-        {post.vComments && post.vComments.length > 0 && (
-          <View className="pb-6 ">
-            <ScrollView
-              horizontal
-              scrollEnabled={scrollEnabled}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
-            >
-              {post.vComments.slice(0, 6).map((commentItem, index) => (
-                <TouchableOpacity
-                  key={index}
-                  className="relative"
-                  onPress={handleVideoCommentPress}
-                >
-                  <View className="relative">
-                    <View className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/40">
-                      {commentItem.type === "video" ? (
-                        <Video
-                          source={{ uri: commentItem.url }}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 999,
-                          }}
-                          resizeMode={ResizeMode.COVER}
-                          shouldPlay={index === 0 && isVisible} // Only play if first video AND post is visible
-                          isLooping={index === 0 && isVisible} // Only loop if first video AND post is visible
-                          isMuted
-                          ref={(ref) => {
-                            if (!videoRefs[index]) {
-                              videoRefs[index] = ref;
-                              // Auto-start the first video when ref is set, only if visible
-                              if (index === 0 && ref && isVisible) {
-                                setTimeout(() => {
-                                  handleVideoPlayback(ref, index);
-                                }, 500);
-                              }
-                            }
-                          }}
-                          onLoad={() => {
-                            // When video loads, start playback only if visible and first video
-                            if (index === 0 && isVisible) {
-                              handleVideoPlayback(videoRefs[index], index);
-                            }
-                          }}
-                          onPlaybackStatusUpdate={(status) => {
-                            // Handle the 5-second loop for first video, only if visible
-                            if (
-                              index === 0 &&
-                              isVisible && // Add this check
-                              status.isLoaded &&
-                              status.positionMillis >= 10000
-                            ) {
-                              const videoRef = videoRefs[index];
-                              if (videoRef) {
-                                videoRef.setPositionAsync(0); // Reset to start
-                              }
-                            }
-                          }}
-                        />
-                      ) : (
-                        <Image
-                          source={
-                            typeof commentItem.url === "string" &&
-                            commentItem.url.startsWith("http")
-                              ? { uri: commentItem.url } // Remote image
-                              : (commentItem.url as any) // Local image (imported asset)
-                          }
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: 999,
-                          }}
-                          resizeMode="cover"
-                        />
-                      )}
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
-              {post.vComments.length > 6 && (
-                <TouchableOpacity className="items-center">
-                  <View className="w-20 h-20 rounded-full border-4 border-white/40 bg-[#2c2c2c] items-center justify-center">
-                    <Text className="text-white text-base font-neutral-medium">
-                      See all
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              )}
-            </ScrollView>
+                <Text className="text-white text-sm">{post.likes}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="rounded-full">
+                <Feather name="send" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
+
+            <View className="flex-row gap-1">
+              <TouchableOpacity className="rounded-full">
+                <Feather name="bookmark" size={22} color="white" />
+              </TouchableOpacity>
+            </View>
           </View>
         )}
+
+        <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
+          <TouchableOpacity
+            onPress={() => setOpenComments(true)}
+            className="flex-row items-center"
+          >
+            <View className="flex-row">
+              {post.vComments?.slice(0, 3).map((commentItem, index) => (
+                <View
+                  key={index}
+                  className="w-8 h-8 rounded-full overflow-hidden border-2 border-black bg-black"
+                  style={{ marginLeft: index === 0 ? 0 : -10 }}
+                >
+                  {commentItem.type === "video" ? (
+                    <Video
+                      source={{ uri: commentItem?.url || "" }}
+                      style={{ width: "100%", height: "100%" }}
+                      resizeMode={ResizeMode.COVER}
+                      shouldPlay={false}
+                      isMuted
+                    />
+                  ) : (
+                    <Image
+                      source={
+                        typeof commentItem?.url === "string" &&
+                        commentItem.url.startsWith("http")
+                          ? { uri: commentItem.url }
+                          : (commentItem?.url as any)
+                      }
+                      className="w-full h-full"
+                      resizeMode="cover"
+                    />
+                  )}
+                </View>
+              ))}
+            </View>
+
+            <View className="flex-row items-center ml-1">
+              <Ionicons name="play" size={16} color="#9CA3AF" />
+              <Text className="text-white/60 ml-1 text-[14px] font-sfpro-medium">
+                Watch comments
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setShowRecordModal(true)}
+            className="flex-row items-center bg-[#363636]/[40%] rounded-full p-4"
+          >
+            <View className="w-5 h-5 rounded-full items-center justify-center mr-2">
+              <Image source={icons.record} className="h-full w-full" />
+            </View>
+            <Text className="text-white font-sfpro-regular text-sm">
+              Record a comment
+            </Text>
+          </TouchableOpacity>
+        </View>
       </Animated.View>
     </View>
   );
 };
-
-interface PostCardProps {
-  post: Post;
-  setIsOpen: (val: boolean) => void;
-  setOpenComments: (val: boolean) => void;
-  setShowRecordModal: (val: boolean) => void;
-  onImageScrollStateChange?: (isScrolling: boolean) => void;
-  scrollEnabled?: boolean;
-  isVisible?: boolean; // 👈 new
-  handleVideoCommentPress?: () => void; // 👈 new
-}
 
 interface AllFeedsProps {
   posts?: Post[];
@@ -443,9 +434,11 @@ interface AllFeedsProps {
   simulateUpload?: any;
   externalScrollEnabled?: boolean;
   setExternalScrollEnabled?: (val: boolean) => void;
-  // Add these new props
   onShowLikePuff?: () => void;
   onShowDislikePuff?: () => void;
+  onScroll?: (event: any) => void; // Animated.event from parent
+  scrollEventThrottle?: number;
+  contentContainerStyle?: any;
 }
 
 const AllFeeds: React.FC<AllFeedsProps> = ({
@@ -457,6 +450,9 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   externalScrollEnabled,
   onShowLikePuff,
   onShowDislikePuff,
+  onScroll,
+  scrollEventThrottle,
+  contentContainerStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
@@ -466,12 +462,10 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
 
-  // Calculate center positions for puff animations
-  const centerY = height / 2 - 100; // Center vertically, offset up a bit
-  const likePosition = { x: (width * 3.3) / 4 - 50, y: centerY }; // Right side (75% of screen width)
-  const dislikePosition = { x: (width * 0.45) / 4 - 50, y: centerY }; // Left side (25% of screen width)
+  const centerY = height / 2 - 100;
+  const likePosition = { x: (width * 3.3) / 4 - 50, y: centerY };
+  const dislikePosition = { x: (width * 0.45) / 4 - 50, y: centerY };
 
-  // Gesture state management
   const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
   const [imageScrollingStates, setImageScrollingStates] = useState<{
     [key: string]: boolean;
@@ -505,38 +499,31 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     }, 100);
   };
 
-  // Update these functions
   const removePostWithLike = (id: string) => {
-    onShowLikePuff?.(); // Trigger like animation in parent
+    onShowLikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
   const removePostWithDislike = (id: string) => {
-    onShowDislikePuff?.(); // Trigger dislike animation in parent
+    onShowDislikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Smooth gesture state management
   const handleGestureStateChange = (postId: string, isActive: boolean) => {
     setActiveSwipeStates((prev) => {
       const newState = { ...prev, [postId]: isActive };
 
-      // Debounce scroll state updates
       if (scrollStateTimeoutRef.current) {
         clearTimeout(scrollStateTimeoutRef.current);
       }
 
+      // Debounce to avoid flapping scrollEnabled
+      // @ts-ignore: setTimeout type
       scrollStateTimeoutRef.current = setTimeout(() => {
         const hasActiveGestures = Object.values(newState).some(Boolean);
         const hasImageScrolling =
           Object.values(imageScrollingStates).some(Boolean);
         const shouldDisableScroll = hasActiveGestures || hasImageScrolling;
-
-        console.log("AllFeeds: Updating scroll state:", {
-          shouldDisableScroll,
-          activeGestures: Object.keys(newState).filter((key) => newState[key]),
-          hasImageScrolling,
-        });
 
         if (setExternalScrollEnabled) {
           setExternalScrollEnabled(!shouldDisableScroll);
@@ -551,16 +538,9 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     postId: string,
     isScrolling: boolean
   ) => {
-    console.log(
-      `AllFeeds: Image scroll ${
-        isScrolling ? "started" : "ended"
-      } for ${postId}`
-    );
-
     setImageScrollingStates((prev) => {
       const newState = { ...prev, [postId]: isScrolling };
 
-      // Update scroll state immediately for image scrolling
       const hasActiveGestures = Object.values(activeSwipeStates).some(Boolean);
       const hasImageScrolling = Object.values(newState).some(Boolean);
       const shouldDisableScroll = hasActiveGestures || hasImageScrolling;
@@ -590,7 +570,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     }
   };
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (scrollStateTimeoutRef.current) {
@@ -605,143 +584,38 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
     const ids = viewableItems.map((v: any) => v.item.id);
     setVisiblePostIds(ids);
   }).current;
+
   const viewabilityConfig = {
-    itemVisiblePercentThreshold: 80, // % of item that must be visible
+    itemVisiblePercentThreshold: 80,
   };
 
   const [showVideoReply, setShowVideoReply] = useState(false);
   const handleVideoCommentPress = () => {
     setShowVideoReply(true);
-    console.log("good on there ");
   };
 
-  // Add these state variables and refs at the top of your component
-
-  // Empty state
-  if (!feedPosts || feedPosts.length === 0) {
-    return (
-      <View className="px-6 pb-20 items-center justify-center flex-1">
-        <View className="mb-8 relative">
-          <View
-            className="absolute w-20 h-24 bg-[#6B46C1] rounded-2xl"
-            style={{
-              transform: [{ rotate: "-15deg" }],
-              zIndex: 1,
-              left: -10,
-              top: 10,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <View className="w-full h-full rounded-2xl overflow-hidden">
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-                }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-          </View>
-
-          <View
-            className="absolute w-20 h-24 bg-[#EF4444] rounded-2xl"
-            style={{
-              transform: [{ rotate: "8deg" }],
-              zIndex: 2,
-              left: 15,
-              top: -5,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <View className="w-full h-full rounded-2xl overflow-hidden">
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
-                }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-          </View>
-
-          <View
-            className="w-20 h-24 bg-[#10B981] rounded-2xl"
-            style={{
-              zIndex: 3,
-              left: 40,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.3,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <View className="w-full h-full rounded-2xl overflow-hidden">
-              <Image
-                source={{
-                  uri: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
-                }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </View>
-          </View>
-        </View>
-
-        <Text className="text-white text-[20px] font-semibold mb-3 text-center">
-          You aren't in any communities yet
-        </Text>
-        <Text className="text-gray-400 text-[16px] text-center mb-8 leading-6">
-          Tap below to explore and find your{"\n"}favorite communities!
-        </Text>
-
-        <TouchableOpacity
-          onPress={addPost}
-          className="bg-[#0368FF] rounded-full py-4 px-8"
-          activeOpacity={0.8}
-          style={{
-            shadowColor: "#0368FF",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 6,
-          }}
-        >
-          <Text className="text-white text-[16px] font-semibold">
-            Browse communities
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Determine effective scroll enabled state
   const effectiveScrollEnabled = externalScrollEnabled ?? true;
 
+  const keyExtractor = useCallback((item: Post) => item.id, []);
+
   return (
-    <View className="relative">
-      <FlatList
+    <View className="relative w-full">
+      <AnimatedGHFlatList
         data={feedPosts}
-        nestedScrollEnabled={true}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor as any}
+        nestedScrollEnabled
         onViewableItemsChanged={onViewableItemsChanged}
-        contentContainerClassName="pb-24"
         viewabilityConfig={viewabilityConfig}
-        renderItem={({ item, index }) => (
+        onScroll={onScroll} // animated onScroll from parent (useNativeDriver)
+        scrollEventThrottle={scrollEventThrottle ?? 16}
+        renderItem={({ item, index }: any) => (
           <View
             key={item.id}
             ref={(ref) => {
               cardRefs.current[item.id] = ref;
             }}
             collapsable={false}
+            className="w-full"
           >
             <SwipeableCard
               onSwipeLeft={() => removePostWithDislike(item.id)}
@@ -765,19 +639,21 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
                   handleImageScrollStateChange(item.id, isScrolling)
                 }
                 handleVideoCommentPress={handleVideoCommentPress}
-                isVisible={visiblePostIds.includes(item.id)} // 👈 new
+                isVisible={visiblePostIds.includes(item.id)}
               />
             </SwipeableCard>
           </View>
         )}
         scrollEnabled={effectiveScrollEnabled}
         showsVerticalScrollIndicator={false}
-        // 🔥 KEY CHANGES HERE:
-        maxToRenderPerBatch={2} // Only render 1 item at a time
-        windowSize={2} // Only keep 1 screen height worth of items (0.5 above + 0.5 below)
-        initialNumToRender={1} // Start with just 1 item
-        removeClippedSubviews={true}
+        // Replaced contentContainerClassName with style for compatibility
+        contentContainerStyle={contentContainerStyle}
+        maxToRenderPerBatch={2}
+        windowSize={2}
+        initialNumToRender={1}
+        removeClippedSubviews
       />
+
       {showVideoReply && (
         <VideoReply
           videos={videoComments}
@@ -786,7 +662,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
           onClose={() => setShowVideoReply(false)}
         />
       )}
-      {/* Existing Modals */}
+
       <UserProfileModal
         visible={isOpen}
         onClose={() => setIsOpen(false)}
@@ -822,7 +698,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
           console.log("Posted:", data);
           setShowRecordModal(false);
           setUploadVisible?.(true);
-          simulateUpload();
+          simulateUpload?.();
         }}
       />
     </View>

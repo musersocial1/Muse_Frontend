@@ -207,6 +207,7 @@ export default function SwipeableCard({
           transform: [
             { rotate: scrollBasedRotation }, // Apply scroll-based rotation
           ],
+          overflow: "hidden",
         },
       ]}
       className={`${index === activeSwipeIndex ? "z-[10000]" : ""}  `}
@@ -244,7 +245,8 @@ export default function SwipeableCard({
 
 const styles = StyleSheet.create({
   container: {
-    // marginHorizontal: 10,
+    // marginHorizontal: 0,
+    width: "100%",
   },
   card: {
     width: "100%",

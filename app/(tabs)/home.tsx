@@ -1,5 +1,6 @@
 import AllFeeds from "@/components/feed/AllFeeds";
 import UploadToast from "@/components/feed/UploadToast";
+import CommunitySwitcher from "@/components/modals/CommunitySwitcher";
 import PuffySmoke from "@/components/ui/PuffySmoke";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
@@ -14,8 +15,6 @@ import {
   Dimensions,
   Easing,
   Image,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -36,8 +35,11 @@ const Home: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedCommunity, setSelectedCommunity] = useState("All");
+  const [openSwitcher, setOpenSwitcher] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
+  const prevScrollY = useRef(0);
+  const scrollDirection = useRef<"up" | "down">("down");
 
   // Track scroll start position for dynamic interpolation
   const scrollStartPosition = useRef(0);
@@ -107,10 +109,55 @@ const Home: React.FC = () => {
     outputRange: [0, 1],
   });
 
-  const headerTranslateY = pull.interpolate({
-    inputRange: [0, 150],
-    outputRange: [-30, 0],
-  });
+  const [topBarHeight, setTopBarHeight] = useState(0);
+  const headerTranslateYAnim = useRef(new Animated.Value(0)).current;
+
+  // Twitter-like header animation
+  const SCROLL_THRESHOLD = 5; // Minimum scroll to trigger hide/show
+
+  useEffect(() => {
+    const listenerId = scrollY.addListener(({ value }) => {
+      const diff = value - prevScrollY.current;
+
+      // Determine scroll direction with threshold
+      if (Math.abs(diff) > SCROLL_THRESHOLD) {
+        if (diff > 0 && value > topBarHeight) {
+          // Scrolling down & past header height - hide header
+          if (scrollDirection.current !== "down") {
+            scrollDirection.current = "down";
+            Animated.timing(headerTranslateYAnim, {
+              toValue: -topBarHeight,
+              duration: 250,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }).start();
+          }
+        } else if (diff < 0) {
+          // Scrolling up - show header
+          if (scrollDirection.current !== "up") {
+            scrollDirection.current = "up";
+            Animated.timing(headerTranslateYAnim, {
+              toValue: 0,
+              duration: 250,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }).start();
+          }
+        }
+      }
+
+      prevScrollY.current = value;
+    });
+
+    return () => {
+      scrollY.removeListener(listenerId);
+    };
+  }, [topBarHeight]);
+
+  const onFeedScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
 
   // spinning refresh icon
   const spin = useRef(new Animated.Value(0)).current;
@@ -205,53 +252,29 @@ const Home: React.FC = () => {
     extrapolate: "clamp",
   });
 
-  const [visibleStoriesCount, setVisibleStoriesCount] = useState(
-    stories.length
-  );
-
   // Function to handle clicking on compact stories - just reset to 0
   const handleStoriesClick = () => {
-    // Just reset scroll position to 0 (no animation scaling)
     scrollRef.current?.scrollTo({ y: 0, animated: true });
-    // Reset tracking variables
     scrollStartPosition.current = 0;
     lastScrollY.current = 0;
     isScrollingDown.current = false;
-  };
 
-  // Enhanced scroll handler with dynamic start position tracking
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const currentScrollY = event.nativeEvent.contentOffset.y;
-
-    // Track scroll direction
-    if (currentScrollY > lastScrollY.current) {
-      // Scrolling down - update start position if we weren't scrolling down before
-      if (!isScrollingDown.current) {
-        scrollStartPosition.current = currentScrollY;
-        isScrollingDown.current = true;
-      }
-    } else if (currentScrollY < lastScrollY.current) {
-      isScrollingDown.current = false;
-    }
-
-    // Reset everything when back to top
-    if (currentScrollY === 0) {
-      scrollStartPosition.current = 0;
-      isScrollingDown.current = false;
-      if (visibleStoriesCount !== stories.length) {
-        setVisibleStoriesCount(stories.length);
-      }
-    }
-
-    lastScrollY.current = currentScrollY;
+    // Reset header to visible when clicking stories
+    Animated.timing(headerTranslateYAnim, {
+      toValue: 0,
+      duration: 250,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+    scrollDirection.current = "up";
   };
 
   const [visibleIds, setVisibleIds] = useState<any[]>([]);
   const scrollRef = useRef<any>(null);
   const [flatListScrollEnabled, setFlatListScrollEnabled] = useState(true);
-  // Add these state variables near the top of your Home component
   const [showLikePuff, setShowLikePuff] = useState(false);
   const [showDislikePuff, setShowDislikePuff] = useState(false);
+
   return (
     <SafeAreaView className="flex-1 bg-[#121212]">
       <Animated.View className="flex-1">
@@ -265,7 +288,8 @@ const Home: React.FC = () => {
             right: 0,
             alignItems: "center",
             opacity: headerOpacity,
-            transform: [{ translateY: headerTranslateY }],
+            transform: [{ translateY: headerTranslateYAnim }],
+            zIndex: 150,
           }}
         >
           <View
@@ -306,202 +330,162 @@ const Home: React.FC = () => {
           </View>
         </Animated.View>
 
-        {/* Scrollable Content */}
-        {/* <Animated.ScrollView
-          // stickyHeaderIndices={[0]}
-          // className="flex-1"
-          scrollEnabled={feedScrollEnabled}
-          nestedScrollEnabled={true}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            zIndex: 99,
+        {/* Main Header - Now with smooth hide/show */}
+        <Animated.View
+          onLayout={(e) => setTopBarHeight(e.nativeEvent.layout.height)}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            transform: [{ translateY: headerTranslateYAnim }],
+            elevation: 12,
             backgroundColor: "#121212",
-            borderTopRightRadius: 30,
-            borderTopLeftRadius: 30,
-            overflow: "hidden",
           }}
-          ref={scrollRef}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor="transparent"
-              colors={["transparent"]}
-              progressBackgroundColor="transparent"
-              progressViewOffset={100}
-            />
-          }
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            {
-              useNativeDriver: false,
-              listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-                const y = e.nativeEvent.contentOffset.y;
-                const pulled = Math.max(0, -y);
-                setCanTrigger(pulled > THRESHOLD && !refreshing);
-                handleScroll(e);
+        >
+          <Animated.View className="bg-[#121212] pb-2">
+            <Animated.View
+              style={{
+                zIndex: 100,
+              }}
+              className="relative"
+            >
+              {/* Header with Logo and Navigation */}
+              <View className="w-full mb-4 flex-row px-4 items-center justify-between">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="items-center justify-center z-20"
+                >
+                  <Image
+                    source={images.logo_white}
+                    className="w-28 h-14"
+                    resizeMode="contain"
+                    style={{ opacity: 0.9 }}
+                  />
+                </TouchableOpacity>
 
-                if (y > 30 && flatListScrollEnabled) {
-                  setFlatListScrollEnabled(false);
-                } else if (y <= 0 && !flatListScrollEnabled) {
-                  setFlatListScrollEnabled(true);
-                }
-              },
-            }
-          )}
-          onScrollEndDrag={(e) => {
-            const y = e.nativeEvent.contentOffset.y;
+                <View className="flex-row space-x-3 gap-2">
+                  <View className="relative">
+                    <TouchableOpacity
+                      className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
+                      activeOpacity={0.7}
+                      style={{ minWidth: 80, maxWidth: 160 }}
+                      onPress={() => setOpenSwitcher(true)}
+                    >
+                      <BlurView
+                        intensity={10}
+                        style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                      />
+                      <Text
+                        className="text-white font-medium text-[16px] flex-1"
+                        numberOfLines={1}
+                      >
+                        {selectedCommunity}
+                      </Text>
+                      <Feather
+                        name="server"
+                        size={16}
+                        color="#fff"
+                        style={{ opacity: 0.7, marginLeft: 4 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
 
-            if (-y > THRESHOLD && !refreshing) {
-              onRefresh();
-            }
-          }}
-          scrollEventThrottle={16}
-        ></Animated.ScrollView> */}
-        <Animated.View style={{ zIndex: 100 }} className="bg-[#121212] pb-2">
-          <Animated.View
-            style={{
-              zIndex: 100,
-              maxHeight: storiesMaxHeight,
-            }}
-            className="relative"
-          >
-            {/* Header with Logo and Navigation */}
-            <View className="w-full mb-4 flex-row px-4 items-center justify-between">
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="items-center justify-center z-20"
-              >
-                <Image
-                  source={images.logo_white}
-                  className="w-28 h-14"
-                  resizeMode="contain"
-                  style={{ opacity: 0.9 }}
-                />
-              </TouchableOpacity>
-
-              <View className="flex-row space-x-3 gap-2">
-                <View className="relative">
                   <TouchableOpacity
-                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
+                    onPress={() => console.log("bell pressed")}
                     activeOpacity={0.7}
-                    style={{ minWidth: 80, maxWidth: 160 }}
+                    className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
                   >
                     <BlurView
                       intensity={10}
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
                     />
-                    <Text
-                      className="text-white font-medium text-[16px] flex-1"
-                      numberOfLines={1}
-                    >
-                      {selectedCommunity}
-                    </Text>
                     <Feather
-                      name="server"
-                      size={16}
+                      name="bell"
+                      size={20}
                       color="#fff"
-                      style={{ opacity: 0.7, marginLeft: 4 }}
+                      style={{ opacity: 0.9 }}
                     />
                   </TouchableOpacity>
-
-                  {dropdownVisible && (
-                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
-                      <BlurView
-                        intensity={20}
-                        style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
-                        experimentalBlurMethod="dimezisBlurView"
-                      />
-                      <View className="p-2">
-                        <Text className="text-white/60 text-xs font-medium px-3 py-2 uppercase tracking-wider">
-                          Communities
-                        </Text>
-                        {communities.map((community) => (
-                          <TouchableOpacity
-                            key={community.id}
-                            onPress={() => handleCommunitySelect(community)}
-                            className={`flex-row items-center px-3 py-3 rounded-xl ${
-                              selectedCommunity === community.name
-                                ? "bg-white/20"
-                                : "active:bg-white/10"
-                            }`}
-                            activeOpacity={0.7}
-                          >
-                            <View
-                              className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
-                                selectedCommunity === community.name
-                                  ? "bg-white/20"
-                                  : "bg-white/10"
-                              }`}
-                            >
-                              <Feather
-                                name={community.icon as any}
-                                size={14}
-                                color="#fff"
-                              />
-                            </View>
-                            <Text
-                              className={`font-medium flex-1 ${
-                                selectedCommunity === community.name
-                                  ? "text-white"
-                                  : "text-white/80"
-                              }`}
-                            >
-                              {community.name}
-                            </Text>
-                            {selectedCommunity === community.name && (
-                              <Feather name="check" size={16} color="#fff" />
-                            )}
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </Animated.View>
-                  )}
                 </View>
-
-                <TouchableOpacity
-                  onPress={() => console.log("bell pressed")}
-                  activeOpacity={0.7}
-                  className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
-                >
-                  <BlurView
-                    intensity={10}
-                    style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                  />
-                  <Feather
-                    name="bell"
-                    size={20}
-                    color="#fff"
-                    style={{ opacity: 0.9 }}
-                  />
-                </TouchableOpacity>
               </View>
-            </View>
 
-            {/* Compact Stories (Absolute positioned) - with click handler */}
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={handleStoriesClick}
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-            >
-              <Animated.View
+              {/* Compact Stories (Absolute positioned) */}
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={handleStoriesClick}
                 style={{
-                  transformOrigin: "left center",
-                  transform: [
-                    { scale: storiesScale },
-                    { translateX: storiesTranslateX },
-                  ],
-                  opacity: AbsoluteOpacity,
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                 }}
               >
+                <Animated.View
+                  style={{
+                    transformOrigin: "left center",
+                    transform: [
+                      { scale: storiesScale },
+                      { translateX: storiesTranslateX },
+                    ],
+                    opacity: AbsoluteOpacity,
+                  }}
+                >
+                  <FlatList
+                    data={visibleIds}
+                    scrollEnabled={flatListScrollEnabled}
+                    viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+                    horizontal
+                    keyExtractor={(_, index) => index.toString()}
+                    showsHorizontalScrollIndicator={false}
+                    snapToInterval={88}
+                    decelerationRate="fast"
+                    contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
+                    renderItem={({ item, index }) => (
+                      <Animated.View
+                        style={{
+                          transform: [
+                            {
+                              translateX:
+                                index > 0
+                                  ? scrollY.interpolate({
+                                      inputRange: [
+                                        scrollStartPosition.current,
+                                        scrollStartPosition.current + 60,
+                                      ],
+                                      outputRange: [0, -30 * index],
+                                      extrapolate: "clamp",
+                                    })
+                                  : 0,
+                            },
+                          ],
+                        }}
+                        className="relative"
+                      >
+                        <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
+                          <Image
+                            source={item}
+                            className="w-full h-full rounded-full"
+                            resizeMode="cover"
+                          />
+                        </View>
+                      </Animated.View>
+                    )}
+                  />
+                </Animated.View>
+              </TouchableOpacity>
+
+              {/* Regular Stories */}
+              <Animated.View style={{ opacity: opacity }}>
                 <FlatList
-                  data={visibleIds}
-                  scrollEnabled={flatListScrollEnabled}
+                  data={stories}
+                  onViewableItemsChanged={({ viewableItems }) => {
+                    const visibleItems = viewableItems
+                      .map((vi) => vi.item)
+                      .slice(0, 5);
+                    setVisibleIds(visibleItems);
+                  }}
                   viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
                   horizontal
                   keyExtractor={(_, index) => index.toString()}
@@ -509,27 +493,8 @@ const Home: React.FC = () => {
                   snapToInterval={88}
                   decelerationRate="fast"
                   contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
-                  renderItem={({ item, index }) => (
-                    <Animated.View
-                      style={{
-                        transform: [
-                          {
-                            translateX:
-                              index > 0
-                                ? scrollY.interpolate({
-                                    inputRange: [
-                                      scrollStartPosition.current,
-                                      scrollStartPosition.current + 60,
-                                    ],
-                                    outputRange: [0, -30 * index],
-                                    extrapolate: "clamp",
-                                  })
-                                : 0,
-                          },
-                        ],
-                      }}
-                      className="relative"
-                    >
+                  renderItem={({ item }) => (
+                    <Animated.View className="relative">
                       <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
                         <Image
                           source={item}
@@ -541,41 +506,12 @@ const Home: React.FC = () => {
                   )}
                 />
               </Animated.View>
-            </TouchableOpacity>
-
-            {/* Regular Stories */}
-            <Animated.View style={{ opacity: opacity }}>
-              <FlatList
-                data={stories}
-                onViewableItemsChanged={({ viewableItems }) => {
-                  const visibleItems = viewableItems
-                    .map((vi) => vi.item)
-                    .slice(0, 5);
-                  setVisibleIds(visibleItems);
-                }}
-                viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-                horizontal
-                keyExtractor={(_, index) => index.toString()}
-                showsHorizontalScrollIndicator={false}
-                snapToInterval={88}
-                decelerationRate="fast"
-                contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
-                renderItem={({ item, index }) => (
-                  <Animated.View className="relative">
-                    <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
-                      <Image
-                        source={item}
-                        className="w-full h-full rounded-full"
-                        resizeMode="cover"
-                      />
-                    </View>
-                  </Animated.View>
-                )}
-              />
             </Animated.View>
           </Animated.View>
         </Animated.View>
-        <View className="flex-row flex-1 justify-center items-center gap-3">
+
+        {/* Feed Content - removed the spacer issue */}
+        <View className="flex-1">
           <AllFeeds
             posts={posts}
             addPost={() => setShowUpload(true)}
@@ -585,6 +521,9 @@ const Home: React.FC = () => {
             setExternalScrollEnabled={setFeedScrollEnabled}
             onShowLikePuff={() => setShowDislikePuff(true)}
             onShowDislikePuff={() => setShowLikePuff(true)}
+            onScroll={onFeedScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingTop: topBarHeight }}
           />
         </View>
 
@@ -614,7 +553,7 @@ const Home: React.FC = () => {
       <PuffySmoke
         type="like"
         visible={showLikePuff}
-        x={width - 140} // Right side for like
+        x={width - 140}
         y={height * 0.45}
         onComplete={() => setShowLikePuff(false)}
       />
@@ -622,10 +561,32 @@ const Home: React.FC = () => {
       <PuffySmoke
         type="dislike"
         visible={showDislikePuff}
-        x={20} // Left side for dislike
+        x={20}
         y={height * 0.45}
         onComplete={() => setShowDislikePuff(false)}
       />
+
+      {openSwitcher && (
+        <>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setOpenSwitcher(false)}
+            style={[StyleSheet.absoluteFillObject, { zIndex: 9998 }]}
+          />
+
+          <Animated.View
+            style={[StyleSheet.absoluteFillObject, { zIndex: 9999 }]}
+            pointerEvents="box-none"
+          >
+            <CommunitySwitcher
+              onClose={() => {
+                setOpenSwitcher(false);
+                setDropdownVisible(false);
+              }}
+            />
+          </Animated.View>
+        </>
+      )}
     </SafeAreaView>
   );
 };

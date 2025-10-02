@@ -1,9 +1,15 @@
-// Create this file: src/contexts/PlayerContext.tsx (or wherever you prefer)
-
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import TrackPlayer, {
+  AppKilledPlaybackBehavior,
   Capability,
   Event,
+  RepeatMode,
   State,
   usePlaybackState,
   useProgress,
@@ -28,21 +34,52 @@ interface PlayerContextType {
   // Actions
   playTrack: (track: Track) => Promise<void>;
   togglePlayPause: () => Promise<void>;
-  seekTo: (position: number) => Promise<void>;
+  seekTo: (positionSeconds: number) => Promise<void>;
   setRate: (rate: number) => Promise<void>;
   skipForward: (seconds: number) => Promise<void>;
   skipBackward: (seconds: number) => Promise<void>;
+  play: () => Promise<void>;
+  pause: () => Promise<void>;
 }
 
 const PlayerContext = createContext<PlayerContextType | null>(null);
-
 export const usePlayer = () => {
-  const context = useContext(PlayerContext);
-  if (!context) {
-    throw new Error("usePlayer must be used within PlayerProvider");
-  }
-  return context;
+  const ctx = useContext(PlayerContext);
+  if (!ctx) throw new Error("usePlayer must be used within PlayerProvider");
+  return ctx;
 };
+
+let didSetup = false;
+
+async function setupPlayerOnce() {
+  if (didSetup) return;
+  await TrackPlayer.setupPlayer({
+    // optional: fine tune here
+    autoHandleInterruptions: true,
+  });
+
+  await TrackPlayer.updateOptions({
+    // Foreground/lockscreen capabilities
+    capabilities: [
+      Capability.Play,
+      Capability.Pause,
+      Capability.SeekTo,
+      Capability.SkipToNext,
+      Capability.SkipToPrevious,
+      Capability.Stop,
+    ],
+    compactCapabilities: [Capability.Play, Capability.Pause, Capability.SeekTo],
+    progressUpdateEventInterval: 0.5, // seconds
+    alwaysPauseOnInterruption: true,
+    android: {
+      appKilledPlaybackBehavior:
+        AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+    },
+  });
+
+  await TrackPlayer.setRepeatMode(RepeatMode.Off);
+  didSetup = true;
+}
 
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -53,63 +90,55 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const playbackState = usePlaybackState();
   const progress = useProgress();
 
-  // Handle the union type properly
-  const isPlaying = playbackState?.state === State.Playing;
+  // v3 hook can return either State or an object with .state
+  const state = (playbackState as any)?.state ?? playbackState;
+  const isPlaying = state === State.Playing;
 
   useEffect(() => {
-    setupPlayer();
+    setupPlayerOnce().catch((e) => console.warn("setupPlayer error:", e));
   }, []);
 
-  // Listen to track changes
+  // Keep currentTrack in sync with the queue
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
     if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
       const track = await TrackPlayer.getTrack(event.nextTrack);
       if (track) {
         setCurrentTrack({
-          id: track.id as string,
-          url: track.url as string,
-          title: track.title as string,
-          artist: track.artist as string,
-          artwork: track.artwork as string,
-          duration: track.duration,
+          id: String(track.id),
+          url: String(track.url),
+          title: String(track.title ?? ""),
+          artist: String(track.artist ?? ""),
+          artwork: (track.artwork as string) || undefined,
+          duration:
+            typeof track.duration === "number" ? track.duration : undefined,
         });
       }
     }
   });
 
-  const setupPlayer = async () => {
-    try {
-      await TrackPlayer.setupPlayer();
-      await TrackPlayer.updateOptions({
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.SeekTo,
-        ],
-        compactCapabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-        ],
-      });
-    } catch (error) {
-      console.log("Error setting up player:", error);
+  // Re-apply rate after prepare or focus changes
+  useTrackPlayerEvents(
+    [Event.PlaybackState, Event.PlaybackQueueEnded],
+    async () => {
+      try {
+        await TrackPlayer.setRate(playbackRate);
+      } catch {}
     }
-  };
+  );
 
   const playTrack = async (track: Track) => {
     try {
+      await setupPlayerOnce();
       await TrackPlayer.reset();
       await TrackPlayer.add({
         id: track.id,
         url: track.url,
         title: track.title,
         artist: track.artist,
-        artwork: track.artwork || "",
-        duration: track.duration,
+        artwork: track.artwork,
+        duration: track.duration, // seconds
       });
+      await TrackPlayer.setRate(playbackRate);
       await TrackPlayer.play();
       setCurrentTrack(track);
     } catch (error) {
@@ -125,13 +154,13 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
         await TrackPlayer.play();
       }
     } catch (error) {
-      console.log("Error toggling playback:", error);
+      console.log("Error toggling:", error);
     }
   };
 
-  const seekTo = async (position: number) => {
+  const seekTo = async (positionSeconds: number) => {
     try {
-      await TrackPlayer.seekTo(position);
+      await TrackPlayer.seekTo(Math.max(0, positionSeconds));
     } catch (error) {
       console.log("Error seeking:", error);
     }
@@ -147,43 +176,48 @@ export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const skipForward = async (seconds: number) => {
-    try {
-      const newPosition = Math.min(
-        progress.position + seconds,
-        progress.duration
-      );
-      await TrackPlayer.seekTo(newPosition);
-    } catch (error) {
-      console.log("Error skipping forward:", error);
-    }
+    const newPos = Math.min(progress.position + seconds, progress.duration);
+    await seekTo(newPos);
   };
 
   const skipBackward = async (seconds: number) => {
-    try {
-      const newPosition = Math.max(progress.position - seconds, 0);
-      await TrackPlayer.seekTo(newPosition);
-    } catch (error) {
-      console.log("Error skipping backward:", error);
-    }
+    const newPos = Math.max(progress.position - seconds, 0);
+    await seekTo(newPos);
   };
 
+  const play = async () => {
+    await TrackPlayer.play();
+  };
+  const pause = async () => {
+    await TrackPlayer.pause();
+  };
+
+  const value = useMemo(
+    () => ({
+      currentTrack,
+      isPlaying,
+      position: progress.position, // seconds
+      duration: progress.duration, // seconds
+      playbackRate,
+      playTrack,
+      togglePlayPause,
+      seekTo,
+      setRate,
+      skipForward,
+      skipBackward,
+      play,
+      pause,
+    }),
+    [
+      currentTrack,
+      isPlaying,
+      progress.position,
+      progress.duration,
+      playbackRate,
+    ]
+  );
+
   return (
-    <PlayerContext.Provider
-      value={{
-        currentTrack,
-        isPlaying,
-        position: progress.position,
-        duration: progress.duration,
-        playbackRate,
-        playTrack,
-        togglePlayPause,
-        seekTo,
-        setRate,
-        skipForward,
-        skipBackward,
-      }}
-    >
-      {children}
-    </PlayerContext.Provider>
+    <PlayerContext.Provider value={value}>{children}</PlayerContext.Provider>
   );
 };

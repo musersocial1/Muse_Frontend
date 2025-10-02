@@ -14,6 +14,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BaseToast } from "react-native-toast-message";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import "./globals.css";
+import { registerRootComponent } from "expo";
+import TrackPlayer from "react-native-track-player";
 
 const queryClient = new QueryClient();
 

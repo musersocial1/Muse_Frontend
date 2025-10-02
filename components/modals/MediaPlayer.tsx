@@ -31,8 +31,9 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import DragToClose from "../navigations/DragToClose";
 import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 import ClipModal from "./ClipModal";
-import RecordCommentModal from "./RecordCommentModal";
 import CreatePostStart from "./create-post-startup";
+import RecordCommentModal from "./RecordCommentModal";
+import RelatedPosts from "./RelatedPosts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -95,6 +96,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   // Add these with your other state variables
   const [isDraggingProgress, setIsDraggingProgress] = useState(false);
   const [progressBarWidth, setProgressBarWidth] = useState(0);
+  const [showRelatedPost, setRelatedPost] = useState(false);
   // Sample comments data
   const [comments] = useState<Comment[]>([
     {
@@ -900,7 +902,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
           {/* Bottom Controls */}
           <View className="flex-col w-[90%] mx-auto items-center gap-y-3">
             {/* See related posts */}
-            <TouchableOpacity className="w-full flex-row items-center justify-center bg-[white]/10 border border-white/20 rounded-full px-4 py-4">
+            <TouchableOpacity className="w-full flex-row items-center justify-center bg-[white]/10 border border-white/20 rounded-full px-4 py-4" onPress={() => setRelatedPost(true)}>
               <Text className="text-white font-sfpro-medium text-base">
                 See related posts
               </Text>
@@ -950,6 +952,10 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
       <ClipModal
         visible={showClipModal}
         onClose={() => setShowClipModal(false)}
+      />
+      <RelatedPosts
+        visible={showRelatedPost}
+        onClose={() => setRelatedPost(false)}
       />
     </Modal>
   );
