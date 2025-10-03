@@ -1,7 +1,9 @@
 import AIModal from "@/components/modals/AiModal";
 import FloatingAIButton from "@/components/museai/FloatingAiButton";
 import AuthProvider from "@/context/AuthContext";
+import { PostsProvider } from "@/context/PostsContext";
 import { customFonts } from "@/lib/fonts";
+import ScreenLongPressWrapper from "@/wrappers/ScreenLongPress";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -14,8 +16,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BaseToast } from "react-native-toast-message";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import "./globals.css";
-import { registerRootComponent } from "expo";
-import TrackPlayer from "react-native-track-player";
 
 const queryClient = new QueryClient();
 
@@ -40,39 +40,52 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <View style={{ flex: 1, backgroundColor: "#121212" }}>
-              <FloatingAIButton setShowAIModal={setShowAIModal} />
-              <AIModal
-                showAIModal={showAIModal}
-                setShowAIModal={setShowAIModal}
-              />
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                }}
-              >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="(profile)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(discover)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(community)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="(museai)"
-                  options={{ headerShown: false }}
-                />
-                <Stack.Screen name="(posts)" options={{ headerShown: false }} />
-                {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
-              </Stack>
-            </View>
+            <PostsProvider>
+              <ScreenLongPressWrapper>
+                <View style={{ flex: 1, backgroundColor: "#121212" }}>
+                  <FloatingAIButton setShowAIModal={setShowAIModal} />
+                  <AIModal
+                    showAIModal={showAIModal}
+                    setShowAIModal={setShowAIModal}
+                  />
+                  <Stack
+                    screenOptions={{
+                      headerShown: false,
+                    }}
+                  >
+                    <Stack.Screen
+                      name="(tabs)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(auth)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(profile)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(discover)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(community)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(museai)"
+                      options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                      name="(posts)"
+                      options={{ headerShown: false }}
+                    />
+                    {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
+                  </Stack>
+                </View>
+              </ScreenLongPressWrapper>
+            </PostsProvider>
             <Toast
               config={{
                 success: (props) => (

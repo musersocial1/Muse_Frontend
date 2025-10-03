@@ -88,7 +88,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
-                  <View className="w-4 h-4 bg-[#0368FF] rounded-full items-center justify-center mr-2">
+                  <View className="w-3.5 h-3.5 bg-[#0368FF] rounded-full items-center justify-center mr-2">
                     <Feather name="check" size={8} color="white" />
                   </View>
                 )}
@@ -124,6 +124,7 @@ interface PostCardProps {
   scrollEnabled?: boolean;
   isVisible?: boolean;
   handleVideoCommentPress?: () => void;
+  setShowVideoReply: (val: boolean) => void;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -135,6 +136,7 @@ const PostCard: React.FC<PostCardProps> = ({
   scrollEnabled = true,
   isVisible,
   handleVideoCommentPress,
+  setShowVideoReply,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = React.useRef<any[]>([]).current;
@@ -322,8 +324,9 @@ const PostCard: React.FC<PostCardProps> = ({
 
         <View className="pb-3 px-6">
           <View className="flex-row flex-wrap items-baseline">
-            <Text className="text-white text-[17px] inline-flex items-baseline font-sfpro-medium leading-[20px]">
-              {getDisplayText()}
+            <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
+              <Text className="font-sfpro-bold">{post.author.username}</Text>{" "}
+              <Text className="font-sfpro-medium">{getDisplayText()}</Text>
               {shouldShowReadMore && (
                 <TouchableOpacity
                   onPress={() => setIsTextExpanded(!isTextExpanded)}
@@ -368,7 +371,7 @@ const PostCard: React.FC<PostCardProps> = ({
 
         <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
           <TouchableOpacity
-            onPress={() => setOpenComments(true)}
+            onPress={() => setShowVideoReply(true)}
             className="flex-row items-center"
           >
             <View className="flex-row">
@@ -640,6 +643,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
                 }
                 handleVideoCommentPress={handleVideoCommentPress}
                 isVisible={visiblePostIds.includes(item.id)}
+                setShowVideoReply={setShowVideoReply}
               />
             </SwipeableCard>
           </View>

@@ -495,7 +495,7 @@ const Home: React.FC = () => {
                   contentContainerStyle={{ gap: 10, paddingLeft: 10 }}
                   renderItem={({ item }) => (
                     <Animated.View className="relative">
-                      <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#B3B3B3]">
+                      <View className="w-16 h-16 rounded-full overflow-hidden border-[4px] border-[#B3B3B3]">
                         <Image
                           source={item}
                           className="w-full h-full rounded-full"

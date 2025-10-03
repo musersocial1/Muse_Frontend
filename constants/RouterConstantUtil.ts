@@ -48,4 +48,4 @@ export const RouterConstantUtil = {
     login: "/(auth)",
     register: "/(auth)",
   },
-} as const; // 👈 THIS is the magic
+} as const; 

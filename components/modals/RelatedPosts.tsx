@@ -1,12 +1,10 @@
 import { dummyAllPosts } from "@/constants/data";
-import { images } from "@/constants/images";
 import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
-  Image,
   KeyboardAvoidingView,
   PanResponder,
   Platform,
@@ -136,7 +134,7 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
         >
           <View className="flex-1">
             {/* Background flourish */}
-            <View className="flex-1 items-center absolute top-0 left-0 right-0 bottom-0">
+            {/* <View className="flex-1 items-center absolute top-0 left-0 right-0 bottom-0">
               <View className="w-[220px] pt-24 blur-2xl aspect-square rounded-full border-2 border-white/10">
                 <Image
                   source={images.img11}
@@ -145,7 +143,7 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
                   blurRadius={150}
                 />
               </View>
-            </View>
+            </View> */}
 
             {/* Frosted overlay */}
             <BlurView
@@ -158,12 +156,12 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
             {/* Content */}
             <View
               style={{ paddingBottom: insets.bottom }}
-              className="flex-1 px-3 pt-10"
+              className="flex-1 pt-10 "
             >
               <View className="flex-col items-center justify-center mb-4">
                 {/* Drag handle / indicator */}
                 <DragToClose translateY={sheetY} onClose={closeWithSlide} />
-                <Text className="text-white text-xl font-semibold">
+                <Text className="text-white text-[21px] font-semibold">
                   Related Posts
                 </Text>
               </View>
