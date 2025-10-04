@@ -1,88 +1,91 @@
+import React from "react";
+import { TouchableOpacity, View, Image, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { usePlayer } from "@/context/PlayerContext";
-import { ResizeMode, Video } from "expo-av";
-import React, { useEffect, useRef } from "react";
+import { images } from "@/constants/images";
 
-const MS = 1000;
+export default function MiniCirclePlayer({ onPress }: { onPress: () => void }) {
+  const insets = useSafeAreaInsets();
+  const { currentTrack, isPlaying, togglePlayPause, showMini } = usePlayer();
 
-export default function VideoSurface({
-  uri,
-  style,
-  visible = true,
-}: {
-  uri: string;
-  style?: any;
-  visible?: boolean;
-}) {
-  const ref = useRef<Video>(null);
-  const { isPlaying, position, playbackRate } = usePlayer();
-
-  // Keep rate in sync
-  useEffect(() => {
-    ref.current?.setRateAsync(playbackRate, true).catch(() => {});
-  }, [playbackRate]);
-
-  // Play/pause UI surface based on global engine
-  useEffect(() => {
-    if (!ref.current) return;
-    (async () => {
-      try {
-        if (isPlaying && visible) {
-          await ref.current?.playAsync();
-        } else {
-          await ref.current?.pauseAsync();
-        }
-      } catch {}
-    })();
-  }, [isPlaying, visible]);
-
-  // Soft-sync position (only correct when drift > 500ms)
-  useEffect(() => {
-    let mounted = true;
-    const sync = async () => {
-      if (!ref.current || !visible) return;
-      try {
-        const status = await ref.current?.getStatusAsync();
-        if (!mounted || !status.isLoaded) return;
-        const uiPos = status.positionMillis ?? 0;
-        const target = position * MS;
-        if (Math.abs(uiPos - target) > 500) {
-          await ref.current?.setPositionAsync(target);
-          if (isPlaying) await ref.current?.playAsync();
-        }
-      } catch {}
-    };
-    const t = setTimeout(sync, 120);
-    return () => {
-      mounted = false;
-      clearTimeout(t);
-    };
-  }, [position, visible, isPlaying]);
-
-  if (!visible) {
-    return (
-      <Video
-        ref={ref}
-        source={{ uri }}
-        style={{ width: 1, height: 1, opacity: 0 }}
-        isMuted
-        shouldPlay={false}
-        rate={playbackRate}
-        resizeMode={ResizeMode.COVER}
-        useNativeControls={false}
-      />
-    );
-  }
+  if (!currentTrack || !showMini) return null;
 
   return (
-    <Video
-      ref={ref}
-      source={{ uri }}
-      style={style}
-      isMuted
-      shouldPlay={isPlaying}
-      rate={playbackRate}
-      resizeMode={ResizeMode.COVER}
-      useNativeControls={false}
-    />
+    <View
+      pointerEvents="box-none"
+      style={[
+        styles.container,
+        { bottom: (insets.bottom || 16) + 16 }, // lift above home indicator
+      ]}
+    >
+      <TouchableOpacity
+        activeOpacity={0.9}
+        style={styles.bubble}
+        onPress={onPress}
+      >
+        <Image
+          source={
+            currentTrack.artwork ? { uri: currentTrack.artwork } : images.media
+          }
+          style={styles.art}
+          resizeMode="cover"
+        />
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation();
+            togglePlayPause();
+          }}
+          style={styles.playPause}
+          activeOpacity={0.9}
+        >
+          <Ionicons
+            name={isPlaying ? "pause" : "play"}
+            size={16}
+            color="#fff"
+            style={!isPlaying && { marginLeft: 2 }}
+          />
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </View>
   );
 }
+
+const SIZE = 64;
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    right: 16,
+    left: undefined,
+    zIndex: 1000,
+  },
+  bubble: {
+    width: SIZE,
+    height: SIZE,
+    borderRadius: SIZE / 2,
+    overflow: "hidden",
+    backgroundColor: "#1f1f1f",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.15)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  art: {
+    width: "100%",
+    height: "100%",
+  },
+  playPause: {
+    position: "absolute",
+    right: -6,
+    bottom: -6,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "rgba(0,0,0,0.65)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+});

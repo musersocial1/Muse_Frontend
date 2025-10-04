@@ -24,6 +24,7 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import MediaPlayerModal from "../modals/MediaPlayer";
+import MiniCirclePlayer from "./MiniPlayer";
 
 type Video = {
   id: string;
@@ -262,6 +263,8 @@ export default function DiscoveryExclusivesScreen() {
             duration={0}
           />
         )}
+
+        <MiniCirclePlayer onPress={() => setShowPlayer(true)} />
 
         <Animatable.View
           // animation="non" // 👈 enters from right

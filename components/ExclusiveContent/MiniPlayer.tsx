@@ -17,9 +17,8 @@ interface MiniPlayerProps {
 const { width } = Dimensions.get("window");
 
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ onPress }) => {
-  const { currentTrack, isPlaying, togglePlayPause } = usePlayer();
-  if (!currentTrack) return null;
-
+  const { currentTrack, isPlaying, togglePlayPause, showMini } = usePlayer();
+  if (!currentTrack || !showMini) return null;
   return (
     <View style={styles.container}>
       <TouchableOpacity

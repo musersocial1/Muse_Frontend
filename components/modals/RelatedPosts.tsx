@@ -26,12 +26,14 @@ interface RelatedPostsProps {
 
 const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   const insets = useSafeAreaInsets();
+
   const { width, height } = Dimensions.get("window");
 
-  // Use the actual device height, including safe-area bottom inset
   const SCREEN_HEIGHT = height + insets.bottom;
-
+  // Only 90–95% tall
+  const SHEET_HEIGHT = SCREEN_HEIGHT * 0.92;
   const HIDE_OFFSET = SCREEN_HEIGHT;
+
   const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
 
   const blurOpacity = sheetY.interpolate({
@@ -41,10 +43,9 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   });
 
   const openWithSlide = () => {
-    // Reset then slide up
     sheetY.setValue(HIDE_OFFSET);
     Animated.timing(sheetY, {
-      toValue: 0,
+      toValue: SCREEN_HEIGHT - SHEET_HEIGHT,
       duration: 260,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
@@ -104,7 +105,6 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
       style={StyleSheet.absoluteFill}
       className="z-50"
     >
-      {/* Dim/blur background. Tapping backdrop closes, though the sheet is full-screen */}
       <TouchableOpacity
         activeOpacity={1}
         style={StyleSheet.absoluteFill}
@@ -120,45 +120,34 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
         <Animated.View
           style={{
             transform: [{ translateY: sheetY }],
-            // Full-screen sheet
             position: "absolute",
-            top: 0,
             left: 0,
             right: 0,
+            height: SHEET_HEIGHT,
             bottom: 0,
-            // Ensure it sits above the backdrop
-            zIndex: 1,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+            overflow: "hidden",
             backgroundColor: "black",
+            zIndex: 1,
           }}
           {...responder.panHandlers}
         >
           <View className="flex-1">
-            {/* Background flourish */}
-            {/* <View className="flex-1 items-center absolute top-0 left-0 right-0 bottom-0">
-              <View className="w-[220px] pt-24 blur-2xl aspect-square rounded-full border-2 border-white/10">
-                <Image
-                  source={images.img11}
-                  className="w-full rounded-full h-full"
-                  resizeMode="cover"
-                  blurRadius={150}
-                />
-              </View>
-            </View> */}
-
             {/* Frosted overlay */}
             <BlurView
               style={StyleSheet.absoluteFill}
               tint="dark"
-              intensity={100}
+              intensity={80}
               experimentalBlurMethod="dimezisBlurView"
             />
 
             {/* Content */}
             <View
               style={{ paddingBottom: insets.bottom }}
-              className="flex-1 pt-10 "
+              className="flex-1 pt-2 "
             >
-              <View className="flex-col items-center justify-center mb-4">
+              <View className="flex-col items-center justify-center mb-3">
                 {/* Drag handle / indicator */}
                 <DragToClose translateY={sheetY} onClose={closeWithSlide} />
                 <Text className="text-white text-[21px] font-semibold">

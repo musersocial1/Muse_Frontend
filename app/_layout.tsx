@@ -1,6 +1,7 @@
 import AIModal from "@/components/modals/AiModal";
 import FloatingAIButton from "@/components/museai/FloatingAiButton";
 import AuthProvider from "@/context/AuthContext";
+import { PlayerProvider } from "@/context/PlayerContext";
 import { PostsProvider } from "@/context/PostsContext";
 import { customFonts } from "@/lib/fonts";
 import ScreenLongPressWrapper from "@/wrappers/ScreenLongPress";
@@ -40,120 +41,122 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <PostsProvider>
-              <ScreenLongPressWrapper>
-                <View style={{ flex: 1, backgroundColor: "#121212" }}>
-                  <FloatingAIButton setShowAIModal={setShowAIModal} />
-                  <AIModal
-                    showAIModal={showAIModal}
-                    setShowAIModal={setShowAIModal}
-                  />
-                  <Stack
-                    screenOptions={{
-                      headerShown: false,
-                    }}
-                  >
-                    <Stack.Screen
-                      name="(tabs)"
-                      options={{ headerShown: false }}
+            <PlayerProvider>
+              <PostsProvider>
+                <ScreenLongPressWrapper>
+                  <View style={{ flex: 1, backgroundColor: "#121212" }}>
+                    <FloatingAIButton setShowAIModal={setShowAIModal} />
+                    <AIModal
+                      showAIModal={showAIModal}
+                      setShowAIModal={setShowAIModal}
                     />
-                    <Stack.Screen
-                      name="(auth)"
-                      options={{ headerShown: false }}
+                    <Stack
+                      screenOptions={{
+                        headerShown: false,
+                      }}
+                    >
+                      <Stack.Screen
+                        name="(tabs)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(auth)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(profile)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(discover)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(community)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(museai)"
+                        options={{ headerShown: false }}
+                      />
+                      <Stack.Screen
+                        name="(posts)"
+                        options={{ headerShown: false }}
+                      />
+                      {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
+                    </Stack>
+                  </View>
+                </ScreenLongPressWrapper>
+              </PostsProvider>
+              <Toast
+                config={{
+                  success: (props) => (
+                    <BaseToast
+                      {...props}
+                      style={{
+                        borderLeftColor: "#18FF037D",
+                        backgroundColor: "#F3FFF6",
+                      }}
+                      text1Style={{
+                        fontWeight: "bold",
+                        color: "#121212",
+                      }}
+                      text2Style={{
+                        color: "#363636",
+                      }}
                     />
-                    <Stack.Screen
-                      name="(profile)"
-                      options={{ headerShown: false }}
+                  ),
+                  error: (props) => (
+                    <BaseToast
+                      {...props}
+                      style={{
+                        borderLeftColor: "#FF03037D",
+                        backgroundColor: "#FFF3F3",
+                      }}
+                      text1Style={{
+                        fontWeight: "bold",
+                        color: "#121212",
+                      }}
+                      text2Style={{
+                        color: "#363636",
+                      }}
                     />
-                    <Stack.Screen
-                      name="(discover)"
-                      options={{ headerShown: false }}
+                  ),
+                  warning: (props) => (
+                    <BaseToast
+                      {...props}
+                      style={{
+                        borderLeftColor: "#FFA500",
+                        backgroundColor: "#FFF8E1",
+                      }}
+                      text1Style={{
+                        fontWeight: "bold",
+                        color: "#121212",
+                      }}
+                      text2Style={{
+                        color: "#363636",
+                      }}
                     />
-                    <Stack.Screen
-                      name="(community)"
-                      options={{ headerShown: false }}
+                  ),
+                  info: (props) => (
+                    <BaseToast
+                      {...props}
+                      style={{
+                        borderLeftColor: "#0368FF",
+                        backgroundColor: "#F3F7FF",
+                      }}
+                      text1Style={{
+                        fontWeight: "bold",
+                        color: "#121212",
+                      }}
+                      text2Style={{
+                        color: "#363636",
+                      }}
                     />
-                    <Stack.Screen
-                      name="(museai)"
-                      options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                      name="(posts)"
-                      options={{ headerShown: false }}
-                    />
-                    {/* <Stack.Screen name="modal" options={{ presentation: "modal" }} /> */}
-                  </Stack>
-                </View>
-              </ScreenLongPressWrapper>
-            </PostsProvider>
-            <Toast
-              config={{
-                success: (props) => (
-                  <BaseToast
-                    {...props}
-                    style={{
-                      borderLeftColor: "#18FF037D",
-                      backgroundColor: "#F3FFF6",
-                    }}
-                    text1Style={{
-                      fontWeight: "bold",
-                      color: "#121212",
-                    }}
-                    text2Style={{
-                      color: "#363636",
-                    }}
-                  />
-                ),
-                error: (props) => (
-                  <BaseToast
-                    {...props}
-                    style={{
-                      borderLeftColor: "#FF03037D",
-                      backgroundColor: "#FFF3F3",
-                    }}
-                    text1Style={{
-                      fontWeight: "bold",
-                      color: "#121212",
-                    }}
-                    text2Style={{
-                      color: "#363636",
-                    }}
-                  />
-                ),
-                warning: (props) => (
-                  <BaseToast
-                    {...props}
-                    style={{
-                      borderLeftColor: "#FFA500",
-                      backgroundColor: "#FFF8E1",
-                    }}
-                    text1Style={{
-                      fontWeight: "bold",
-                      color: "#121212",
-                    }}
-                    text2Style={{
-                      color: "#363636",
-                    }}
-                  />
-                ),
-                info: (props) => (
-                  <BaseToast
-                    {...props}
-                    style={{
-                      borderLeftColor: "#0368FF",
-                      backgroundColor: "#F3F7FF",
-                    }}
-                    text1Style={{
-                      fontWeight: "bold",
-                      color: "#121212",
-                    }}
-                    text2Style={{
-                      color: "#363636",
-                    }}
-                  />
-                ),
-              }}
-            />
+                  ),
+                }}
+              />
+            </PlayerProvider>
           </AuthProvider>
         </QueryClientProvider>
       </SafeAreaProvider>

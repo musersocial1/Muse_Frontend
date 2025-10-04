@@ -902,7 +902,10 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
           {/* Bottom Controls */}
           <View className="flex-col w-[90%] mx-auto items-center gap-y-3">
             {/* See related posts */}
-            <TouchableOpacity className="w-full flex-row items-center justify-center bg-[white]/10 border border-white/20 rounded-full px-4 py-4" onPress={() => setRelatedPost(true)}>
+            <TouchableOpacity
+              className="w-full flex-row items-center justify-center bg-[white]/10 border border-white/20 rounded-full px-4 py-4"
+              onPress={() => setRelatedPost(true)}
+            >
               <Text className="text-white font-sfpro-medium text-base">
                 See related posts
               </Text>

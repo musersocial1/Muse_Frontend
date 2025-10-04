@@ -1,4 +1,4 @@
-import { useInteractedPostsModal } from "@/context/PostsContext";
+import { usePostContext } from "@/context/PostsContext";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, ViewProps } from "react-native";
@@ -8,7 +8,7 @@ const ScreenLongPressWrapper: React.FC<React.PropsWithChildren<ViewProps>> = ({
   style,
   ...rest
 }) => {
-  const { open } = useInteractedPostsModal();
+  const { open } = usePostContext();
 
   const handleLongPress = async () => {
     try {

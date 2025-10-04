@@ -18,6 +18,8 @@ type OpenArgs = {
 type Ctx = {
   open: (args?: OpenArgs) => void;
   close: () => void;
+  setLiked: React.Dispatch<React.SetStateAction<Post[]>>;
+  setDisliked: React.Dispatch<React.SetStateAction<Post[]>>;
 };
 
 const PostsContext = createContext<Ctx | null>(null);
@@ -39,7 +41,10 @@ export const PostsProvider: React.FC<React.PropsWithChildren> = ({
 
   const close = useCallback(() => setVisible(false), []);
 
-  const value = useMemo(() => ({ open, close }), [open, close]);
+  const value = useMemo(
+    () => ({ open, close, setDisliked, setLiked }),
+    [open, close, setDisliked, setLiked]
+  );
 
   return (
     <PostsContext.Provider value={value}>
@@ -55,11 +60,8 @@ export const PostsProvider: React.FC<React.PropsWithChildren> = ({
   );
 };
 
-export const useInteractedPostsModal = () => {
+export const usePostContext = () => {
   const ctx = useContext(PostsContext);
-  if (!ctx)
-    throw new Error(
-      "useInteractedPostsModal must be used within InteractedPostsProvider"
-    );
+  if (!ctx) throw new Error("usePostContext must be used within PostsProvider");
   return ctx;
 };

@@ -1,5 +1,6 @@
 import { textComments, user, videoComments } from "@/constants/data";
 import { icons } from "@/constants/icons";
+import { usePostContext } from "@/context/PostsContext";
 import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
@@ -70,9 +71,17 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
             shadowOpacity: 0.25,
             shadowRadius: 94.13,
             elevation: 16,
+            overflow: "hidden",
           }}
           activeOpacity={0.8}
         >
+          <BlurView
+            intensity={50}
+            style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+            experimentalBlurMethod="dimezisBlurView"
+            tint="dark"
+          />
+
           <View className="w-12 h-12 rounded-full overflow-hidden mr-2">
             <Image
               source={{ uri: post.author.avatar }}
@@ -242,8 +251,8 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "video" && post.videos && post.videos.length > 0 && (
-          <View className="px-2">
-            <View className="relative rounded-[20px] w-full gap-5 overflow-hidden bg-[#242424] p-2">
+          <View className="px-2 mt-2">
+            <View className="relative rounded-[20px] w-full gap-5 overflow-hidden mb-3 ">
               <PostHeader
                 post={post}
                 onAuthorPress={() => setIsOpen(true)}
@@ -294,7 +303,7 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {hasMedia && (
-          <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
+          <View className="flex-row px-6 items-center pb-4 justify-between pt-3">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setOpenComments(true)}
@@ -375,11 +384,11 @@ const PostCard: React.FC<PostCardProps> = ({
             className="flex-row items-center"
           >
             <View className="flex-row">
-              {post.vComments?.slice(0, 3).map((commentItem, index) => (
+              {post.vComments?.slice(0, 4).map((commentItem, index) => (
                 <View
                   key={index}
-                  className="w-8 h-8 rounded-full overflow-hidden border-2 border-black bg-black"
-                  style={{ marginLeft: index === 0 ? 0 : -10 }}
+                  className="w-8 h-8 rounded-full overflow-hidden   bg-black"
+                  style={{ marginLeft: index === 0 ? 0 : -16 }}
                 >
                   {commentItem.type === "video" ? (
                     <Video
@@ -442,6 +451,7 @@ interface AllFeedsProps {
   onScroll?: (event: any) => void; // Animated.event from parent
   scrollEventThrottle?: number;
   contentContainerStyle?: any;
+  ListHeaderComponent?: React.ReactNode | null;
 }
 
 const AllFeeds: React.FC<AllFeedsProps> = ({
@@ -456,6 +466,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   onScroll,
   scrollEventThrottle,
   contentContainerStyle,
+  ListHeaderComponent,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
@@ -464,6 +475,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
+  const { setLiked, setDisliked } = usePostContext();
 
   const centerY = height / 2 - 100;
   const likePosition = { x: (width * 3.3) / 4 - 50, y: centerY };
@@ -505,11 +517,13 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const removePostWithLike = (id: string) => {
     onShowLikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+    setDisliked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const removePostWithDislike = (id: string) => {
     onShowDislikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+    setLiked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const handleGestureStateChange = (postId: string, isActive: boolean) => {
@@ -602,7 +616,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const keyExtractor = useCallback((item: Post) => item.id, []);
 
   return (
-    <View className="relative w-full">
+    <View className="relative w-full ">
       <AnimatedGHFlatList
         data={feedPosts}
         keyExtractor={keyExtractor as any}
@@ -611,6 +625,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         viewabilityConfig={viewabilityConfig}
         onScroll={onScroll} // animated onScroll from parent (useNativeDriver)
         scrollEventThrottle={scrollEventThrottle ?? 16}
+        ListHeaderComponent={ListHeaderComponent}
         renderItem={({ item, index }: any) => (
           <View
             key={item.id}

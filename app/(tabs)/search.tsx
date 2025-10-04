@@ -157,7 +157,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         opacity,
         marginRight: 12,
       }}
-      className="w-[180px] aspect-square rounded-full bg-white overflow-hidden relative"
+      className="w-[150px] aspect-square rounded-full bg-white overflow-hidden relative"
     >
       <Image
         source={category.img}
@@ -194,9 +194,9 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   );
 };
 
-const CARD_W = 200;
-const CARD_H = 180;
-const RADIUS = 16;
+const CARD_W = 160;
+const CARD_H = 160;
+const RADIUS = 14;
 
 const styles = StyleSheet.create({
   card: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     height: CARD_H,
     borderRadius: RADIUS,
     overflow: "hidden",
-    marginRight: 12,
+    marginRight: 10,
   },
   image: {
     ...StyleSheet.absoluteFillObject,
@@ -222,14 +222,14 @@ const PlaylistCard: React.FC<CategoryCardProps> = ({
     Animated.timing(animatedValue, {
       toValue: 1,
       duration: 600,
-      delay: index * 200,
+      delay: index * 150,
       useNativeDriver: true,
     }).start();
   }, [animatedValue, index]);
 
   const translateY = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [50, 0],
+    outputRange: [40, 0],
   });
   const opacity = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -237,7 +237,7 @@ const PlaylistCard: React.FC<CategoryCardProps> = ({
   });
 
   return (
-    <View className=" w-[200px] h-[220px] rounded-2xl overflow-hidden mr-4">
+    <View className="w-[160px]   overflow-hidden mr-3">
       <Animated.View
         style={[styles.card, { transform: [{ translateY }], opacity }]}
       >
@@ -246,21 +246,19 @@ const PlaylistCard: React.FC<CategoryCardProps> = ({
           resizeMode="cover"
           style={[
             styles.image,
-            { transform: [{ scale: 1.34 }], width: "100%", height: "100%" },
+            { transform: [{ scale: 1.5 }], width: "100%", height: "100%" },
           ]}
         />
 
-        {/* Overlay press */}
         <TouchableOpacity
           activeOpacity={0.85}
           onPress={() => setModalVisible(true)}
           style={StyleSheet.absoluteFillObject}
         />
       </Animated.View>
-      {/* Text at bottom */}
-      <View className="w-[80%] p-1 mb-4 ">
+      <View className="w-[85%] mt-2">
         <Text
-          className="text-white/60 font-bold text-[18px]  "
+          className="text-white/70 font-sfpro-medium text-[16px]"
           numberOfLines={3}
         >
           {category.name}
