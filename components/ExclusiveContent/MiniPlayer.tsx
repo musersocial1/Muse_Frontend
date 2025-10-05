@@ -31,7 +31,7 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
   } = usePlayer();
 
   // Geometry (thicker ring)
-  const outerRadius = 35; // overall radius
+  const outerRadius = 30; // overall radius
   const ringThickness = 5; // thick progress ring
   const innerRadius = outerRadius - ringThickness;
   const innerSize = innerRadius * 2;
@@ -240,8 +240,8 @@ export default MiniCirclePlayer;
 const styles = StyleSheet.create({
   floatingContainer: {
     position: "absolute",
-    bottom: "22%",
-    right: "3%",
+    bottom: "21%",
+    right: "2%",
     zIndex: 999,
     elevation: Platform.OS === "android" ? 3 : 0,
     shadowColor: "#000",

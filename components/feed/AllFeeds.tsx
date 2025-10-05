@@ -34,10 +34,9 @@ import SwipeableCard from "./SwipeableCard";
 
 const { width, height } = Dimensions.get("window");
 
-// Wrap RNGH FlatList so native onScroll works with useNativeDriver
 const AnimatedGHFlatList = Animated.createAnimatedComponent(GHFlatList as any);
 
-type PostHeaderProps = {
+export type PostHeaderProps = {
   post: any; // Replace with your Post type
   onAuthorPress?: () => void;
   onMenuPress?: () => void;
@@ -64,7 +63,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
-          className="flex-row shrink bg-[#36363666]/[40%] rounded-full px-2 py-1  "
+          className="flex-row shrink bg-[#36363666]/[40%] rounded-full p-1  "
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -124,7 +123,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   );
 };
 
-interface PostCardProps {
+export interface PostCardProps {
   post: Post;
   setIsOpen: (val: boolean) => void;
   setOpenComments: (val: boolean) => void;
@@ -136,7 +135,7 @@ interface PostCardProps {
   setShowVideoReply: (val: boolean) => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({
+export const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
   setOpenComments,
@@ -148,22 +147,6 @@ const PostCard: React.FC<PostCardProps> = ({
   setShowVideoReply,
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const videoRefs = React.useRef<any[]>([]).current;
-
-  const [playingVideoIndex, setPlayingVideoIndex] = useState<number | null>(
-    null
-  );
-
-  const handleVideoPlayback = (videoRef: any, index: number) => {
-    if (videoRef && index === 0) {
-      videoRef.playAsync();
-      setPlayingVideoIndex(0);
-      setTimeout(() => {
-        videoRef.setPositionAsync(0);
-        videoRef.playAsync();
-      }, 3000);
-    }
-  };
 
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [shouldShowReadMore, setShouldShowReadMore] = useState(false);
@@ -477,10 +460,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [showRecordModal, setShowRecordModal] = useState(false);
   const { setLiked, setDisliked } = usePostContext();
 
-  const centerY = height / 2 - 100;
-  const likePosition = { x: (width * 3.3) / 4 - 50, y: centerY };
-  const dislikePosition = { x: (width * 0.45) / 4 - 50, y: centerY };
-
   const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
   const [imageScrollingStates, setImageScrollingStates] = useState<{
     [key: string]: boolean;
@@ -517,13 +496,13 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const removePostWithLike = (id: string) => {
     onShowLikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
-    setDisliked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
+    setLiked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const removePostWithDislike = (id: string) => {
     onShowDislikePuff?.();
     setFeedPosts((prev) => prev.filter((p) => p.id !== id));
-    setLiked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
+    setDisliked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const handleGestureStateChange = (postId: string, isActive: boolean) => {

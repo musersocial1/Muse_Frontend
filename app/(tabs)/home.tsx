@@ -233,7 +233,7 @@ const Home: React.FC = () => {
             zIndex: 100,
             transform: [{ translateY: headerTranslateYAnim }],
             elevation: 12,
-            backgroundColor: "transparent",
+            // backgroundColor: "transparent",
           }}
         >
           <Animated.View className="bg-[#121212]/[80%] rounded-full mx-5">
