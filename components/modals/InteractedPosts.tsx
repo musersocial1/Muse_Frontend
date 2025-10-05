@@ -1,5 +1,7 @@
 import { FadingBlurBackground } from "@/components/ui/FadingBlurBackground";
+import MaskedView from "@react-native-masked-view/masked-view";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -81,11 +83,32 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
   const ListHeader = (
     <View
       style={{
-        paddingTop: insets.top + 15,
+        paddingTop: insets.top + 4,
         paddingBottom: 8,
         paddingHorizontal: 16,
       }}
+      className=""
     >
+      <View style={StyleSheet.absoluteFill}>
+        <MaskedView
+          style={StyleSheet.absoluteFill}
+          maskElement={
+            <LinearGradient
+              colors={["rgba(0,0,0,1)", "rgba(0,0,0,0)"]} // fade from opaque → transparent
+              start={{ x: 0.5, y: 0.4 }}
+              end={{ x: 0.5, y: 1 }} // diagonal fade
+              style={StyleSheet.absoluteFill}
+            />
+          }
+        >
+          <BlurView
+            intensity={100}
+            tint="dark"
+            style={StyleSheet.absoluteFill}
+          />
+        </MaskedView>
+      </View>
+      {/* <BlurView style={StyleSheet.absoluteFill} /> */}
       <View className="items-center mb-4">
         <Pressable
           onPress={closeWithSlide}
@@ -107,6 +130,7 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
           height: 53,
         }}
       >
+        <BlurView style={StyleSheet.absoluteFill} />
         <Pressable
           onPress={() => setTab("liked")}
           className="flex-1 items-center justify-center"
@@ -202,7 +226,7 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
               ListHeaderComponent={ListHeader}
               stickyHeaderIndices={[0]}
               ListHeaderComponentStyle={{
-                backgroundColor: "rgba(18,18,18,0.9)",
+                // backgroundColor: "rgba(18,18,18,0.9)",
                 zIndex: 10,
               }}
             />
