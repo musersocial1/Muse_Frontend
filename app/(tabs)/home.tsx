@@ -26,10 +26,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -189,7 +186,7 @@ const Home: React.FC = () => {
 
   const StoriesHeader = useCallback(() => {
     return (
-      <View style={{ paddingVertical: 8 }}>
+      <View style={{ paddingVertical: 8, paddingTop: insets.top + 15 }}>
         <FlatList
           data={stories}
           onViewableItemsChanged={({ viewableItems }) => {
@@ -220,14 +217,15 @@ const Home: React.FC = () => {
   }, [stories]);
 
   return (
-    <SafeAreaView className="flex-1 bg-[#121212]">
+    // <SafeAreaView className="flex-1 bg-[#121212]">
+    <View className="flex-1 bg-[#121212]">
       <Animated.View className="flex-1">
         {/* Main Header  */}
         <Animated.View
           onLayout={(e) => setTopBarHeight(e.nativeEvent.layout.height)}
           style={{
             position: "absolute",
-            top: 0,
+            top: insets.top,
             left: 0,
             right: 0,
             zIndex: 100,
@@ -236,7 +234,7 @@ const Home: React.FC = () => {
             // backgroundColor: "transparent",
           }}
         >
-          <Animated.View className="bg-[#121212]/[80%] rounded-full mx-5">
+          <Animated.View className="bg-[#121212]/[80%] w-[95%] mx-auto  overflow-hidden rounded-full">
             <Animated.View
               style={{
                 zIndex: 100,
@@ -244,7 +242,7 @@ const Home: React.FC = () => {
               className="relative"
             >
               <BlurView
-                intensity={5}
+                intensity={50}
                 style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
                 experimentalBlurMethod="dimezisBlurView"
                 tint="dark"
@@ -326,7 +324,7 @@ const Home: React.FC = () => {
             onScroll={onFeedScroll}
             scrollEventThrottle={16}
             contentContainerStyle={{ paddingTop: topBarHeight }}
-            ListHeaderComponent={<StoriesHeader />}
+            // ListHeaderComponent={<StoriesHeader />}
           />
         </View>
 
@@ -338,7 +336,6 @@ const Home: React.FC = () => {
           />
         )}
       </Animated.View>
-
       {uploadVisible && (
         <UploadToast
           visible={uploadVisible}
@@ -351,7 +348,6 @@ const Home: React.FC = () => {
           onCancel={() => setUploadVisible(false)}
         />
       )}
-
       {/* Fixed Position Puff Animations */}
       <PuffySmoke
         type="like"
@@ -360,7 +356,6 @@ const Home: React.FC = () => {
         y={height * 0.45}
         onComplete={() => setShowLikePuff(false)}
       />
-
       <PuffySmoke
         type="dislike"
         visible={showDislikePuff}
@@ -368,7 +363,6 @@ const Home: React.FC = () => {
         y={height * 0.45}
         onComplete={() => setShowDislikePuff(false)}
       />
-
       {openSwitcher && (
         <>
           <TouchableOpacity
@@ -390,7 +384,8 @@ const Home: React.FC = () => {
           </Animated.View>
         </>
       )}
-    </SafeAreaView>
+      {/* </SafeAreaView> */}
+    </View>
   );
 };
 

@@ -63,7 +63,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
-          className="flex-row shrink bg-[#36363666]/[40%] rounded-full p-1  "
+          className="flex-row shrink  bg-[#36363666]/[40%] rounded-full px-2 py-1  "
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -81,7 +81,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
             tint="dark"
           />
 
-          <View className="w-12 h-12 rounded-full overflow-hidden mr-2">
+          <View className="w-11 h-11 rounded-full overflow-hidden mr-2">
             <Image
               source={{ uri: post.author.avatar }}
               className="w-full h-full"
@@ -92,7 +92,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <View>
             <View className="flex-col">
               <View className="flex-row items-center pt-1">
-                <Text className="text-white capitalize font-semibold text-[14px] mr-1.5">
+                <Text className="text-white capitalize font-semibold text-[12px] mr-1.5">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
@@ -102,7 +102,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
                 )}
               </View>
 
-              <Text className="text-white font-sfpro-medium text-[13px] pt-1">
+              <Text className="text-white font-sfpro-medium text-[11px] pt-1">
                 TBD Podcast
               </Text>
             </View>
