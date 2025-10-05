@@ -1,4 +1,3 @@
-import { images } from "@/constants/images";
 import { usePlayer } from "@/context/PlayerContext";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -7,12 +6,11 @@ import {
   Animated,
   Easing,
   Platform,
-  Image as RNImage,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 
 interface MiniCirclePlayerProps {
   onPress?: () => void;
@@ -33,8 +31,8 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
   } = usePlayer();
 
   // Geometry (thicker ring)
-  const outerRadius = 30; // overall radius
-  const ringThickness = 4; // thick progress ring
+  const outerRadius = 35; // overall radius
+  const ringThickness = 5; // thick progress ring
   const innerRadius = outerRadius - ringThickness;
   const innerSize = innerRadius * 2;
   const size = outerRadius * 2;
@@ -42,7 +40,6 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
   const ringRadius = outerRadius - ringThickness / 2;
   const circumference = 2 * Math.PI * ringRadius;
 
-  // Keep a stable Animated.Value for dash offset (no conditional creation)
   const dashOffset = useRef(new Animated.Value(circumference)).current;
 
   // Progress from context
@@ -84,7 +81,6 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
     outputRange: ["0deg", "360deg"],
   });
 
-  // Ring colors
   const EMPTY = "rgba(188, 188, 188, 0.11)";
   const PROGRESS = "#FFFFFF";
 
@@ -154,7 +150,7 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
               />
             </Svg>
 
-            {/* Inner circle using GOLD IMAGE for now  */}
+            {/* Inner circle using SVG gold gradient */}
             <View
               style={{
                 position: "absolute",
@@ -168,7 +164,36 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
               }}
               pointerEvents="none"
             >
-              <Animated.View
+              <Svg
+                width={innerSize}
+                height={innerSize}
+                style={StyleSheet.absoluteFill}
+              >
+                <Defs>
+                  <RadialGradient
+                    id="goldGradient"
+                    cx="50%"
+                    cy="30%"
+                    r="70%"
+                    fx="50%"
+                    fy="30%"
+                  >
+                    <Stop offset="0%" stopColor="#F5E6C8" stopOpacity="1" />
+                    <Stop offset="40%" stopColor="#E8D4A0" stopOpacity="1" />
+                    <Stop offset="70%" stopColor="#C9A861" stopOpacity="1" />
+                    <Stop offset="100%" stopColor="#8B7340" stopOpacity="1" />
+                  </RadialGradient>
+                </Defs>
+                <Circle
+                  cx={innerSize / 2}
+                  cy={innerSize / 2}
+                  r={innerRadius}
+                  fill="url(#goldGradient)"
+                />
+              </Svg>
+
+              {/* Commented out RN Image approach */}
+              {/* <Animated.View
                 style={[
                   StyleSheet.absoluteFill,
                   { transform: [{ rotate: rotation }] },
@@ -182,7 +207,7 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
                     { transform: [{ scale: 2 }] },
                   ]}
                 />
-              </Animated.View>
+              </Animated.View> */}
 
               <View
                 style={[

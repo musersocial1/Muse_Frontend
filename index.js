@@ -1,12 +1,12 @@
 import { registerRootComponent } from 'expo';
 
-import Constants from "expo-constants";
+// import Constants from "expo-constants";
 
 
-if (Constants.appOwnership !== "expo") {
-  const TrackPlayer = require("react-native-track-player").default;
-  TrackPlayer.registerPlaybackService(() => require("./src/trackPlayerService").default);
-}
+// if (Constants.appOwnership !== "expo") {
+//   const TrackPlayer = require("react-native-track-player").default;
+//   TrackPlayer.registerPlaybackService(() => require("./src/trackPlayerService").default);
+// }
 
 import App from './App';
 

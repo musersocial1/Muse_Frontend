@@ -1,5 +1,4 @@
 import { AVPlaybackStatus } from "expo-av";
-import Constants from "expo-constants";
 import React from "react";
 
 export type Track = {
@@ -45,15 +44,17 @@ export const usePlayer = () => {
 export const PlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const isExpoGo = Constants.appOwnership === "expo";
+  // const isExpoGo = Constants.appOwnership === "expo";
 
-  if (isExpoGo) {
-    const { ExpoAVProvider } = require("./ExpoAVProvider");
-    return <ExpoAVProvider>{children}</ExpoAVProvider>;
-  } else {
-    const { TrackPlayerProvider } = require("./TrackPlayerProvider");
-    return <TrackPlayerProvider>{children}</TrackPlayerProvider>;
-  }
+  // if (isExpoGo) {
+  //   const { ExpoAVProvider } = require("./ExpoAVProvider");
+  //   return <ExpoAVProvider>{children}</ExpoAVProvider>;
+  // } else {
+  //   const { TrackPlayerProvider } = require("./TrackPlayerProvider");
+  //   return <TrackPlayerProvider>{children}</TrackPlayerProvider>;
+  // }
+  const { ExpoAVProvider } = require("./ExpoAVProvider");
+  return <ExpoAVProvider>{children}</ExpoAVProvider>;
 };
 
 export default PlayerContext;
