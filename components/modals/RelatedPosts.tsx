@@ -26,26 +26,25 @@ interface RelatedPostsProps {
 
 const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   const insets = useSafeAreaInsets();
-
   const { width, height } = Dimensions.get("window");
 
   const SCREEN_HEIGHT = height + insets.bottom;
-  // Only 90–95% tall
-  const SHEET_HEIGHT = SCREEN_HEIGHT * 0.92;
-  const HIDE_OFFSET = SCREEN_HEIGHT;
+  const SHEET_HEIGHT = SCREEN_HEIGHT * 0.92; // ~92% height
+  const CLOSED_Y = SCREEN_HEIGHT;
+  const OPEN_Y = SCREEN_HEIGHT - SHEET_HEIGHT;
 
-  const sheetY = useRef(new Animated.Value(HIDE_OFFSET)).current;
+  const sheetY = useRef(new Animated.Value(CLOSED_Y)).current;
 
   const blurOpacity = sheetY.interpolate({
-    inputRange: [0, HIDE_OFFSET],
+    inputRange: [OPEN_Y, CLOSED_Y],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const openWithSlide = () => {
-    sheetY.setValue(HIDE_OFFSET);
+    sheetY.setValue(CLOSED_Y);
     Animated.timing(sheetY, {
-      toValue: SCREEN_HEIGHT - SHEET_HEIGHT,
+      toValue: OPEN_Y,
       duration: 260,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
@@ -54,38 +53,44 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
 
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
-      toValue: HIDE_OFFSET,
+      toValue: CLOSED_Y,
       duration: 220,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
-    }).start(() => onClose());
+    }).start(onClose);
   };
 
   useEffect(() => {
     if (visible) openWithSlide();
   }, [visible]);
 
-  const responder = useRef(
+  const handlePanResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dy) > 4,
+      onMoveShouldSetPanResponder: (_, g) =>
+        Math.abs(g.dy) > 3 && Math.abs(g.dy) > Math.abs(g.dx),
       onPanResponderMove: (_, g) => {
-        if (g.dy > 0) sheetY.setValue(g.dy);
+        const dy = Math.max(0, g.dy);
+        const nextY = Math.min(CLOSED_Y, OPEN_Y + dy);
+        sheetY.setValue(nextY);
       },
       onPanResponderRelease: (_, g) => {
-        if (g.dy > 120) {
-          Animated.timing(sheetY, {
-            toValue: HIDE_OFFSET,
-            duration: 220,
-            useNativeDriver: true,
-          }).start(() => onClose());
-        } else {
-          Animated.spring(sheetY, {
-            toValue: 0,
-            bounciness: 6,
-            useNativeDriver: true,
-          }).start();
-        }
+        const shouldClose = g.dy > 120 || g.vy > 1.0;
+        Animated.timing(sheetY, {
+          toValue: shouldClose ? CLOSED_Y : OPEN_Y,
+          duration: 220,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }).start(() => {
+          if (shouldClose) onClose();
+        });
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(sheetY, {
+          toValue: OPEN_Y,
+          bounciness: 6,
+          useNativeDriver: true,
+        }).start();
       },
     })
   ).current;
@@ -93,7 +98,6 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   const [showUpload, setShowUpload] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
   const [feedScrollEnabled, setFeedScrollEnabled] = useState(true);
-  const [flatListScrollEnabled, setFlatListScrollEnabled] = useState(true);
   const [showLikePuff, setShowLikePuff] = useState(false);
   const [showDislikePuff, setShowDislikePuff] = useState(false);
 
@@ -105,11 +109,7 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
       style={StyleSheet.absoluteFill}
       className="z-50"
     >
-      <TouchableOpacity
-        activeOpacity={1}
-        style={StyleSheet.absoluteFill}
-        onPress={closeWithSlide}
-      >
+      <TouchableOpacity activeOpacity={1} style={StyleSheet.absoluteFill}>
         <FadingBlurBackground opacity={blurOpacity} />
       </TouchableOpacity>
 
@@ -131,7 +131,6 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
             backgroundColor: "black",
             zIndex: 1,
           }}
-          {...responder.panHandlers}
         >
           <View className="flex-1">
             {/* Frosted overlay */}
@@ -147,8 +146,10 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
               style={{ paddingBottom: insets.bottom }}
               className="flex-1 pt-2 "
             >
-              <View className="flex-col items-center justify-center mb-3">
-                {/* Drag handle / indicator */}
+              <View
+                className="flex-col items-center justify-center mb-3"
+                {...handlePanResponder.panHandlers}
+              >
                 <DragToClose translateY={sheetY} onClose={closeWithSlide} />
                 <Text className="text-white text-[21px] font-semibold">
                   Related Posts
