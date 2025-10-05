@@ -23,6 +23,10 @@ interface NormalFeedsProps {
   setExternalScrollEnabled?: (val: boolean) => void;
   onScroll?: () => void;
   ListHeaderComponent?: React.ReactNode;
+  ListHeaderComponentStyle?: any;
+  stickyHeaderIndices?: number[];
+  contentContainerStyle?: any;
+  extraData?: any;
 }
 
 const NormalFeeds: React.FC<NormalFeedsProps> = ({
@@ -32,6 +36,10 @@ const NormalFeeds: React.FC<NormalFeedsProps> = ({
   simulateUpload,
   externalScrollEnabled,
   ListHeaderComponent,
+  ListHeaderComponentStyle,
+  stickyHeaderIndices,
+  contentContainerStyle,
+  extraData,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
@@ -40,9 +48,6 @@ const NormalFeeds: React.FC<NormalFeedsProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
-  const [activeSwipeStates, setActiveSwipeStates] = useState<{
-    [key: string]: boolean;
-  }>({});
 
   const cardRefs = useRef<{ [key: string]: View | null }>({});
 
@@ -88,14 +93,30 @@ const NormalFeeds: React.FC<NormalFeedsProps> = ({
 
   const keyExtractor = useCallback((item: Post) => item.id, []);
 
+  // Make header sticky by default when provided
+  const computedStickyHeaderIndices =
+    stickyHeaderIndices ?? (ListHeaderComponent ? [0] : undefined);
+
+  const computedHeaderStyle =
+    ListHeaderComponentStyle ??
+    (ListHeaderComponent
+      ? {
+          backgroundColor: "rgba(18,18,18,0.95)",
+          zIndex: 10,
+        }
+      : undefined);
+
   return (
     <View className="relative w-full ">
       <AnimatedGHFlatList
         data={feedPosts}
+        extraData={extraData ?? feedPosts}
         keyExtractor={keyExtractor as any}
         nestedScrollEnabled
         onViewableItemsChanged={onViewableItemsChanged}
         ListHeaderComponent={ListHeaderComponent}
+        ListHeaderComponentStyle={computedHeaderStyle}
+        stickyHeaderIndices={computedStickyHeaderIndices}
         viewabilityConfig={viewabilityConfig}
         renderItem={({ item, index }: any) => (
           <View
@@ -119,8 +140,7 @@ const NormalFeeds: React.FC<NormalFeedsProps> = ({
         )}
         scrollEnabled={effectiveScrollEnabled}
         showsVerticalScrollIndicator={false}
-        // Replaced contentContainerClassName with style for compatibility
-        // contentContainerStyle={contentContainerStyle}
+        contentContainerStyle={contentContainerStyle}
         maxToRenderPerBatch={2}
         windowSize={2}
         initialNumToRender={1}

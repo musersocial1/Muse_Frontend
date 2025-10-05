@@ -76,11 +76,6 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
     [tab, likedPosts, dislikedPosts]
   );
 
-  console.log(tab, "the tab");
-  console.log(posts, "the posts");
-  console.log(likedPosts, "the posts");
-  console.log(dislikedPosts, "the posts");
-
   if (!visible) return null;
 
   const ListHeader = (
@@ -188,7 +183,6 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
             backgroundColor: "#121212",
           }}
         >
-          {/* Frosted overlay */}
           <BlurView
             style={StyleSheet.absoluteFill}
             tint="dark"
@@ -206,6 +200,11 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
               externalScrollEnabled
               setExternalScrollEnabled={() => {}}
               ListHeaderComponent={ListHeader}
+              stickyHeaderIndices={[0]}
+              ListHeaderComponentStyle={{
+                backgroundColor: "rgba(18,18,18,0.9)",
+                zIndex: 10,
+              }}
             />
           </View>
         </Animated.View>

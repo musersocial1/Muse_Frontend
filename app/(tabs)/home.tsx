@@ -6,11 +6,12 @@ import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
+  FlatList,
   Image,
   StyleSheet,
   Text,
@@ -49,6 +50,7 @@ const Home: React.FC = () => {
   const [showLikePuff, setShowLikePuff] = useState(false);
   const [showDislikePuff, setShowDislikePuff] = useState(false);
   const [topBarHeight, setTopBarHeight] = useState(0);
+  const [visibleIds, setVisibleIds] = useState<any[]>([]);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const prevScrollY = useRef(0);
@@ -140,6 +142,42 @@ const Home: React.FC = () => {
       }
     };
   }, []);
+
+  const StoriesHeader = useCallback(() => {
+    return (
+      <View style={{ paddingVertical: 8 }}>
+        <FlatList
+          data={STORIES}
+          onViewableItemsChanged={({ viewableItems }) => {
+            const visibleItems = viewableItems.map((vi) => vi.item).slice(0, 5);
+            setVisibleIds(visibleItems);
+          }}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+          horizontal
+          keyExtractor={(_, index) => index.toString()}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={88}
+          decelerationRate="fast"
+          contentContainerStyle={{
+            gap: 10,
+            paddingLeft: 10,
+            paddingRight: 10,
+          }}
+          renderItem={({ item }) => (
+            <View className="relative">
+              <View className="w-16 h-16 rounded-full overflow-hidden border-[4px] border-[#B3B3B3]">
+                <Image
+                  source={item}
+                  className="w-full h-full rounded-full"
+                  resizeMode="cover"
+                />
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    );
+  }, [STORIES]);
 
   return (
     <View className="flex-1 bg-[#121212]">
@@ -240,6 +278,7 @@ const Home: React.FC = () => {
             onScroll={onFeedScroll}
             scrollEventThrottle={16}
             contentContainerStyle={{ paddingTop: topBarHeight + insets.top }}
+            ListHeaderComponent={<StoriesHeader />}
           />
         </View>
       </View>
