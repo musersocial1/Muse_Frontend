@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { AVPlaybackStatus, Video } from "expo-av";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import TrackPlayer, {
   AppKilledPlaybackBehavior,
   Capability,
@@ -44,6 +45,14 @@ export const TrackPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [showMini, setShowMini] = useState(false);
   const [showModalVideo, setShowModalVideo] = useState(false);
+  const videoRef = useRef<Video | null>(null);
+
+  const [videoLayout, setVideoLayout] = useState({
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+  });
 
   const playbackState = usePlaybackState();
   const progress = useProgress();
@@ -55,6 +64,19 @@ export const TrackPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       console.warn("setupPlayer error:", e)
     );
   }, []);
+
+  const onVideoLoad = async () => {
+    try {
+      await videoRef.current?.setRateAsync(playbackRate, true);
+      if (isPlaying) {
+        await videoRef.current?.playAsync();
+      }
+    } catch {}
+  };
+
+  const onPlaybackStatusUpdate = (s: AVPlaybackStatus) => {
+    console.log("Nothing for now");
+  };
 
   useTrackPlayerEvents([Event.PlaybackTrackChanged], async (event) => {
     if (event.type === Event.PlaybackTrackChanged && event.nextTrack != null) {
@@ -132,6 +154,9 @@ export const TrackPlayerProvider: React.FC<{ children: React.ReactNode }> = ({
       videoRef: undefined,
       showModalVideo,
       setShowModalVideo,
+      onPlaybackStatusUpdate,
+      onVideoLoad,
+      setVideoLayout,
     }),
     [
       currentTrack,

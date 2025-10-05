@@ -1,3 +1,4 @@
+import { AVPlaybackStatus } from "expo-av";
 import Constants from "expo-constants";
 import React from "react";
 
@@ -29,6 +30,8 @@ export type PlayerContextType = {
   videoRef?: any;
   showModalVideo: boolean;
   setShowModalVideo: (v: boolean) => void;
+  onPlaybackStatusUpdate: (s: AVPlaybackStatus) => void;
+  onVideoLoad: () => void;
 };
 
 const PlayerContext = React.createContext<PlayerContextType | null>(null);

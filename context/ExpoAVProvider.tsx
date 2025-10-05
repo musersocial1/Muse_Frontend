@@ -25,6 +25,13 @@ export const ExpoAVProvider: React.FC<{
   const [showMini, setShowMini] = useState(false);
   const [showModalVideo, setShowModalVideo] = useState(false);
 
+  const [videoLayout, setVideoLayout] = useState({
+    width: 0,
+    height: 0,
+    x: 0,
+    y: 0,
+  });
+
   useEffect(() => {
     Audio.setAudioModeAsync({
       staysActiveInBackground: true,
@@ -35,32 +42,25 @@ export const ExpoAVProvider: React.FC<{
     }).catch(() => {});
   }, []);
 
-  const onStatusUpdate = (s: AVPlaybackStatus) => {
+  const onPlaybackStatusUpdate = (s: AVPlaybackStatus) => {
     if (!s.isLoaded) return;
     setIsPlaying(!!s.isPlaying);
     setPosition((s.positionMillis ?? 0) / MS);
     setDuration((s.durationMillis ?? 0) / MS);
   };
 
-  const unload = async () => {
-    try {
-      await videoRef.current?.unloadAsync();
-    } catch {}
+  const playTrack = async (track: Track) => {
+    setCurrentTrack(track);
+    setIsPlaying(true);
   };
 
-  const playTrack = async (track: Track) => {
-    await unload();
-    setCurrentTrack(track);
-    await videoRef.current?.loadAsync(
-      { uri: track.url },
-      {
-        shouldPlay: true,
-        progressUpdateIntervalMillis: 500,
-        rate: playbackRate,
-      },
-      false
-    );
-    setIsPlaying(true);
+  const onVideoLoad = async () => {
+    try {
+      await videoRef.current?.setRateAsync(playbackRate, true);
+      if (isPlaying) {
+        await videoRef.current?.playAsync();
+      }
+    } catch {}
   };
 
   const togglePlayPause = async () => {
@@ -116,6 +116,9 @@ export const ExpoAVProvider: React.FC<{
       videoRef,
       showModalVideo,
       setShowModalVideo,
+      onPlaybackStatusUpdate,
+      onVideoLoad,
+      setVideoLayout,
     }),
     [
       currentTrack,
@@ -131,20 +134,25 @@ export const ExpoAVProvider: React.FC<{
   return (
     <PlayerContext.Provider value={value}>
       {children}
-      {/* Single Video - conditionally styled based on modal visibility */}
-      <View
-        style={showModalVideo ? styles.modalContainer : styles.hidden}
-        pointerEvents={showModalVideo ? "auto" : "none"}
-      >
-        <Video
-          ref={videoRef}
-          style={showModalVideo ? styles.modalVideo : styles.hiddenVideo}
-          isMuted={false}
-          useNativeControls={false}
-          onPlaybackStatusUpdate={onStatusUpdate}
-          resizeMode={ResizeMode.COVER}
-        />
-      </View>
+
+      {/* Only render a hidden audio Video when the modal isn't showing video.
+          The visible <Video> should be rendered inline inside your Modal and
+          must pass onLoad={onVideoLoad} and onPlaybackStatusUpdate={onPlaybackStatusUpdate}. */}
+      {currentTrack && !showModalVideo && (
+        <View style={styles.hidden} pointerEvents="none">
+          <Video
+            ref={videoRef}
+            source={{ uri: currentTrack.url }}
+            style={{ width: 1, height: 1 }}
+            isMuted={false}
+            useNativeControls={false}
+            onLoad={onVideoLoad}
+            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+            resizeMode={ResizeMode.COVER}
+            progressUpdateIntervalMillis={500}
+          />
+        </View>
+      )}
     </PlayerContext.Provider>
   );
 };
@@ -157,21 +165,10 @@ const styles = StyleSheet.create({
     left: -9999,
     top: -9999,
   },
-  hiddenVideo: {
-    width: 1,
-    height: 1,
-  },
-  modalContainer: {
+  videoOverlay: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     zIndex: 9999,
-    pointerEvents: "none",
-  },
-  modalVideo: {
-    width: "100%",
-    height: "100%",
+    overflow: "hidden",
+    borderRadius: 30,
   },
 });

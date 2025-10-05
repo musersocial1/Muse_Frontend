@@ -106,6 +106,7 @@ import cat6 from "@/assets/images/categories/ct6.webp";
 import cat7 from "@/assets/images/categories/ct7.webp";
 import cat8 from "@/assets/images/categories/ct8.webp";
 import cat9 from "@/assets/images/categories/ct9.webp";
+import gold from "@/assets/images/gold.webp";
 
 
 export const images = {
@@ -212,4 +213,5 @@ export const images = {
   cat18,
   cat19,
   cat20,  
+  gold
 };
