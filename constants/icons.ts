@@ -10,6 +10,7 @@ import camera from "@/assets/icons/camera.webp";
 import cardinfo from "@/assets/icons/cardinfo.png";
 import cash from "@/assets/icons/cash.png";
 import chat_message from "@/assets/icons/chat_comment.webp";
+import check from "@/assets/icons/check.webp";
 import comment from "@/assets/icons/comment.png";
 import communities from "@/assets/icons/communities.png";
 import dollar from "@/assets/icons/dollar.png";
@@ -108,4 +109,5 @@ export const icons = {
   cash,
   badge,
   groups,
+  check
 };

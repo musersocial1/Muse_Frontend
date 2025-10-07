@@ -4,7 +4,7 @@ import { usePlayer } from "@/context/PlayerContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -41,6 +41,11 @@ interface MediaPlayerModalProps {
   author: string;
   thumbnail?: ImageSourcePropType;
 }
+
+const DOT_SIZE = 24; // w-6 h-6
+const DOT_RADIUS = DOT_SIZE / 2;
+const LONG_PRESS_MS = 450;
+const CTA_AUTO_HIDE_MS = 1800;
 
 const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   isVisible,
@@ -88,13 +93,97 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   const [showModal, setShowModal] = useState(false);
   const scrollAnim = useRef(new Animated.Value(0)).current;
 
+  // Clip CTA state
+  const [showClipCTA, setShowClipCTA] = useState(false);
+  const clipCTAOpacity = useRef(new Animated.Value(0)).current;
+  const clipCTAScale = useRef(new Animated.Value(0.95)).current;
+  const [clipCTAW, setClipCTAW] = useState(0);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const progressRatio = useMemo(() => {
+    if (!actualDuration) return 0;
+    return Math.max(0, Math.min(1, (position || 0) / actualDuration));
+  }, [position, actualDuration]);
+
+  const knobLeftPx = useMemo(
+    () => progressBarWidth * progressRatio,
+    [progressBarWidth, progressRatio]
+  );
+
+  const showCTA = () => {
+    if (showClipCTA) return;
+    setShowClipCTA(true);
+    Animated.parallel([
+      Animated.timing(clipCTAOpacity, {
+        toValue: 1,
+        duration: 160,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.spring(clipCTAScale, {
+        toValue: 1,
+        stiffness: 250,
+        damping: 20,
+        mass: 0.8,
+        useNativeDriver: true,
+      }),
+    ]).start();
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    // Auto hide after some time (so user can tap)
+    if (autoHideTimerRef.current) clearTimeout(autoHideTimerRef.current);
+    autoHideTimerRef.current = setTimeout(hideCTA, CTA_AUTO_HIDE_MS);
+  };
+
+  const hideCTA = () => {
+    if (!showClipCTA) return;
+    Animated.parallel([
+      Animated.timing(clipCTAOpacity, {
+        toValue: 0,
+        duration: 140,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
+      Animated.timing(clipCTAScale, {
+        toValue: 0.95,
+        duration: 140,
+        easing: Easing.in(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowClipCTA(false);
+    });
+  };
+
+  const clearHoldTimer = () => {
+    if (holdTimerRef.current) {
+      clearTimeout(holdTimerRef.current);
+      holdTimerRef.current = null;
+    }
+  };
+
+  const clearAutoHideTimer = () => {
+    if (autoHideTimerRef.current) {
+      clearTimeout(autoHideTimerRef.current);
+      autoHideTimerRef.current = null;
+    }
+  };
+
+  // Cleanup timers on unmount/close
+  useEffect(() => {
+    return () => {
+      clearHoldTimer();
+      clearAutoHideTimer();
+    };
+  }, []);
+
   // Load track when modal opens
   useEffect(() => {
     if (isVisible) {
       const trackUrl =
         "https://cubbyproduct.s3.amazonaws.com/hatespeech/output/hateSpeech_10min_output/index.m3u8";
 
-      // Only load if it's a different track or no track loaded
       if (!currentTrack || currentTrack.url !== trackUrl) {
         playTrack({
           id: `track-${Date.now()}`,
@@ -116,7 +205,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   // Animate modal
   useEffect(() => {
     if (isVisible) {
-      setShowMini(false); // Hide mini player when modal opens
+      setShowMini(false);
       StatusBar.setBarStyle("light-content");
 
       Animated.timing(slideAnim, {
@@ -149,6 +238,9 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
       }).start();
 
       scrollAnim.stopAnimation();
+      hideCTA();
+      clearHoldTimer();
+      clearAutoHideTimer();
     }
   }, [isVisible]);
 
@@ -306,6 +398,15 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
 
   if (!isVisible) return null;
 
+  // Clamp CTA X so it's always visible inside the progress bar
+  const ctaLeftClamped = useMemo(() => {
+    if (progressBarWidth === 0) return 0;
+    const idealLeft = knobLeftPx - (clipCTAW ? clipCTAW / 2 : 40) + DOT_RADIUS;
+    const min = 8;
+    const max = progressBarWidth - (clipCTAW || 80) - 8;
+    return Math.max(min, Math.min(max, idealLeft));
+  }, [knobLeftPx, clipCTAW, progressBarWidth]);
+
   return (
     <Modal
       visible={isVisible}
@@ -377,7 +478,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
             </View>
           </View>
 
-          {/* Progress Bar */}
+          {/* Progress Bar + Clip CTA */}
           <View className="max-w-[90%] mx-auto w-full px-4 mb-5">
             <PanGestureHandler
               onGestureEvent={({ nativeEvent: { x } }) => {
@@ -397,8 +498,19 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                   setIsDraggingProgress(true);
                   wasPlayingRef.current = isPlaying;
                   pausedForScrubRef.current = false;
+
+                  // start long-press detection for CTA
+                  clearHoldTimer();
+                  holdTimerRef.current = setTimeout(() => {
+                    showCTA();
+                  }, LONG_PRESS_MS);
                 } else if (state === GestureState.ACTIVE) {
                   const dragDistance = Math.abs(x - dragStartX);
+                  // if dragging, cancel CTA show and hide if visible
+                  if (dragDistance > DRAG_THRESHOLD) {
+                    clearHoldTimer();
+                    if (showClipCTA) hideCTA();
+                  }
                   if (
                     dragDistance > DRAG_THRESHOLD &&
                     !pausedForScrubRef.current
@@ -415,7 +527,12 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                 ) {
                   const dragDistance = Math.abs(x - dragStartX);
 
-                  // Only resume if it was actually a drag (not just a tap)
+                  clearHoldTimer(); // stop long-press timer
+                  // keep CTA visible for auto-hide window if it already showed
+                  if (!showClipCTA) {
+                    clearAutoHideTimer();
+                  }
+
                   if (
                     dragDistance > DRAG_THRESHOLD &&
                     pausedForScrubRef.current &&
@@ -435,6 +552,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                   setProgressBarWidth(e.nativeEvent.layout.width)
                 }
               >
+                {/* Track */}
                 <View className="h-2 bg-white/30 rounded-full">
                   <View
                     className="h-full bg-white rounded-full"
@@ -447,6 +565,8 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                     }}
                   />
                 </View>
+
+                {/* Knob */}
                 <View
                   className="absolute w-6 h-6 rounded-full top-2 shadow-lg"
                   style={{
@@ -455,10 +575,12 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                         ? ((position || 0) / actualDuration) * 100
                         : 0
                     }%`,
-                    marginLeft: -12,
+                    marginLeft: -DOT_RADIUS,
                     backgroundColor: isDraggingProgress ? "#3b82f6" : "#fff",
                   }}
                 />
+
+                {/* Tap area overlay to make grabbing easier */}
                 <View
                   className="absolute inset-0"
                   style={{
@@ -467,6 +589,58 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                     backgroundColor: "transparent",
                   }}
                 />
+
+                {/* Clip CTA bubble (above knob) */}
+                {showClipCTA && (
+                  <Animated.View
+                    pointerEvents="box-none"
+                    style={{
+                      position: "absolute",
+                      bottom: 32 + DOT_RADIUS, // above the bar and knob
+                      left: ctaLeftClamped,
+                      opacity: clipCTAOpacity,
+                      transform: [{ scale: clipCTAScale }],
+                      zIndex: 20,
+                    }}
+                  >
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={() => {
+                        Haptics.selectionAsync();
+                        setShowClipModal(true);
+                        hideCTA();
+                        clearAutoHideTimer();
+                      }}
+                      onLayout={(e) => setClipCTAW(e.nativeEvent.layout.width)}
+                      style={{
+                        backgroundColor: "#FFFFFF",
+                        borderRadius: 999,
+                        paddingHorizontal: 12,
+                        paddingVertical: 6,
+                        alignItems: "center",
+                        flexDirection: "row",
+                        shadowColor: "#000",
+                        shadowOpacity: 0.2,
+                        shadowRadius: 6,
+                        shadowOffset: { width: 0, height: 2 },
+                        elevation: 3,
+                      }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Text
+                        style={{
+                          color: "#2a221b",
+                          fontWeight: "700",
+                          fontSize: 13,
+                          marginRight: 6,
+                        }}
+                      >
+                        Clip
+                      </Text>
+                      <Feather name="scissors" size={16} color="#2a221b" />
+                    </TouchableOpacity>
+                  </Animated.View>
+                )}
               </View>
             </PanGestureHandler>
           </View>

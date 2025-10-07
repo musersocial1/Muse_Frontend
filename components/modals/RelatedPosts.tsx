@@ -6,8 +6,8 @@ import {
   Dimensions,
   Easing,
   KeyboardAvoidingView,
-  PanResponder,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AllFeeds from "../feed/AllFeeds";
-import DragToClose from "../navigations/DragToClose";
 import { FadingBlurBackground } from "../ui/FadingBlurBackground";
 import PuffySmoke from "../ui/PuffySmoke";
 
@@ -29,22 +28,18 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   const { width, height } = Dimensions.get("window");
 
   const SCREEN_HEIGHT = height + insets.bottom;
-  const SHEET_HEIGHT = SCREEN_HEIGHT * 0.92; // ~92% height
-  const CLOSED_Y = SCREEN_HEIGHT;
-  const OPEN_Y = SCREEN_HEIGHT - SHEET_HEIGHT;
-
-  const sheetY = useRef(new Animated.Value(CLOSED_Y)).current;
+  const sheetY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
   const blurOpacity = sheetY.interpolate({
-    inputRange: [OPEN_Y, CLOSED_Y],
+    inputRange: [0, SCREEN_HEIGHT],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const openWithSlide = () => {
-    sheetY.setValue(CLOSED_Y);
+    sheetY.setValue(SCREEN_HEIGHT);
     Animated.timing(sheetY, {
-      toValue: OPEN_Y,
+      toValue: 0,
       duration: 260,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
@@ -53,7 +48,7 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
 
   const closeWithSlide = () => {
     Animated.timing(sheetY, {
-      toValue: CLOSED_Y,
+      toValue: SCREEN_HEIGHT,
       duration: 220,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
@@ -64,37 +59,6 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
     if (visible) openWithSlide();
   }, [visible]);
 
-  const handlePanResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: (_, g) =>
-        Math.abs(g.dy) > 3 && Math.abs(g.dy) > Math.abs(g.dx),
-      onPanResponderMove: (_, g) => {
-        const dy = Math.max(0, g.dy);
-        const nextY = Math.min(CLOSED_Y, OPEN_Y + dy);
-        sheetY.setValue(nextY);
-      },
-      onPanResponderRelease: (_, g) => {
-        const shouldClose = g.dy > 120 || g.vy > 1.0;
-        Animated.timing(sheetY, {
-          toValue: shouldClose ? CLOSED_Y : OPEN_Y,
-          duration: 220,
-          easing: Easing.out(Easing.quad),
-          useNativeDriver: true,
-        }).start(() => {
-          if (shouldClose) onClose();
-        });
-      },
-      onPanResponderTerminate: () => {
-        Animated.spring(sheetY, {
-          toValue: OPEN_Y,
-          bounciness: 6,
-          useNativeDriver: true,
-        }).start();
-      },
-    })
-  ).current;
-
   const [showUpload, setShowUpload] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
   const [feedScrollEnabled, setFeedScrollEnabled] = useState(true);
@@ -103,13 +67,53 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
 
   if (!visible) return null;
 
+  const ListHeader = (
+    <View
+      style={{
+        paddingTop: insets.top + 15,
+        paddingBottom: 8,
+        paddingHorizontal: 16,
+      }}
+    >
+      <View className="items-center mb-4">
+        <Pressable
+          onPress={closeWithSlide}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+          className="w-14 h-14 rounded-full items-center justify-center"
+          style={{ backgroundColor: "rgba(243, 243, 243, 0.15)" }}
+        >
+          <Text style={{ color: "white", fontSize: 25, fontWeight: "600" }}>
+            ×
+          </Text>
+        </Pressable>
+      </View>
+
+      <Text
+        style={{
+          color: "white",
+          fontSize: 21,
+          fontWeight: "600",
+          textAlign: "center",
+        }}
+      >
+        Related Posts
+      </Text>
+    </View>
+  );
+
   return (
     <View
       pointerEvents="box-none"
       style={StyleSheet.absoluteFill}
       className="z-50"
     >
-      <TouchableOpacity activeOpacity={1} style={StyleSheet.absoluteFill}>
+      {/* Backdrop */}
+      <TouchableOpacity
+        activeOpacity={1}
+        style={StyleSheet.absoluteFill}
+        onPress={closeWithSlide}
+      >
         <FadingBlurBackground opacity={blurOpacity} />
       </TouchableOpacity>
 
@@ -121,56 +125,44 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
           style={{
             transform: [{ translateY: sheetY }],
             position: "absolute",
+            top: 0,
             left: 0,
             right: 0,
-            height: SHEET_HEIGHT,
             bottom: 0,
-            borderTopLeftRadius: 30,
-            borderTopRightRadius: 30,
-            overflow: "hidden",
-            backgroundColor: "black",
             zIndex: 1,
+            backgroundColor: "#121212",
           }}
         >
-          <View className="flex-1">
-            {/* Frosted overlay */}
-            <BlurView
-              style={StyleSheet.absoluteFill}
-              tint="dark"
-              intensity={80}
-              experimentalBlurMethod="dimezisBlurView"
+          {/* Global blur like InteractedPostsModal */}
+          <BlurView
+            style={StyleSheet.absoluteFill}
+            tint="dark"
+            intensity={100}
+            experimentalBlurMethod="dimezisBlurView"
+          />
+
+          {/* Content */}
+          <View style={{ paddingBottom: insets.bottom }} className="flex-1">
+            <AllFeeds
+              posts={dummyAllPosts}
+              addPost={() => setShowUpload(true)}
+              setUploadVisible={setUploadVisible}
+              externalScrollEnabled={feedScrollEnabled}
+              setExternalScrollEnabled={setFeedScrollEnabled}
+              onShowLikePuff={() => setShowDislikePuff(true)}
+              onShowDislikePuff={() => setShowLikePuff(true)}
+              ListHeaderComponent={ListHeader}
+              stickyHeaderIndices={[0]}
+              ListHeaderComponentStyle={{
+                backgroundColor: "rgba(18,18,18,0.9)",
+                zIndex: 10,
+              }}
             />
-
-            {/* Content */}
-            <View
-              style={{ paddingBottom: insets.bottom }}
-              className="flex-1 pt-2 "
-            >
-              <View
-                className="flex-col items-center justify-center mb-3"
-                {...handlePanResponder.panHandlers}
-              >
-                <DragToClose translateY={sheetY} onClose={closeWithSlide} />
-                <Text className="text-white text-[21px] font-semibold">
-                  Related Posts
-                </Text>
-              </View>
-
-              <AllFeeds
-                posts={dummyAllPosts}
-                addPost={() => setShowUpload(true)}
-                setUploadVisible={setUploadVisible}
-                externalScrollEnabled={feedScrollEnabled}
-                setExternalScrollEnabled={setFeedScrollEnabled}
-                onShowLikePuff={() => setShowDislikePuff(true)}
-                onShowDislikePuff={() => setShowLikePuff(true)}
-              />
-            </View>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
 
-      {/* Puffs */}
+      {/* Puffs (feed reactions; header has no like/dislike tabs) */}
       <PuffySmoke
         type="like"
         visible={showLikePuff}

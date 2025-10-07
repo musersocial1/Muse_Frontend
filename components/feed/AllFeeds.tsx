@@ -92,12 +92,12 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <View>
             <View className="flex-col">
               <View className="flex-row items-center pt-1">
-                <Text className="text-white capitalize font-semibold text-[12px] mr-1.5">
+                <Text className="text-white capitalize font-sfpro-medium text-[13px] mr-1.5">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
-                  <View className="w-3.5 h-3.5 bg-[#0368FF] rounded-full items-center justify-center mr-2">
-                    <Feather name="check" size={8} color="white" />
+                  <View className=" rounded-full items-center justify-center mr-2">
+                    <Image source={icons.check} className="w-4 h-4" />
                   </View>
                 )}
               </View>
@@ -191,29 +191,38 @@ export const PostCard: React.FC<PostCardProps> = ({
 
         {post.type === "image" && post.images && post.images.length > 0 && (
           <View className="px-2 mt-2">
-            <View className="relative mb-3 w-full aspect-[1/1.1] rounded-[25px] overflow-hidden">
+            <View className="relative mb-3 w-full aspect-[2/1.5] rounded-[25px] overflow-hidden">
               <PostHeader
                 post={post}
                 onAuthorPress={() => setIsOpen(true)}
                 onMenuPress={() => {}}
                 variant="overlay"
               />
+
               <ScrollView
                 horizontal
                 pagingEnabled
                 scrollEnabled={scrollEnabled}
                 showsHorizontalScrollIndicator={false}
                 scrollEventThrottle={16}
-                contentContainerStyle={{ alignItems: "center" }}
               >
                 {post.images?.map((item, index) => (
-                  <Image
+                  <View
                     key={index}
-                    source={typeof item === "string" ? { uri: item } : item}
-                    style={{ width: width - 30 }}
-                    resizeMode="cover"
-                    className="h-full"
-                  />
+                    style={{
+                      width: width - 30,
+                      height: "100%",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#0a0a0a",
+                    }}
+                  >
+                    <Image
+                      source={typeof item === "string" ? { uri: item } : item}
+                      resizeMode="cover"
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </View>
                 ))}
               </ScrollView>
 
@@ -243,7 +252,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 variant="overlay"
               />
               <View className="overflow-hidden">
-                <View className="relative overflow-hidden aspect-[16/14] rounded-[15px] w-full">
+                <View className="relative overflow-hidden aspect-[2/1.5] rounded-[15px] w-full">
                   <Image
                     source={post.thumbnail}
                     className="h-full w-full"
@@ -296,13 +305,16 @@ export const PostCard: React.FC<PostCardProps> = ({
                   <Ionicons
                     name="chatbubble-ellipses-outline"
                     size={27}
-                    color="#D1D5DB"
+                    color="white"
                   />
                 </View>
-                <Text className="text-white text-sm">{post.likes}</Text>
+                <Text className="text-white text-[14px]">{post.likes}</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="rounded-full">
-                <Feather name="send" size={22} color="white" />
+              <TouchableOpacity className="flex-row items-center rounded-full">
+                <View className="w-8 h-8 rounded-full items-center justify-center">
+                  <Feather name="send" size={22} color="white" />
+                </View>
+                <Text className="text-white text-[14px]">Share</Text>
               </TouchableOpacity>
             </View>
 
@@ -317,7 +329,6 @@ export const PostCard: React.FC<PostCardProps> = ({
         <View className="pb-3 px-6">
           <View className="flex-row flex-wrap items-baseline">
             <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
-              <Text className="font-sfpro-bold">{post.author.username}</Text>{" "}
               <Text className="font-sfpro-medium">{getDisplayText()}</Text>
               {shouldShowReadMore && (
                 <TouchableOpacity
@@ -348,8 +359,11 @@ export const PostCard: React.FC<PostCardProps> = ({
                 </View>
                 <Text className="text-white text-sm">{post.likes}</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="rounded-full">
-                <Feather name="send" size={22} color="white" />
+              <TouchableOpacity className="flex-row items-center rounded-full">
+                <View className="w-8 h-8 rounded-full items-center justify-center">
+                  <Feather name="send" size={22} color="white" />
+                </View>
+                <Text className="text-white text-[14px]">Share</Text>
               </TouchableOpacity>
             </View>
 
@@ -398,8 +412,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             </View>
 
             <View className="flex-row items-center ml-1">
-              <Ionicons name="play" size={16} color="#9CA3AF" />
-              <Text className="text-white/60 ml-1 text-[14px] font-sfpro-medium">
+              <Ionicons name="play" size={16} color="white" />
+              <Text className="text-white ml-1 text-[15px] font-sfpro-medium">
                 Watch comments
               </Text>
             </View>
@@ -431,10 +445,12 @@ interface AllFeedsProps {
   setExternalScrollEnabled?: (val: boolean) => void;
   onShowLikePuff?: () => void;
   onShowDislikePuff?: () => void;
-  onScroll?: (event: any) => void; // Animated.event from parent
+  onScroll?: (event: any) => void;
   scrollEventThrottle?: number;
   contentContainerStyle?: any;
   ListHeaderComponent?: React.ReactNode | null;
+  stickyHeaderIndices?: number[] | undefined;
+  ListHeaderComponentStyle?: any;
 }
 
 const AllFeeds: React.FC<AllFeedsProps> = ({
@@ -450,6 +466,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   scrollEventThrottle,
   contentContainerStyle,
   ListHeaderComponent,
+  stickyHeaderIndices,
+  ListHeaderComponentStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
@@ -605,6 +623,15 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         onScroll={onScroll} // animated onScroll from parent (useNativeDriver)
         scrollEventThrottle={scrollEventThrottle ?? 16}
         ListHeaderComponent={ListHeaderComponent}
+        stickyHeaderIndices={stickyHeaderIndices}
+        ListHeaderComponentStyle={ListHeaderComponentStyle}
+        ListEmptyComponent={
+          <View className="h-[300px] w-full items-center justify-center">
+            <Text className="text-white/50 text-[16px]">
+              No more posts to show
+            </Text>
+          </View>
+        }
         renderItem={({ item, index }: any) => (
           <View
             key={item.id}

@@ -73,10 +73,10 @@ const CommunityCard: React.FC<{
       className="items-center mb-10 w-[47%] "
       activeOpacity={0.9}
       onPress={() => {
-        router.push(RouterConstantUtil.community.user as any);
+        router.push(RouterConstantUtil.tabs.home as any);
         setTimeout(() => {
           onClose();
-        }, 1000);
+        }, 100);
       }}
       // onPress={() => onClose()}
     >
@@ -96,7 +96,7 @@ const CommunityCard: React.FC<{
           resizeMode="cover"
         />
       </View>
-      <Text className="text-white/60 text-base tracking-wider mt-2 font-sfpro-bold">
+      <Text className="text-white text-base tracking-wider mt-2 font-sfpro-bold">
         {community.name}
       </Text>
     </TouchableOpacity>
@@ -167,9 +167,9 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
             />
             {/* Header */}
             <View className="items-center  px-6  pb-6">
-              <Text className="text-white text-[24px] font-sfpro-bold mb-4">
+              {/* <Text className="text-white text-[24px] font-sfpro-bold mb-4">
                 All communities
-              </Text>
+              </Text> */}
 
               <View className="bg-[#363636] border-[0.7px] border-[#575757] w-full rounded-full px-4 ">
                 <TextInput

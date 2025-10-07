@@ -13,6 +13,7 @@ import {
   Easing,
   FlatList,
   Image,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -59,6 +60,7 @@ const Home: React.FC = () => {
 
   const insets = useSafeAreaInsets();
   const SCROLL_THRESHOLD = 5;
+  StatusBar.setBarStyle("light-content");
 
   // Optimized scroll listener with proper cleanup
   const scrollDirection = useRef<"up" | "down" | null>(null); // Change to null initially

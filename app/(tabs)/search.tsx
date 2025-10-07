@@ -827,7 +827,7 @@ const Search: React.FC = () => {
                     ))}
                   </ScrollView>
                 </View>
-
+                {/* 
                 <View className="mt-6 pb-1 ">
                   <Text className="text-white text-[20px] tracking-wider font-sfpro-medium px-3 mb-6">
                     Playlist of the day
@@ -846,7 +846,7 @@ const Search: React.FC = () => {
                       />
                     ))}
                   </ScrollView>
-                </View>
+                </View> */}
 
                 <View className="mt-8">
                   <View className="flex-row justify-between items-center px-3 mb-6">
