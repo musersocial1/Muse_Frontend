@@ -109,15 +109,19 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           </View>
         </TouchableOpacity>
 
-        <View className="flex-row gap-1 items-center">
-          <Text className="text-white/50 ml-2 font-sfpro-medium text-[16px]">
+        <BlurView
+          intensity={40}
+          tint="dark"
+          className="flex-row gap-1 items-center p-2 rounded-full overflow-hidden"
+        >
+          <Text className="text-white/70 ml-2 font-sfpro-medium text-[16px]">
             {post.timestamp}
           </Text>
 
           <TouchableOpacity onPress={onMenuPress} hitSlop={8}>
-            <Ionicons name="ellipsis-vertical" size={20} color="#9CA3AF" />
+            <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
           </TouchableOpacity>
-        </View>
+        </BlurView>
       </View>
     </View>
   );
@@ -133,6 +137,46 @@ export interface PostCardProps {
   isVisible?: boolean;
   handleVideoCommentPress?: () => void;
   setShowVideoReply: (val: boolean) => void;
+}
+
+export function CollapsibleText({
+  text,
+  lines = 2,
+}: {
+  text: string;
+  lines?: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const [measured, setMeasured] = useState(false);
+  const [showToggle, setShowToggle] = useState(false);
+
+  return (
+    <View>
+      <Text
+        className="font-sfpro-medium text-white text-[17px]"
+        numberOfLines={measured && !expanded ? lines : undefined}
+        ellipsizeMode="tail"
+        onTextLayout={(e) => {
+          if (!measured) {
+            const overflowed = e.nativeEvent.lines.length > lines;
+            setShowToggle(overflowed);
+            setMeasured(true);
+          }
+        }}
+        style={{ flexShrink: 1 }}
+      >
+        {text}
+      </Text>
+
+      {showToggle && (
+        <TouchableOpacity onPress={() => setExpanded((v) => !v)}>
+          <Text className="text-[#0368FF]  mt-1 text-[15px] leading-[15px] font-sfpro-medium">
+            {expanded ? "Read less" : "Read more"}
+          </Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 }
 
 export const PostCard: React.FC<PostCardProps> = ({
@@ -329,16 +373,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         <View className="pb-3 px-6">
           <View className="flex-row flex-wrap items-baseline">
             <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
-              <Text className="font-sfpro-medium">{getDisplayText()}</Text>
-              {shouldShowReadMore && (
-                <TouchableOpacity
-                  onPress={() => setIsTextExpanded(!isTextExpanded)}
-                >
-                  <Text className="text-[#0368FF] ml-3 inline-flex items-baseline text-[15px] -mb-1 leading-[15px] font-sfpro-medium">
-                    {isTextExpanded ? "Read less" : "Read more"}
-                  </Text>
-                </TouchableOpacity>
-              )}
+              <CollapsibleText text={post.content} lines={2} />
             </Text>
           </View>
         </View>
