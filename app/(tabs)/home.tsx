@@ -166,11 +166,11 @@ const Home: React.FC = () => {
             paddingRight: 10,
           }}
           renderItem={({ item }) => (
-            <View className="relative">
-              <View className="w-16 h-16 rounded-full overflow-hidden border-[4px] border-[#B3B3B3]">
+            <View className="relative ">
+              <View className="w-16 h-16 justify-center items-center rounded-full overflow-hidden border-[1.5px] border-[#FFFFFF]/70">
                 <Image
                   source={item}
-                  className="w-full h-full rounded-full"
+                  className="w-[85%] h-[85%] rounded-full"
                   resizeMode="cover"
                 />
               </View>
