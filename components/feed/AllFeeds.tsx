@@ -5,6 +5,7 @@ import { Post } from "@/types/community";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import React, {
   useCallback,
   useEffect,
@@ -51,7 +52,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   variant = "default",
   containerClassName = "",
 }) => {
-  const baseRow = "flex-row justify-between items-center px-2 pt-3.5 pb-3 ";
+  const baseRow = "flex-row  justify-between items-center px-2 pt-2 pb-3  ";
   const overlayWrap =
     variant === "overlay" ? "absolute top-0 left-0 right-0 z-10" : "";
 
@@ -63,7 +64,9 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
-          className="flex-row shrink  bg-[#36363666]/[40%] rounded-full px-2 py-1  "
+          className={`flex-row shrink ${
+            overlayWrap ? "bg-[#36363666]/[40%]" : ""
+          }  rounded-full pl-1  pr-2 py-1  `}
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -74,14 +77,16 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           }}
           activeOpacity={0.8}
         >
-          <BlurView
-            intensity={50}
-            style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-            experimentalBlurMethod="dimezisBlurView"
-            tint="dark"
-          />
+          {overlayWrap && (
+            <BlurView
+              intensity={50}
+              style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+              experimentalBlurMethod="dimezisBlurView"
+              tint="dark"
+            />
+          )}
 
-          <View className="w-11 h-11 rounded-full overflow-hidden mr-2">
+          <View className="w-11 h-11 rounded-full overflow-hidden mr-1.5">
             <Image
               source={{ uri: post.author.avatar }}
               className="w-full h-full"
@@ -92,17 +97,17 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <View>
             <View className="flex-col">
               <View className="flex-row items-center pt-1">
-                <Text className="text-white capitalize font-sfpro-medium text-[13px] mr-1.5">
+                <Text className="text-white capitalize font-sfpro-bold text-[12px]  mr-1">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
-                  <View className=" rounded-full items-center justify-center mr-2">
+                  <View className=" rounded-full items-center justify-center mr-1">
                     <Image source={icons.check} className="w-4 h-4" />
                   </View>
                 )}
               </View>
 
-              <Text className="text-white font-sfpro-medium text-[11px] pt-1">
+              <Text className="text-white font-sfpro-bold text-[10px] pt-[5px]">
                 TBD Podcast
               </Text>
             </View>
@@ -110,11 +115,11 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
         </TouchableOpacity>
 
         <BlurView
-          intensity={40}
+          intensity={50}
           tint="dark"
-          className="flex-row gap-1 items-center p-2 rounded-full overflow-hidden"
+          className="flex-row gap-1  items-center p-2 rounded-full overflow-hidden"
         >
-          <Text className="text-white/70 ml-2 font-sfpro-medium text-[16px]">
+          <Text className="text-white/70 ml-1 font-sfpro-medium text-[15px]">
             {post.timestamp}
           </Text>
 
@@ -147,38 +152,32 @@ export function CollapsibleText({
   lines?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const [measured, setMeasured] = useState(false);
-  const [showToggle, setShowToggle] = useState(false);
+  const MAX_WORDS = 13; // Adjust this number based on your needs
+
+  const words = text.split(" ");
+  const shouldTruncate = words.length > MAX_WORDS;
+  const displayText =
+    expanded || !shouldTruncate ? text : words.slice(0, MAX_WORDS).join(" ");
 
   return (
-    <View>
+    <TouchableOpacity
+      onPress={() => setExpanded((v) => !v)}
+      activeOpacity={0.9}
+    >
       <Text
-        className="font-sfpro-medium text-white text-[17px]"
-        numberOfLines={measured && !expanded ? lines : undefined}
-        ellipsizeMode="tail"
-        onTextLayout={(e) => {
-          if (!measured) {
-            const overflowed = e.nativeEvent.lines.length > lines;
-            setShowToggle(overflowed);
-            setMeasured(true);
-          }
-        }}
+        className="font-sfpro-medium text-white text-[16px]"
         style={{ flexShrink: 1 }}
       >
-        {text}
-      </Text>
-
-      {showToggle && (
-        <TouchableOpacity onPress={() => setExpanded((v) => !v)}>
-          <Text className="text-[#0368FF]  mt-1 text-[15px] leading-[15px] font-sfpro-medium">
-            {expanded ? "Read less" : "Read more"}
+        {displayText}
+        {shouldTruncate && (
+          <Text className="text-[white]/60 text-[15px] font-sfpro-bold">
+            {expanded ? " Read less" : " Read more"}
           </Text>
-        </TouchableOpacity>
-      )}
-    </View>
+        )}
+      </Text>
+    </TouchableOpacity>
   );
 }
-
 export const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
@@ -222,8 +221,8 @@ export const PostCard: React.FC<PostCardProps> = ({
   );
 
   return (
-    <View className="my-[4px]">
-      <Animated.View className="bg-[#1C1C1C] rounded-[30px] overflow-hidden relative">
+    <View className="my-[4px]  ">
+      <Animated.View className="bg-[#1C1C1C] border border-white/10 rounded-[30px]  overflow-hidden relative">
         {!hasMedia && (
           <PostHeader
             post={post}
@@ -287,51 +286,59 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "video" && post.videos && post.videos.length > 0 && (
-          <View className="px-2 mt-2">
-            <View className="relative rounded-[20px] w-full gap-5 overflow-hidden mb-3 ">
-              <PostHeader
-                post={post}
-                onAuthorPress={() => setIsOpen(true)}
-                onMenuPress={() => {}}
-                variant="overlay"
+          <View className="px-1 mt-2 ">
+            <View className=" px-1  overflow-hidden  rounded-[20px]">
+              <LinearGradient
+                colors={["rgba(0, 0, 0, 0)", "rgba(18, 18, 18, 1)"]}
+                start={{ x: 0.5, y: 0.78 }}
+                end={{ x: 0.5, y: 1 }}
+                style={StyleSheet.absoluteFill}
               />
-              <View className="overflow-hidden">
-                <View className="relative overflow-hidden aspect-[2/1.5] rounded-[15px] w-full">
-                  <Image
-                    source={post.thumbnail}
-                    className="h-full w-full"
-                    resizeMode="cover"
-                  />
-                  <View className="absolute inset-0 items-center justify-center">
-                    <View className="overflow-hidden rounded-full p-5">
-                      <BlurView
-                        style={StyleSheet.absoluteFill}
-                        intensity={50}
-                        experimentalBlurMethod="dimezisBlurView"
-                      />
-                      <Image
-                        source={icons.play}
-                        className="h-8 w-8"
-                        resizeMode="contain"
-                      />
+              <View className="relative   rounded-[20px] w-full gap-5 overflow-hidden  ">
+                <PostHeader
+                  post={post}
+                  onAuthorPress={() => setIsOpen(true)}
+                  onMenuPress={() => {}}
+                  variant="overlay"
+                />
+                <View className="overflow-hidden ">
+                  <View className="relative overflow-hidden aspect-[2/1.5] rounded-[15px] w-full">
+                    <Image
+                      source={post.thumbnail}
+                      className="h-full w-full"
+                      resizeMode="cover"
+                    />
+                    <View className="absolute inset-0 items-center justify-center">
+                      <View className="overflow-hidden rounded-full p-5">
+                        <BlurView
+                          style={StyleSheet.absoluteFill}
+                          intensity={50}
+                          experimentalBlurMethod="dimezisBlurView"
+                        />
+                        <Image
+                          source={icons.play}
+                          className="h-8 w-8"
+                          resizeMode="contain"
+                        />
+                      </View>
                     </View>
                   </View>
                 </View>
-              </View>
 
-              <View className="flex-row pb-2 px-1 justify-between items-start">
-                <View className="w-[80%]">
-                  <Text className="text-white text-[16px] font-sfpro-bold">
-                    The travails of being a dancer in the modern age
-                  </Text>
-                  <Text className="text-white/50 text-[13px] font-sfpro-medium mt-2">
-                    Content from TBD Podcast
-                  </Text>
-                </View>
-                <View className="bg-[black]/[70%] rounded-full px-3 py-3 self-start">
-                  <Text className="text-white font-medium text-[12px]">
-                    45:54
-                  </Text>
+                <View className="flex-row  pb-4 px-3 justify-between items-start">
+                  <View className="w-[80%]">
+                    <Text className="text-white text-[16px] font-sfpro-bold">
+                      The travails of being a dancer in the modern age
+                    </Text>
+                    <Text className="text-white/50 text-[13px] font-sfpro-medium mt-2">
+                      Content from TBD Podcast
+                    </Text>
+                  </View>
+                  <View className="bg-[black]/[70%] rounded-full px-3 py-3 self-start">
+                    <Text className="text-white font-medium text-[12px]">
+                      45:54
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
@@ -346,19 +353,19 @@ export const PostCard: React.FC<PostCardProps> = ({
                 className="flex-row items-center rounded-full"
               >
                 <View className="w-8 h-8 rounded-full items-center justify-center mr-1">
-                  <Ionicons
-                    name="chatbubble-ellipses-outline"
-                    size={27}
-                    color="white"
-                  />
+                  <Image source={icons.likes} className="w-7 h-7" />
                 </View>
-                <Text className="text-white text-[14px]">{post.likes}</Text>
+                <Text className="text-white font-sfpro-bold text-[14px]">
+                  {post.likes}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity className="flex-row items-center rounded-full">
                 <View className="w-8 h-8 rounded-full items-center justify-center">
-                  <Feather name="send" size={22} color="white" />
+                  <Image source={icons.share} className="w-[23px] h-[23px]" />
                 </View>
-                <Text className="text-white text-[14px]">Share</Text>
+                <Text className="text-white font-sfpro-bold text-[14px]">
+                  Share
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -386,19 +393,19 @@ export const PostCard: React.FC<PostCardProps> = ({
                 className="flex-row items-center rounded-full"
               >
                 <View className="w-8 h-8 rounded-full items-center justify-center mr-1">
-                  <Ionicons
-                    name="chatbubble-ellipses-outline"
-                    size={27}
-                    color="#D1D5DB"
-                  />
+                  <Image source={icons.likes} className="w-7 h-7" />
                 </View>
-                <Text className="text-white text-sm">{post.likes}</Text>
+                <Text className="text-white font-sfpro-bold text-[14px]">
+                  {post.likes}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity className="flex-row items-center rounded-full">
                 <View className="w-8 h-8 rounded-full items-center justify-center">
-                  <Feather name="send" size={22} color="white" />
+                  <Image source={icons.share} className="w-[23px] h-[23px]" />
                 </View>
-                <Text className="text-white text-[14px]">Share</Text>
+                <Text className="text-white font-sfpro-bold text-[14px]">
+                  Share
+                </Text>
               </TouchableOpacity>
             </View>
 

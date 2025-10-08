@@ -27,6 +27,7 @@ import google from "@/assets/icons/google.png";
 import groups from "@/assets/icons/groups.png";
 import helpdesk from "@/assets/icons/helpdesk.png";
 import home from "@/assets/icons/home.png";
+import likes from "@/assets/icons/likes.png";
 import lock from "@/assets/icons/lock.png";
 import lock_2 from "@/assets/icons/lock_2.png";
 import lockedContent from "@/assets/icons/lockedContent.png";
@@ -43,6 +44,7 @@ import ring from "@/assets/icons/ring.png";
 import search from "@/assets/icons/search.png";
 import settings from "@/assets/icons/settings.png";
 import settings_2 from "@/assets/icons/settings_2.png";
+import share from "@/assets/icons/share.png";
 import swifties from "@/assets/icons/swifties.png";
 import tags from "@/assets/icons/tags.png";
 import terms from "@/assets/icons/terms.png";
@@ -109,5 +111,7 @@ export const icons = {
   cash,
   badge,
   groups,
-  check
+  check,
+  share,
+  likes,
 };
