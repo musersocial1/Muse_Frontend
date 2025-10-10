@@ -580,28 +580,26 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         case STEPS.PHONE: {
           setIsLoading(true);
           setInputError("");
-          // const { exists, message } = await authAPI.checkPhoneNumberExists(
-          //   phoneNumber
-          // );
-          // if (exists) {
-          //   setInputError(message || "Phone number already exists.");
-          //   return;
-          // }
-          // const result = await sendVerificationCode(phoneNumber);
-          // if (result.success) onContinue();
-          onContinue();
+          const { exists, message } = await authAPI.checkPhoneNumberExists(
+            phoneNumber
+          );
+          if (exists) {
+            setInputError(message || "Phone number already exists.");
+            return;
+          }
+          const result = await sendVerificationCode(phoneNumber);
+          if (result.success) onContinue();
           break;
         }
 
         case STEPS.VERIFY_OTP: {
-          // if (!isPhoneVerified) {
-          //   const otpString = otpValues.join("");
-          //   const result = await verifyCode(otpString);
-          //   if (result.success) onContinue();
-          // } else {
-          //   onContinue();
-          // }
-          onContinue();
+          if (!isPhoneVerified) {
+            const otpString = otpValues.join("");
+            const result = await verifyCode(otpString);
+            if (result.success) onContinue();
+          } else {
+            onContinue();
+          }
           break;
         }
 
@@ -619,13 +617,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         case STEPS.PERSONAL_INFO: {
           setIsLoading(true);
           setInputError("");
-          // const { exists, message } = await authAPI.checkEmailExists(email);
-          // if (exists) {
-          //   setInputError(message || "Email already exists.");
-          //   setFocusedField("email");
-          //   setTimeout(() => emailRef.current?.focus(), 100);
-          //   return;
-          // }
+          const { exists, message } = await authAPI.checkEmailExists(email);
+          if (exists) {
+            setInputError(message || "Email already exists.");
+            setFocusedField("email");
+            setTimeout(() => emailRef.current?.focus(), 100);
+            return;
+          }
           onContinue();
           break;
         }
@@ -633,17 +631,17 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         case STEPS.USERNAME: {
           setIsLoading(true);
           setInputError("");
-          // if (!usernameAvailable) {
-          //   setInputError("Username is not available.");
-          //   return;
-          // }
-          // const { exists, message } = await authAPI.checkUsernameExists(
-          //   username
-          // );
-          // if (exists) {
-          //   setInputError(message || "Username is already taken.");
-          //   return;
-          // }
+          if (!usernameAvailable) {
+            setInputError("Username is not available.");
+            return;
+          }
+          const { exists, message } = await authAPI.checkUsernameExists(
+            username
+          );
+          if (exists) {
+            setInputError(message || "Username is already taken.");
+            return;
+          }
 
           // Different form data based on auth method
           const formData = isGoogleAuth
@@ -708,8 +706,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
         const usernameValue = value.toLowerCase().replace(/\s/g, "");
         setUsername(usernameValue);
         setUsernameError("");
-        // checkUsernameAvailability(usernameValue);
-        setUsernameAvailable(true);
+        checkUsernameAvailability(usernameValue);
         break;
       case "password":
         setPassword(value);
