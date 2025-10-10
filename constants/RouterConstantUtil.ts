@@ -1,3 +1,4 @@
+
 export const RouterConstantUtil = {
   tabs: {
     home: "/(tabs)/home",
@@ -19,6 +20,9 @@ export const RouterConstantUtil = {
     privacy: "/(profile)/privacy",
     notifications: "/(profile)/notifications",
     tags: "/(profile)/tags",
+    analytics: "/(profile)/analytics",
+    cashflow: "/(profile)/cashflow",
+    amountGenerated: "/(profile)/amount-generated",
   },
   posts: {
     videoReply: "/video-reply",
@@ -44,4 +48,4 @@ export const RouterConstantUtil = {
     login: "/(auth)",
     register: "/(auth)",
   },
-} as const; // 👈 THIS is the magic
+} as const; 

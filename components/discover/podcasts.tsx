@@ -120,7 +120,7 @@ const PodcastListItem: React.FC<PodcastListItemProps> = ({
       className=""
     >
       <TouchableOpacity
-        className={`flex-row  ${
+        className={`flex-row w-[80%]   ${
           showIndex ? "border-none py-3" : "border-b border-b-white/10 p-3"
         } items-center `}
       >
@@ -373,7 +373,7 @@ const Podcasts: React.FC<PodcastsProps> = ({ onClose, modalVisible }) => {
               {podcastChunks.map((chunk, chunkIndex) => (
                 <View
                   key={chunkIndex}
-                  className="mr-6"
+                  className="mr-2"
                   style={{
                     minWidth: 280,
                     flexDirection: "column",

@@ -3,11 +3,10 @@ import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
 import { useAuthState } from "@/hooks/useAuthState";
 import { useProfileActions } from "@/hooks/useProfile";
 import { communityAPI } from "@/lib/api/community";
-import { showError } from "@/lib/toast";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Dimensions,
   Image,
@@ -77,6 +76,69 @@ interface ProfileStatsProps {
   username?: string;
   communityCount: number;
 }
+
+const CommunityStats: React.FC = () => {
+  const statItems = [
+    {
+      label: "Your community analytics",
+      icon: icons.users,
+      route: RouterConstantUtil.profile.analytics,
+    },
+    {
+      label: "Community cashflow",
+      icon: icons.email,
+      route: RouterConstantUtil.profile.cashflow,
+    },
+  ];
+
+  return (
+    <Animatable.View
+      animation="fadeInUp"
+      duration={350}
+      delay={90}
+      style={{ marginHorizontal: width * 0.05 }}
+      className="space-y-4 gap-3"
+      useNativeDriver
+    >
+      {statItems.map((item, i) => (
+        <Animatable.View
+          key={i}
+          animation="fadeInUp"
+          duration={250}
+          delay={150 + i * 40}
+          useNativeDriver
+        >
+          <TouchableOpacity
+            className="flex-row items-center justify-between p-4 bg-[#1C1C1C] rounded-full"
+            onPress={() => router.replace(item.route as any)}
+            activeOpacity={0.8}
+          >
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-white/10 rounded-full items-center justify-center mr-4">
+                <Image
+                  source={item.icon}
+                  className="w-5 h-5"
+                  tintColor="#9CA3AF"
+                />
+              </View>
+              <Text className="text-gray-400 text-base">{item.label}</Text>
+            </View>
+            <View className="flex-row items-center max-w-[50%]">
+              <View className="flex-row items-center flex-shrink">
+                <Feather
+                  name="chevron-right"
+                  size={20}
+                  color="white"
+                  style={{ opacity: 0.7 }}
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        </Animatable.View>
+      ))}
+    </Animatable.View>
+  );
+};
 
 const ProfileStats: React.FC<ProfileStatsProps> = ({
   router,
@@ -207,19 +269,19 @@ const Profile = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        await refetchProfile();
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        showError("Error", "Error fetching profile");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchProfile = async () => {
+  //     try {
+  //       await refetchProfile();
+  //     } catch (error) {
+  //       console.error("Error fetching profile:", error);
+  //       showError("Error", "Error fetching profile");
+  //     }
+  //   };
 
-    fetchProfile();
-    fetchCommunities();
-  }, []);
+  //   fetchProfile();
+  //   fetchCommunities();
+  // }, []);
 
   return (
     <SafeAreaView className="flex-1 bg-[#121212]">
@@ -253,6 +315,8 @@ const Profile = () => {
           lastName={lastName}
           username={username}
         />
+        <CommunityStats />
+        <View className="border border-white/5 my-10 w-full max-w-[90%] mx-auto" />
         <ProfileStats
           router={router}
           email={email}

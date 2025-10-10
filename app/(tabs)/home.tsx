@@ -1,307 +1,242 @@
 import AllFeeds from "@/components/feed/AllFeeds";
 import UploadToast from "@/components/feed/UploadToast";
+import CommunitySwitcher from "@/components/modals/CommunitySwitcher";
+import PuffySmoke from "@/components/ui/PuffySmoke";
 import { dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
   Easing,
+  FlatList,
   Image,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  RefreshControl,
-  ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+
+// Move static data outside component
+const STORIES = [
+  images.img6,
+  images.img7,
+  images.img8,
+  images.img9,
+  images.img10,
+  images.img11,
+  images.img12,
+  images.img6,
+  images.img7,
+  images.img8,
+  images.img9,
+  images.img10,
+  images.img11,
+  images.img12,
+];
 
 const Home: React.FC = () => {
   const [posts] = useState(dummyAllPosts);
-  const [showUpload, setShowUpload] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [feedScrollEnabled, setFeedScrollEnabled] = useState(true);
   const [selectedCommunity, setSelectedCommunity] = useState("All");
-
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  // Communities data for dropdown - "All" is default
-  const communities = [
-    { id: 0, name: "All", icon: "globe" },
-    { id: 1, name: "General", icon: "users" },
-    { id: 2, name: "Music", icon: "music" },
-    { id: 3, name: "Sports", icon: "activity" },
-    { id: 4, name: "Tech", icon: "cpu" },
-    { id: 5, name: "Art", icon: "image" },
-  ];
-
-  const stories = [
-    images.img6,
-    images.img7,
-    images.img8,
-    images.img9,
-    images.img10,
-    images.img11,
-    images.img12,
-  ];
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Simulate API call
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
-
-  const handleCommunitySelect = (community: (typeof communities)[0]) => {
-    setSelectedCommunity(community.name);
-    setDropdownVisible(false);
-    console.log(`Selected: ${community.name}`);
-  };
-
-  const selectedCommunityData = communities.find(
-    (c) => c.name === selectedCommunity
-  );
-
-  const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const THRESHOLD = 90;
-
-  const pull = scrollY.interpolate({
-    inputRange: [-150, 0],
-    outputRange: [150, 0],
-    extrapolate: "clamp",
-  });
-  const progress = pull.interpolate({
-    inputRange: [0, 150],
-    outputRange: [0, 1],
-  });
-
-  const circleScale = progress.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.6, 1],
-  });
-  const headerTranslateY = pull.interpolate({
-    inputRange: [0, 150],
-    outputRange: [-30, 0],
-  });
-  // spinning refresh icon
-  const spin = useRef(new Animated.Value(0)).current;
-  const spinLoopRef = useRef<Animated.CompositeAnimation | null>(null);
-
-  useEffect(() => {
-    if (refreshing) {
-      // start infinite spin
-      spinLoopRef.current = Animated.loop(
-        Animated.timing(spin, {
-          toValue: 1,
-          duration: 900,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      );
-      spinLoopRef.current.start();
-    } else {
-      // stop & reset
-      if (spinLoopRef.current) {
-        spinLoopRef.current.stop();
-        spinLoopRef.current = null;
-      }
-      spin.setValue(0);
-    }
-  }, [refreshing]);
-
-  const rotate = spin.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
-
-  const headerOpacity = refreshing
-    ? 1 // stay visible while refreshing
-    : progress;
-  const [canTrigger, setCanTrigger] = useState(false);
-
-  const { triggerUpload } = useLocalSearchParams();
+  const [openSwitcher, setOpenSwitcher] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [showLikePuff, setShowLikePuff] = useState(false);
+  const [showDislikePuff, setShowDislikePuff] = useState(false);
+  const [topBarHeight, setTopBarHeight] = useState(0);
+  const [visibleIds, setVisibleIds] = useState<any[]>([]);
 
-  // Simulate a 5s upload
-  const simulateUpload = () => {
-    setUploadVisible(true);
-    setUploadProgress(0);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const prevScrollY = useRef(0);
+  const headerTranslateYAnim = useRef(new Animated.Value(0)).current;
+  const uploadIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    const totalMs = 50000000;
-    const start = Date.now();
-    const interval = setInterval(() => {
-      const p = Math.min((Date.now() - start) / totalMs, 1);
-      setUploadProgress(p);
+  const insets = useSafeAreaInsets();
+  const SCROLL_THRESHOLD = 5;
+  StatusBar.setBarStyle("light-content");
 
-      if (p >= 1) {
-        clearInterval(interval);
-        setTimeout(() => setUploadVisible(false), 800);
+  // Optimized scroll listener with proper cleanup
+  const scrollDirection = useRef<"up" | "down" | null>(null); // Change to null initially
+
+  useEffect(() => {
+    const listenerId = scrollY.addListener(({ value }) => {
+      const diff = value - prevScrollY.current;
+
+      if (Math.abs(diff) > SCROLL_THRESHOLD) {
+        if (diff > 0 && value > 50) {
+          // Scrolling down - hide header
+          if (scrollDirection.current !== "down") {
+            scrollDirection.current = "down";
+            Animated.timing(headerTranslateYAnim, {
+              toValue: -(topBarHeight + insets.top),
+              duration: 300,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }).start();
+          }
+        } else if (diff < 0) {
+          // Scrolling up - show header
+          if (scrollDirection.current !== "up") {
+            scrollDirection.current = "up";
+            Animated.timing(headerTranslateYAnim, {
+              toValue: 0,
+              duration: 300,
+              easing: Easing.out(Easing.cubic),
+              useNativeDriver: true,
+            }).start();
+          }
+        }
       }
-    }, 100);
-  };
+
+      prevScrollY.current = value;
+    });
+
+    return () => {
+      scrollY.removeListener(listenerId);
+    };
+  }, [scrollY, topBarHeight, insets.top, headerTranslateYAnim]);
+
+  // Create scroll event handler once
+  const onFeedScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
+
+  // Optimized upload simulation with cleanup
+  // const simulateUpload = () => {
+  //   // Clear any existing interval
+  //   if (uploadIntervalRef.current) {
+  //     clearInterval(uploadIntervalRef.current);
+  //   }
+
+  //   setUploadVisible(true);
+  //   setUploadProgress(0);
+
+  //   const totalMs = 5000; // Changed to 5 seconds for reasonable demo
+  //   const start = Date.now();
+
+  //   uploadIntervalRef.current = setInterval(() => {
+  //     const p = Math.min((Date.now() - start) / totalMs, 1);
+  //     setUploadProgress(p);
+
+  //     if (p >= 1) {
+  //       if (uploadIntervalRef.current) {
+  //         clearInterval(uploadIntervalRef.current);
+  //         uploadIntervalRef.current = null;
+  //       }
+  //       setTimeout(() => setUploadVisible(false), 800);
+  //     }
+  //   }, 100);
+  // };
+
+  // Cleanup upload interval on unmount
+  useEffect(() => {
+    return () => {
+      if (uploadIntervalRef.current) {
+        clearInterval(uploadIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const StoriesHeader = useCallback(() => {
+    return (
+      <View style={{ paddingVertical: 8 }}>
+        <FlatList
+          data={STORIES}
+          onViewableItemsChanged={({ viewableItems }) => {
+            const visibleItems = viewableItems.map((vi) => vi.item).slice(0, 5);
+            setVisibleIds(visibleItems);
+          }}
+          viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+          horizontal
+          keyExtractor={(_, index) => index.toString()}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={88}
+          decelerationRate="fast"
+          contentContainerStyle={{
+            gap: 10,
+            paddingLeft: 10,
+            paddingRight: 10,
+          }}
+          renderItem={({ item }) => (
+            <View className="relative ">
+              <View className="w-16 h-16 justify-center items-center rounded-full overflow-hidden border-[1.5px] border-[#FFFFFF]/70">
+                <Image
+                  source={item}
+                  className="w-[85%] h-[85%] rounded-full"
+                  resizeMode="cover"
+                />
+              </View>
+            </View>
+          )}
+        />
+      </View>
+    );
+  }, [STORIES]);
 
   return (
-    <SafeAreaView className="flex-1  bg-[#121212]">
-      <Animated.View className="flex-1 ">
-        {/* Custom pull-to-refresh header */}
-        {/* Custom pull-to-refresh header */}
+    <View className="flex-1 bg-[#121212]">
+      <View className="flex-1">
+        {/* Main Header */}
         <Animated.View
-          pointerEvents="none"
+          onLayout={(e) => setTopBarHeight(e.nativeEvent.layout.height)}
           style={{
             position: "absolute",
-            // top: insets.top, // let the gradient fill under the status bar
+            top: insets.top,
             left: 0,
-            top: 0,
             right: 0,
-            alignItems: "center",
-            opacity: headerOpacity,
-            transform: [{ translateY: headerTranslateY }],
+            zIndex: 100,
+            transform: [{ translateY: headerTranslateYAnim }],
+            elevation: 12,
           }}
         >
-          {/* Rounded gradient cap */}
-          <View
-            style={{
-              width: "100%",
-              height: insets.top * 7, // adjust 100–140 to taste
-            }}
-          >
-            <LinearGradient
-              // teal → deep blue (center) → teal
-              colors={["#27D3C0", "#2E6BFF", "#27D3C0"]}
-              locations={[0, 0.5, 1]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }} // horizontal sweep
-              style={{ flex: 1, opacity: 0.95 }}
-            />
-          </View>
+          <View className="bg-[#121212]/[80%] w-[95%] mx-auto overflow-hidden rounded-full">
+            <View style={{ zIndex: 100 }} className="relative">
+              <BlurView
+                intensity={50}
+                style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                experimentalBlurMethod="dimezisBlurView"
+                tint="dark"
+              />
 
-          {/* Label + spinning refresh icon */}
-          <View
-            style={{
-              position: "absolute",
-              top: 40, // below the notch
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-            className=""
-          >
-            <Text className="text-white font-semibold">
-              {refreshing
-                ? "Refreshing…"
-                : canTrigger
-                ? "Release to refresh"
-                : "Refresh"}
-            </Text>
+              {/* Header Content */}
+              <View className="w-full flex-row px-4 py-2 items-center justify-between">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  className="items-center justify-center z-20"
+                >
+                  <Image
+                    source={images.logo_white}
+                    className="w-28 h-14"
+                    resizeMode="contain"
+                    style={{ opacity: 0.9 }}
+                  />
+                </TouchableOpacity>
 
-            <Animated.View style={{ transform: [{ rotate }] }}>
-              <Feather name="rotate-cw" size={16} color="#fff" />
-            </Animated.View>
-          </View>
-        </Animated.View>
-
-        {/* Scrollable Content */}
-        <Animated.ScrollView
-          stickyHeaderIndices={[0]} // 👈 make the first child sticky
-          className="flex-1"
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            // top: insets.top + 0,
-            zIndex: 99,
-            backgroundColor: "#121212",
-            borderTopRightRadius: 30,
-            borderTopLeftRadius: 30,
-            overflow: "hidden",
-          }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              // hide default spinner (we overlay our own)
-              tintColor="transparent"
-              colors={["transparent"]}
-              progressBackgroundColor="transparent"
-              progressViewOffset={100}
-            />
-          }
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            {
-              useNativeDriver: false,
-              listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-                const y = e.nativeEvent.contentOffset.y;
-                const pulled = Math.max(0, -y); // positive while pulling down
-                setCanTrigger(pulled > THRESHOLD && !refreshing);
-              },
-            }
-          )}
-          onScrollEndDrag={(e) => {
-            const y = e.nativeEvent.contentOffset.y;
-            if (-y > THRESHOLD && !refreshing) {
-              onRefresh(); // uses your existing setRefreshing(true) logic
-            }
-          }}
-          scrollEventThrottle={16}
-        >
-          <View
-            style={{
-              zIndex: 100,
-            }}
-            className=" py-4  bg-[#121212] "
-          >
-            <View className="flex-row   justify-between items-center px-6">
-              {/* Logo */}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                className="items-center  justify-center z-20"
-              >
-                <Image
-                  source={images.logo_white}
-                  className="w-28 h-full"
-                  resizeMode="contain"
-                  style={{ opacity: 0.9 }}
-                />
-              </TouchableOpacity>
-
-              <View className="flex-row space-x-3  gap-2">
-                <View className="relative">
+                <View className="flex-row space-x-3 gap-2">
                   <TouchableOpacity
-                    // onPress={() =>
-                    //   router.replace(RouterConstantUtil.tabs.communities as any)
-                    // }
-                    // onPress={() => setDropdownVisible(!dropdownVisible)}
-                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm  z-20"
+                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
                     activeOpacity={0.7}
                     style={{ minWidth: 80, maxWidth: 160 }}
+                    onPress={() => setOpenSwitcher(true)}
                   >
                     <BlurView
                       intensity={10}
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                      experimentalBlurMethod="dimezisBlurView"
                     />
-
                     <Text
-                      className="text-white  font-medium text-[16px] flex-1"
+                      className="text-white font-medium text-[16px] flex-1"
                       numberOfLines={1}
                     >
                       {selectedCommunity}
                     </Text>
-
                     <Feather
                       name="server"
                       size={16}
@@ -310,118 +245,45 @@ const Home: React.FC = () => {
                     />
                   </TouchableOpacity>
 
-                  {dropdownVisible && (
-                    <Animated.View className="absolute top-16 right-0 bg-[#1a1a1a]/95 rounded-2xl border border-[#736F7366]/[40%] shadow-2xl z-50 min-w-[200px]">
-                      <BlurView
-                        intensity={20}
-                        style={[StyleSheet.absoluteFill, { borderRadius: 16 }]}
-                        experimentalBlurMethod="dimezisBlurView"
-                      />
-                      <View className="p-2">
-                        <Text className="text-white/60 text-xs font-medium px-3 py-2 uppercase tracking-wider">
-                          Communities
-                        </Text>
-                        {communities.map((community) => (
-                          <TouchableOpacity
-                            key={community.id}
-                            onPress={() => handleCommunitySelect(community)}
-                            className={`flex-row items-center px-3 py-3 rounded-xl ${
-                              selectedCommunity === community.name
-                                ? "bg-white/20"
-                                : "active:bg-white/10"
-                            }`}
-                            activeOpacity={0.7}
-                          >
-                            <View
-                              className={`w-8 h-8 rounded-full items-center justify-center mr-3 ${
-                                selectedCommunity === community.name
-                                  ? "bg-white/20"
-                                  : "bg-white/10"
-                              }`}
-                            >
-                              <Feather
-                                name={community.icon as any}
-                                size={14}
-                                color="#fff"
-                              />
-                            </View>
-                            <Text
-                              className={`font-medium flex-1 ${
-                                selectedCommunity === community.name
-                                  ? "text-white"
-                                  : "text-white/80"
-                              }`}
-                            >
-                              {community.name}
-                            </Text>
-                            {selectedCommunity === community.name && (
-                              <Feather name="check" size={16} color="#fff" />
-                            )}
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </Animated.View>
-                  )}
+                  <TouchableOpacity
+                    onPress={() => console.log("bell pressed")}
+                    activeOpacity={0.7}
+                    className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
+                  >
+                    <BlurView
+                      intensity={10}
+                      style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
+                    />
+                    <Feather
+                      name="bell"
+                      size={20}
+                      color="#fff"
+                      style={{ opacity: 0.9 }}
+                    />
+                  </TouchableOpacity>
                 </View>
-
-                {/* Notification Bell */}
-                <TouchableOpacity
-                  onPress={() => console.log("bell pressed")}
-                  activeOpacity={0.7}
-                  className="h-12 w-12 overflow-hidden border-[#736F7366]/[40%] border rounded-full bg-[#3636365E]/[37%] drop-shadow-lg shadow-sm items-center justify-center z-20"
-                >
-                  <BlurView
-                    intensity={10}
-                    style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-                    experimentalBlurMethod="dimezisBlurView"
-                  />
-                  <Feather
-                    name="bell"
-                    size={20}
-                    color="#fff"
-                    style={{ opacity: 0.9 }}
-                  />
-                </TouchableOpacity>
               </View>
             </View>
           </View>
-          <View className=" pb-4 ">
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 10, paddingHorizontal: 20 }}
-            >
-              {stories.map((story, index) => (
-                <View key={index} className="relative ">
-                  <View className="w-20 h-20 rounded-full overflow-hidden border-[9px] border-[#FFFFFFA1]/[63%]">
-                    <Image
-                      source={story}
-                      className="w-full rounded-full h-full "
-                      resizeMode="cover"
-                    />
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-          <View className="flex-row   flex-1 justify-center items-center gap-3">
-            <AllFeeds
-              posts={posts}
-              addPost={() => setShowUpload(true)}
-              setUploadVisible={setUploadVisible}
-              simulateUpload={simulateUpload}
-            />
-          </View>
-        </Animated.ScrollView>
+        </Animated.View>
 
-        {dropdownVisible && (
-          <TouchableOpacity
-            className="absolute inset-0 z-40"
-            activeOpacity={1}
-            onPress={() => setDropdownVisible(false)}
+        {/* Feed Content */}
+        <View className="flex-1">
+          <AllFeeds
+            posts={posts}
+            setUploadVisible={setUploadVisible}
+            // simulateUpload={simulateUpload}
+            externalScrollEnabled={feedScrollEnabled}
+            setExternalScrollEnabled={setFeedScrollEnabled}
+            onShowLikePuff={() => setShowLikePuff(true)}
+            onShowDislikePuff={() => setShowDislikePuff(true)}
+            onScroll={onFeedScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={{ paddingTop: topBarHeight + insets.top }}
+            ListHeaderComponent={<StoriesHeader />}
           />
-        )}
-      </Animated.View>
+        </View>
+      </View>
 
       {/* Upload Toast */}
       {uploadVisible && (
@@ -433,10 +295,50 @@ const Home: React.FC = () => {
             "https://randomuser.me/api/portraits/women/44.jpg",
             "https://randomuser.me/api/portraits/men/32.jpg",
           ]}
-          onCancel={() => setUploadVisible(false)}
+          onCancel={() => {
+            if (uploadIntervalRef.current) {
+              clearInterval(uploadIntervalRef.current);
+              uploadIntervalRef.current = null;
+            }
+            setUploadVisible(false);
+          }}
         />
       )}
-    </SafeAreaView>
+
+      {/* Puff Animations */}
+      <PuffySmoke
+        type="like"
+        visible={showLikePuff}
+        x={width - 140}
+        y={height * 0.45}
+        onComplete={() => setShowLikePuff(false)}
+      />
+      <PuffySmoke
+        type="dislike"
+        visible={showDislikePuff}
+        x={20}
+        y={height * 0.45}
+        onComplete={() => setShowDislikePuff(false)}
+      />
+
+      {/* Community Switcher Modal */}
+      {openSwitcher && (
+        <>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setOpenSwitcher(false)}
+            style={[StyleSheet.absoluteFillObject, { zIndex: 9998 }]}
+          />
+
+          <View
+            style={[StyleSheet.absoluteFillObject, { zIndex: 9999 }]}
+            pointerEvents="box-none"
+          >
+            <CommunitySwitcher onClose={() => setOpenSwitcher(false)} />
+          </View>
+        </>
+      )}
+    </View>
   );
 };
 

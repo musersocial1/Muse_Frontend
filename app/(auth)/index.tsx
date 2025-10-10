@@ -58,10 +58,10 @@ export default function Index() {
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
   const blurAnim = useRef(new Animated.Value(0)).current;
   const [blurIntensity, setBlurIntensity] = useState(0);
-  const bgAnim = useRef(new Animated.Value(0)).current; // 0 (transparent) → 1 (full opacity)
+  const bgAnim = useRef(new Animated.Value(0)).current;
   const [direction, setDirection] = useState(1);
 
-  const slideInAnim = useRef(new Animated.Value(1000)).current; // 1000 = offscreen
+  const slideInAnim = useRef(new Animated.Value(1000)).current;
   const [isMoreInfoMounted, setIsMoreInfoMounted] = useState(false);
 
   useEffect(() => {
@@ -428,7 +428,7 @@ export default function Index() {
           pointerEvents={moreInfoVisible ? "auto" : "none"}
         >
           <MoreInfoModal
-            visible={true} // always true for smooth animation
+            visible={true}
             onClose={handleMoreInfoClose}
             onComplete={handleMoreInfoComplete}
           />

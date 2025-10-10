@@ -171,18 +171,9 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
   };
 
   const thumbRefs = useRef<{ [key: string]: any }>({});
-  const [startRect, setStartRect] = useState<{
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  } | null>(null);
 
   const handleOpenVideo = (index: number, id: string) => {
-    // const ref = thumbRefs.current[id];
     setShowVideoReply(true);
-
-    // console.log(ref, "this is davi");
   };
 
   const anim = useRef(new Animated.Value(0)).current; // 0 → 1
@@ -288,13 +279,6 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             />
           </View>
         </TouchableOpacity>
-
-        {/* Title overlay */}
-        {/* <View className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-          <Text className="text-white text-[12px] font-bold" numberOfLines={2}>
-            {video.title}
-          </Text>
-        </View> */}
       </TouchableOpacity>
     );
   };
@@ -309,15 +293,6 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
             Video comments
           </Text>
         </View>
-
-        {/* Video Grid */}
-        {/* <ScrollView className="" showsVerticalScrollIndicator={false}>
-          <View className="flex-row flex-wrap justify-between  ">
-            {displayedVideos.map((video, index) =>
-              renderVideoCard(video, index)
-            )}
-          </View>
-        </ScrollView> */}
 
         <FlatList
           data={videoComments}
@@ -593,16 +568,11 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
         animationType="none"
         onRequestClose={onClose}
       >
-        {/* <VideoReply
-          videos={videoComments} // 👈 pass down
-          visible={showVideoReply}
-          onClose={() => setShowVideoReply(false)}
-          startIndex={activeIndex ?? 0}
-        /> */}
         {showVideoReply && (
           <View style={StyleSheet.absoluteFill}>
             <VideoReply
               videos={videoComments}
+              showVideoReply={showVideoReply}
               startIndex={activeIndex ?? 0}
               onClose={() => setShowVideoReply(false)}
             />

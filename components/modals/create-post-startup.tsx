@@ -26,7 +26,13 @@ export type MediaItem = {
   uri: string;
   type: "image" | "video";
 };
-export default function CreatePostStart({ showModal, onClose }: any) {
+
+export default function CreatePostStart({
+  showModal,
+  onClose,
+  showCommunities: shouldShowCommunities = true,
+  preMedia,
+}: any) {
   const router = useRouter();
 
   const [text, setText] = useState("");
@@ -35,9 +41,8 @@ export default function CreatePostStart({ showModal, onClose }: any) {
     return text.trim() ? text.trim().split(/\s+/).length : 0;
   }, [text]);
 
-  const progress = Math.min(wordCount / 300, 1); // clamp 0–1
+  const progress = Math.min(wordCount / 300, 1);
 
-  // Circle settings
   const size = 38;
   const strokeWidth = 4;
   const radius = (size - strokeWidth) / 2;
@@ -51,12 +56,22 @@ export default function CreatePostStart({ showModal, onClose }: any) {
 
   const [processing, setProcessing] = useState(false);
 
-  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [media, setMedia] = useState<MediaItem[]>(preMedia || []);
+
+  useEffect(() => {
+    if (showModal) {
+      if (preMedia && preMedia.length > 0) {
+        setMedia(preMedia);
+      } else {
+        setMedia([]);
+      }
+    }
+  }, [showModal, preMedia]);
 
   const removeItem = (id: string) => {
     setMedia((prev) => prev.filter((m) => m.id !== id));
   };
-  // 📸 Camera
+
   const openCamera = async () => {
     Keyboard.dismiss();
     try {
@@ -71,7 +86,7 @@ export default function CreatePostStart({ showModal, onClose }: any) {
       }, 1200);
 
       const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All, // 👈 allow both
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         quality: 0.8,
       });
 
@@ -89,7 +104,6 @@ export default function CreatePostStart({ showModal, onClose }: any) {
     }
   };
 
-  // 🖼️ Gallery
   const openGallery = async () => {
     Keyboard.dismiss();
     try {
@@ -104,7 +118,7 @@ export default function CreatePostStart({ showModal, onClose }: any) {
         setProcessing(true);
       }, 1200);
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All, // 👈 allow both
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsMultipleSelection: true,
         quality: 0.8,
       });
@@ -124,59 +138,22 @@ export default function CreatePostStart({ showModal, onClose }: any) {
 
   const [showCommunities, setShowCommunities] = useState(false);
   const { width, height } = Dimensions.get("window");
-  // inside CreatePostStart component
-  const bottomBarTranslate = useRef(new Animated.Value(100)).current; // start hidden below
+  const bottomBarTranslate = useRef(new Animated.Value(100)).current;
 
-  // 🔹 Circle reveal state
   const [visibleCircle, setVisibleCircle] = useState(false);
   const [mode, setMode] = useState<"expand" | "shrink">("expand");
   const [origin, setOrigin] = useState<{ x: number; y: number } | null>(null);
 
-  // 🔹 Content opacity
   const contentOpacity = useRef(new Animated.Value(0)).current;
   const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>(
     []
   );
 
-  // expand circle on mount
-  // track if circle already expanded
   const [hasExpanded, setHasExpanded] = useState(false);
 
-  // useEffect(() => {
-  //   Animated.timing(contentOpacity, {
-  //     toValue: 1,
-  //     duration: 500,
-  //     delay: 400,
-  //     useNativeDriver: true,
-  //   }).start();
-
-  //   Animated.timing(bottomBarTranslate, {
-  //     toValue: 0,
-  //     duration: 300,
-  //     delay: 300,
-  //     useNativeDriver: true,
-  //   }).start();
-
-  //   console.log("this is workign");
-  // }, []);
-
-  // useEffect(() => {
-  //   if (showModal && !hasExpanded) {
-  //     const cx = width - 40; // near FAB
-  //     const cy = height - 100;
-  //     setOrigin({ x: cx, y: cy });
-  //     setMode("expand");
-  //     setVisibleCircle(true);
-  //     setHasExpanded(true); // ✅ prevent retrigger
-  //   }
-  // }, [showModal, hasExpanded]);
-
-  // 🔹 Custom close flow
-
-  // animate content & bottom bar ONLY when modal opens
   useEffect(() => {
     if (showModal) {
-      const cx = width - 40; // near FAB
+      const cx = width - 40;
       const cy = height - 100;
       setOrigin({ x: cx, y: cy });
       setMode("expand");
@@ -196,14 +173,12 @@ export default function CreatePostStart({ showModal, onClose }: any) {
         useNativeDriver: true,
       }).start();
     } else {
-      // reset immediately when closed
       contentOpacity.setValue(0);
       bottomBarTranslate.setValue(100);
     }
-  }, [showModal]); // 🔑 only depends on showModal
+  }, [showModal]);
 
   const handleClose = () => {
-    // 👇 blur/dismiss keyboard first
     Keyboard.dismiss();
 
     Animated.timing(bottomBarTranslate, {
@@ -222,7 +197,7 @@ export default function CreatePostStart({ showModal, onClose }: any) {
 
       setTimeout(() => {
         setVisibleCircle(false);
-        setHasExpanded(false); // ✅ reset so next open animates again
+        setHasExpanded(false);
         onClose?.();
       }, 450);
     });
@@ -233,7 +208,7 @@ export default function CreatePostStart({ showModal, onClose }: any) {
   useEffect(() => {
     const timer = setTimeout(() => {
       inputRef.current?.focus();
-    }, 600); // small delay helps on iOS
+    }, 600);
 
     return () => clearTimeout(timer);
   }, []);
@@ -245,23 +220,14 @@ export default function CreatePostStart({ showModal, onClose }: any) {
         mode={mode}
         color="#121212"
         duration={450}
-        // onDone={() => {
-        //   if (mode === "shrink") {
-        //     setVisibleCircle(false);
-        //   }
-        // }}
       />
       <Animated.View
         style={{
           paddingTop: Platform.OS == "android" ? 10 : insets.top + 10,
           paddingBottom: Platform.OS == "android" ? 15 : insets.bottom,
-          // opacity: contentOpacity,
         }}
         className="flex-1 bg-transparent  px-4"
       >
-        {/* Circle background */}
-
-        {/* Header */}
         <Animated.View
           style={{
             opacity: contentOpacity,
@@ -282,7 +248,7 @@ export default function CreatePostStart({ showModal, onClose }: any) {
         <KeyboardAvoidingView
           className="flex-1 "
           behavior={"padding"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 5} // tweak for safe-area
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 5}
         >
           <ScrollView
             contentContainerStyle={{
@@ -309,8 +275,6 @@ export default function CreatePostStart({ showModal, onClose }: any) {
             </Animated.View>
           </ScrollView>
 
-          {/* Fixed Bottom bar (but now relative, so KAV can move it) */}
-
           <Animated.View
             style={{
               transform: [{ translateY: bottomBarTranslate }],
@@ -330,9 +294,19 @@ export default function CreatePostStart({ showModal, onClose }: any) {
               onPost={() => {
                 Keyboard.dismiss();
 
+                if (!shouldShowCommunities) {
+                  router.replace({
+                    pathname: "/(tabs)/home",
+                    params: {
+                      triggerUpload: "1",
+                      communities: "",
+                    },
+                  });
+                  handleClose();
+                  return;
+                }
+
                 if (selectedCommunityIds.length > 0) {
-                  // ✅ If already selected → go straight home
-                  console.log("Posting to:", selectedCommunityIds);
                   router.replace({
                     pathname: "/(tabs)/home",
                     params: {
@@ -340,11 +314,8 @@ export default function CreatePostStart({ showModal, onClose }: any) {
                       communities: selectedCommunityIds.join(","),
                     },
                   });
-
                   handleClose();
                 } else {
-                  // ✅ If nothing selected → open modal
-
                   setTimeout(() => {
                     setShowCommunities(true);
                   }, 60);
@@ -353,16 +324,17 @@ export default function CreatePostStart({ showModal, onClose }: any) {
             />
           </Animated.View>
 
-          <PostCommunities
-            visible={showCommunities}
-            onClose={() => setShowCommunities(false)}
-            onNudge={() => console.log("Nudge pressed")}
-            // 👇 whenever communities are chosen, update state
-            onDone={(ids) => {
-              setSelectedCommunityIds(ids);
-            }}
-            user={user}
-          />
+          {shouldShowCommunities && (
+            <PostCommunities
+              visible={showCommunities}
+              onClose={() => setShowCommunities(false)}
+              onNudge={() => console.log("Nudge pressed")}
+              onDone={(ids) => {
+                setSelectedCommunityIds(ids);
+              }}
+              user={user}
+            />
+          )}
         </KeyboardAvoidingView>
       </Animated.View>
     </Modal>

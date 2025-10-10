@@ -6,6 +6,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Platform } from "react-native";
 import * as Animatable from "react-native-animatable";
 
+import { useRouter } from "expo-router";
 import {
   Dimensions,
   FlatList,
@@ -190,6 +191,9 @@ const CONTINUE: (Video & { progress: number })[] = [
   },
 ];
 
+// Inside your component:
+const router = useRouter();
+
 export default function DiscoveryExclusivesScreen() {
   const [activeFilter, setActiveFilter] = useState(FILTERS[0]);
 
@@ -242,116 +246,121 @@ export default function DiscoveryExclusivesScreen() {
   }, []);
 
   return (
-    <SafeAreaView
-      style={{ paddingTop: Platform.OS == "ios" ? 0 : insets.top + 10 }}
-      className="flex-1   bg-[#0B0B0B]"
-    >
-      <Animatable.View
-        animation="fadeInRight" // 👈 enters from right
-        duration={600}
-        // exit="fadeOutLeft"        // 👈 exits to left (RN Animatable supports this now)
-        delay={60}
-        style={{
-          flex: 1,
-          // paddingTop: insets.top + (Platform.OS === "ios" ? 0 : 10),
-        }}
+    <>
+      <SafeAreaView
+        style={{ paddingTop: Platform.OS == "ios" ? 0 : insets.top + 10 }}
         className="flex-1   bg-[#0B0B0B]"
       >
-        <ScrollView
-          className="flex-1"
-          //   contentContainerClassName="pb-"
-          contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
-          showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={[0]} // 👈 make the first child sticky
+        {showPlayer && (
+          <MediaPlayerModal
+            isVisible={showPlayer}
+            onClose={() => setShowPlayer(false)}
+            videoUrl={images.media}
+            audioUrl={images.media}
+            title="Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al"
+            author="John"
+            duration={0}
+          />
+        )}
+
+        <Animatable.View
+          // animation="non" // 👈 enters from right
+          // duration={600}
+          // exit="fadeOutLeft"        // 👈 exits to left (RN Animatable supports this now)
+          // delay={60}
+          style={{
+            flex: 1,
+            // paddingTop: insets.top + (Platform.OS === "ios" ? 0 : 10),
+          }}
+          className="flex-1   bg-[#0B0B0B]"
         >
-          {/* Search + download */}
-          <View className="  pb-4  bg-[#0B0B0B]">
-            <View className="flex-row px-2 items-center">
-              <View className="flex-1 flex-row items-center bg-[#1A1A1A] rounded-full px-4 ">
-                <Ionicons name="search" size={20} color="#ffffff" />
-                <TextInput
-                  placeholder="Search"
-                  placeholderTextColor="#9ca3af"
-                  className="flex-1 text-white text-[14px] font-sfpro-medium tracking-wider h-[3.5rem] ml-2"
-                />
+          <ScrollView
+            className="flex-1"
+            //   contentContainerClassName="pb-"
+            contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
+            showsVerticalScrollIndicator={false}
+            stickyHeaderIndices={[0]} // 👈 make the first child sticky
+          >
+            {/* Search + download */}
+            <View className="  pb-4  bg-[#0B0B0B]">
+              <View className="flex-row px-2 items-center">
+                <View className="flex-1 flex-row items-center bg-[#1A1A1A] rounded-full px-4 ">
+                  <Ionicons name="search" size={20} color="#ffffff" />
+                  <TextInput
+                    placeholder="Search"
+                    placeholderTextColor="#9ca3af"
+                    className="flex-1 text-white text-[14px] font-sfpro-medium tracking-wider h-[3.5rem] ml-2"
+                  />
+                </View>
+
+                <TouchableOpacity
+                  className="ml-2 w-[3.4rem] h-[3.4rem] rounded-full bg-white items-center justify-center"
+                  activeOpacity={0.8}
+                >
+                  <Image
+                    source={icons.Xdownloads}
+                    className="w-7 h-7"
+                    resizeMode="contain"
+                  />
+                </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                className="ml-2 w-[3.4rem] h-[3.4rem] rounded-full bg-white items-center justify-center"
-                activeOpacity={0.8}
+              {/* Filter chips */}
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="mt-4 px-2"
               >
-                <Image
-                  source={icons.Xdownloads}
-                  className="w-7 h-7"
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
+                {headerChips}
+              </ScrollView>
             </View>
 
-            {/* Filter chips */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="mt-4 px-2"
-            >
-              {headerChips}
-            </ScrollView>
-          </View>
-
-          {/* Latest */}
-          {/* Latest */}
-          <Section title="Latest">
-            <View className="flex-row flex-wrap px-3 gap-4">
-              {LATEST.slice(0, showAll ? LATEST.length : 2).map((item) => (
-                <View key={item.id} className="w-[48%] ">
-                  <VideoCard item={item} setShowPlayer={setShowPlayer} />
-                </View>
-              ))}
-            </View>
-            <SeeAll
-              label={showAll ? "Show less" : `See All ${LATEST.length} more`}
-              onPress={() => setShowAll(!showAll)}
-            />
-          </Section>
-
-          {/* Your communities */}
-          <Section title="Your communities">
-            <View className="flex-row flex-wrap mt-2 px-3  justify-between">
-              {COMMUNITIES.slice(0, showAll ? COMMUNITIES.length : 3).map(
-                (item) => (
-                  <View key={item.id} className="w-[32%] ">
-                    <CommunityBubble item={item} />
+            {/* Latest */}
+            {/* Latest */}
+            <Section title="Latest">
+              <View className="flex-row flex-wrap px-3 gap-4">
+                {LATEST.slice(0, showAll ? LATEST.length : 2).map((item) => (
+                  <View key={item.id} className="w-[48%] ">
+                    <VideoCard item={item} setShowPlayer={setShowPlayer} />
                   </View>
-                )
-              )}
-            </View>
-            <SeeAll />
-          </Section>
+                ))}
+              </View>
+              <SeeAll
+                label={showAll ? "Show less" : `See All ${LATEST.length} more`}
+                onPress={() => setShowAll(!showAll)}
+              />
+            </Section>
 
-          {/* Continue watching */}
-          <Section title="Continue watching">
-            <FlatList
-              data={CONTINUE}
-              keyExtractor={(i) => i.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 12 }}
-              ItemSeparatorComponent={() => <View className="w-3" />}
-              renderItem={({ item }) => <ContinueCard item={item} />}
-            />
-          </Section>
-        </ScrollView>
-      </Animatable.View>
-      <MediaPlayerModal
-        isVisible={showPlayer}
-        onClose={() => setShowPlayer(false)}
-        videoUrl={images.media}
-        audioUrl={images.media}
-        title="Conversations with Bornfrosh & Al"
-        author="John"
-        duration={1847}
-      />
-    </SafeAreaView>
+            {/* Your communities */}
+            <Section title="Your communities">
+              <View className="flex-row flex-wrap mt-2 px-3  justify-between">
+                {COMMUNITIES.slice(0, showAll ? COMMUNITIES.length : 3).map(
+                  (item) => (
+                    <View key={item.id} className="w-[32%] ">
+                      <CommunityBubble item={item} />
+                    </View>
+                  )
+                )}
+              </View>
+              <SeeAll />
+            </Section>
+
+            {/* Continue watching */}
+            <Section title="Continue watching">
+              <FlatList
+                data={CONTINUE}
+                keyExtractor={(i) => i.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal: 12 }}
+                ItemSeparatorComponent={() => <View className="w-3" />}
+                renderItem={({ item }) => <ContinueCard item={item} />}
+              />
+            </Section>
+          </ScrollView>
+        </Animatable.View>
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -445,7 +454,12 @@ function VideoCard({
 
 function CommunityBubble({ item }: { item: Community }) {
   return (
-    <TouchableOpacity className=" w-full  items-center">
+    <TouchableOpacity
+      onPress={() => {
+        router.push("/(community)/user-view-community");
+      }}
+      className=" w-full  items-center"
+    >
       {item.isNew && (
         <View
           style={{

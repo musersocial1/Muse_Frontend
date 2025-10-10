@@ -20,10 +20,14 @@ export interface Post {
     avatar: string;
     verified: boolean;
   };
+  communityName?: string;
   content: string;
   thumbnail?: number;
   images?: (string | number)[];
-  vComments?: string[];
+  vComments?: Array<{
+    type: "image" | "video";
+    url: string;
+  }>;
   videos?: string[];
   timestamp: string;
   likes: number;

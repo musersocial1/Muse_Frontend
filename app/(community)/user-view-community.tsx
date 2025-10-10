@@ -32,8 +32,7 @@ const UserViewCommunity: React.FC = () => {
   const insets = useSafeAreaInsets();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showLinksModal, setShowLinksModal] = useState(false);
-  const [activePostType, setActivePostType] = useState<string>("all");
-  const slideAnim = useRef(new Animated.Value(height)).current;
+  const [activePostType, setActivePostType] = useState<string>("longform");
 
   const [posts] = useState(dummyAllPosts);
 

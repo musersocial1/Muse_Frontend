@@ -14,6 +14,7 @@ import {
   Dimensions,
   GestureResponderEvent,
   Image,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -25,20 +26,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
-// Sample video data - replace with your actual data
-
 interface VideoReplyModalProps {
-  // visible: boolean;
   onClose: () => void;
   startIndex?: number;
-  videos: any[]; // 👈 pass videos from parent
+  showVideoReply: boolean;
+  videos: any[];
 }
 
 export default function VideoReply({
-  // visible,
   onClose,
   startIndex = 0,
   videos,
+  showVideoReply,
 }: VideoReplyModalProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMenu, setShowMenu] = useState(false);
@@ -284,7 +283,12 @@ export default function VideoReply({
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }} className="z-[1000]">
+    <Modal
+      visible={showVideoReply} // or whatever state controls visibility
+      animationType="slide" // or "fade", "none"
+      presentationStyle="fullScreen" // for full screen modal
+      onRequestClose={() => onClose()} // Android back button handling
+    >
       {/* Top bar */}
       <View
         style={{ top: Platform.OS == "android" ? 10 : insets.top }}
@@ -473,7 +477,6 @@ export default function VideoReply({
           </View>
         </TouchableOpacity>
       )}
-
       <ScrollView
         ref={scrollViewRef}
         pagingEnabled
@@ -488,7 +491,6 @@ export default function VideoReply({
       >
         {videos.map((item, index) => renderVideoItem(item, index))}
       </ScrollView>
-
       <DeletePostFlowModal
         visible={deletePost}
         post={{
@@ -514,6 +516,6 @@ export default function VideoReply({
         }}
         onClose={() => setFlagMember(false)}
       />
-    </View>
+    </Modal>
   );
 }

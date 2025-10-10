@@ -23,6 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         "Muse requires access to your photo library so you can select and upload images/videos.",
       NSMicrophoneUsageDescription:
         "Muse requires access to your microphone so you can record audio for posts and AI transcription.",
+      UIBackgroundModes: ["audio"],
     },
   },
   android: {

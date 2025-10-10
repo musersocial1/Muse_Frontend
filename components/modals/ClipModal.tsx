@@ -1,5 +1,6 @@
 import { images } from "@/constants/images";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -12,11 +13,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 const { width, height } = Dimensions.get("window");
 
-// Dummy data for the thumbnails
 const thumbnails = [
   {
     id: "1",
@@ -58,20 +59,21 @@ const thumbnails = [
 export default function ClipModal({
   visible,
   onClose,
+  handleContinue,
 }: {
   visible: boolean;
   onClose: () => void;
+  handleContinue: () => void;
 }) {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [selectedThumbnail, setSelectedThumbnail] = useState("2");
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (visible) {
-      // Set status bar to light content
       StatusBar.setBarStyle("light-content");
 
-      // Start animations
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 1,
@@ -86,10 +88,6 @@ export default function ClipModal({
         }),
       ]).start();
     } else {
-      // Reset status bar
-      StatusBar.setBarStyle("dark-content");
-
-      // Hide animations
       Animated.parallel([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -168,7 +166,6 @@ export default function ClipModal({
         },
       ]}
     >
-      {/* SVG Gradient Background */}
       <View style={StyleSheet.absoluteFill}>
         <Svg height={height} width={width}>
           <Defs>
@@ -179,7 +176,6 @@ export default function ClipModal({
               x2="0%"
               y2="100%"
             >
-              {/* Top: greenish gray, Bottom: brownish, all fully opaque */}
               <Stop offset="0%" stopColor="#50615b" stopOpacity="1" />
               <Stop offset="50%" stopColor="#3e443e" stopOpacity="1" />
               <Stop offset="100%" stopColor="#693f2e" stopOpacity="1" />
@@ -200,14 +196,12 @@ export default function ClipModal({
         style={[
           StyleSheet.absoluteFill,
           {
-            justifyContent: "center",
+            justifyContent: "flex-start",
             alignItems: "center",
             paddingTop: 60,
-            paddingBottom: 40,
           },
         ]}
       >
-        {/* Header Section */}
         <View
           style={{
             position: "absolute",
@@ -224,7 +218,7 @@ export default function ClipModal({
           <Text
             style={{
               color: "#fff",
-              fontWeight: "600",
+              fontWeight: "700",
               fontSize: 19,
               textAlign: "center",
               flex: 1,
@@ -238,132 +232,143 @@ export default function ClipModal({
             style={{
               position: "absolute",
               right: 20,
-              backgroundColor: "rgba(0,0,0,0.3)",
+              width: 40,
+              height: 40,
               borderRadius: 20,
-              padding: 8,
+              overflow: "hidden",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(0, 0, 0, 0.2)",
             }}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
-            <Ionicons name="close" size={24} color="#fff" />
+            <BlurView
+              tint="dark"
+              intensity={40}
+              experimentalBlurMethod="dimezisBlurView"
+              style={StyleSheet.absoluteFill}
+            />
+            <Ionicons name="close" size={22} color="#fff" />
           </TouchableOpacity>
         </View>
 
-        {/* Content Container */}
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        <Animated.View
+          style={{
+            marginTop: "20%",
+            borderRadius: 28,
+            overflow: "hidden",
+            backgroundColor: "rgba(0, 0, 0, 0.25)",
+            width: width * 0.86,
+            aspectRatio: 1.07,
+            elevation: 24,
+            shadowColor: "rgba(0, 0, 0, 0.25)",
+            shadowOpacity: 0.35,
+            shadowOffset: { width: 0, height: 18 },
+            shadowRadius: 30,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
         >
-          {/* Video/Clip Preview */}
-          <Animated.View
+          <Image
+            source={images.Xcomm2}
             style={{
-              marginBottom: 40,
-              borderRadius: 24,
-              overflow: "hidden",
-              backgroundColor: "#111",
-              width: width * 0.82,
-              aspectRatio: 1.07,
-              elevation: 12,
-              shadowColor: "#000",
-              shadowOpacity: 0.25,
-              shadowOffset: { width: 0, height: 12 },
-              shadowRadius: 24,
-              justifyContent: "center",
-              alignItems: "center",
+              width: "100%",
+              height: "100%",
+              resizeMode: "cover",
             }}
-          >
-            <Image
-              source={images.Xcomm2}
-              style={{
-                width: "100%",
-                height: "100%",
-                resizeMode: "cover",
-              }}
-            />
+          />
 
-            {/* Play button overlay */}
-            <TouchableOpacity
-              style={{
-                position: "absolute",
-                backgroundColor: "rgba(0,0,0,0.6)",
-                borderRadius: 35,
-                width: 70,
-                height: 70,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name="play"
-                size={32}
-                color="#fff"
-                style={{ marginLeft: 4 }}
-              />
-            </TouchableOpacity>
-          </Animated.View>
-
-          {/* Thumbnails Section */}
-          <View style={{ marginBottom: 40, alignItems: "center" }}>
-            <Text
-              style={{
-                color: "#fff",
-                fontSize: 16,
-                fontWeight: "500",
-                textAlign: "center",
-                marginBottom: 16,
-                opacity: 0.95,
-              }}
-            >
-              Select starting point
-            </Text>
-
-            <View style={{ alignItems: "center" }}>
-              <FlatList
-                data={thumbnails}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={renderThumbnail}
-                contentContainerStyle={{
-                  paddingHorizontal: 20,
-                  alignItems: "center",
-                }}
-                style={{
-                  flexGrow: 0,
-                  maxWidth: width * 0.9,
-                }}
-                decelerationRate="fast"
-                snapToInterval={58} // 46 (width) + 12 (margins)
-                snapToAlignment="center"
-              />
-            </View>
-          </View>
-
-          {/* Continue Button */}
           <TouchableOpacity
             style={{
-              width: 140,
+              position: "absolute",
+              backgroundColor: "rgba(0,0,0,0.6)",
+              borderRadius: 35,
+              width: 70,
+              height: 70,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            activeOpacity={0.85}
+          >
+            <Ionicons
+              name="play"
+              size={32}
+              color="#fff"
+              style={{ marginLeft: 4 }}
+            />
+          </TouchableOpacity>
+        </Animated.View>
+
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: (insets?.bottom ?? 0) + 16,
+            alignItems: "center",
+            paddingHorizontal: 20,
+          }}
+          pointerEvents="box-none"
+        >
+          <Text
+            style={{
+              color: "#fff",
+              fontSize: 16,
+              fontWeight: "600",
+              textAlign: "center",
+              marginBottom: 16,
+              opacity: 0.95,
+            }}
+          >
+            Select starting point
+          </Text>
+
+          <View style={{ alignItems: "center" }}>
+            <FlatList
+              data={thumbnails}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              renderItem={renderThumbnail}
+              contentContainerStyle={{
+                paddingHorizontal: 8,
+                alignItems: "center",
+              }}
+              style={{
+                flexGrow: 0,
+                maxWidth: width * 0.92,
+              }}
+              decelerationRate="fast"
+              snapToInterval={58}
+              snapToAlignment="center"
+            />
+          </View>
+
+          <TouchableOpacity
+            style={{
+              marginTop: 18,
+              width: 180,
               backgroundColor: "#fff",
               paddingVertical: 16,
-              borderRadius: 25,
+              borderRadius: 26,
               alignItems: "center",
               elevation: 6,
               shadowColor: "#000",
-              shadowOpacity: 0.2,
+              shadowOpacity: 0.22,
               shadowOffset: { width: 0, height: 4 },
-              shadowRadius: 8,
+              shadowRadius: 10,
             }}
             onPress={() => {
-              console.log("Continue with thumbnail:", selectedThumbnail);
-              onClose();
+              handleContinue();
             }}
-            activeOpacity={0.9}
+            activeOpacity={0.95}
           >
             <Text
               style={{
                 color: "#393623",
-                fontWeight: "700",
+                fontWeight: "800",
                 fontSize: 17,
-                letterSpacing: 0.5,
+                letterSpacing: 0.3,
               }}
             >
               Continue
