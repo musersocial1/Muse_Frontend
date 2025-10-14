@@ -123,7 +123,7 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
         </Pressable>
       </View>
 
-      <View
+      {/* <View
         className="flex-row rounded-full overflow-hidden"
         style={{
           backgroundColor: "rgba(255, 255, 255, 0.03)",
@@ -172,7 +172,7 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
             Disliked
           </Text>
         </Pressable>
-      </View>
+      </View> */}
     </View>
   );
 

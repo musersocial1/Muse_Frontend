@@ -135,7 +135,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
           <View
             pointerEvents="none"
             style={{ top: insets.top + 100 }}
-            className=" absolute max-w-lg flex flex-wrap px-4  flex-row justify-between top-0 left-0 right-0 bottom-0 "
+            className=" absolute max-w-lg  flex flex-wrap px-4  flex-row justify-between top-0 left-0 right-0 bottom-0 "
           >
             {communities.map((community, index) => (
               <View
@@ -156,7 +156,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
           <Animated.View
             className="flex-1  z-[100] "
             style={{
-              paddingTop: Platform.OS == "android" ? 20 : insets.top + 5,
+              paddingTop: Platform.OS == "android" ? 20 : insets.top + 15,
             }}
           >
             <BlurView
@@ -166,7 +166,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
               experimentalBlurMethod="dimezisBlurView"
             />
             {/* Header */}
-            <View className="items-center  px-6  pb-6">
+            <View className="items-center   px-6  pb-6">
               {/* <Text className="text-white text-[24px] font-sfpro-bold mb-4">
                 All communities
               </Text> */}
@@ -183,7 +183,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
 
             {/* Scrollable list */}
             <ScrollView
-              className="flex-1"
+              className="flex-1 mt-5"
               showsVerticalScrollIndicator={false}
               //   contentOffset={{ x: 0, y: insets.bottom + 20 }}
               contentContainerStyle={{
@@ -191,7 +191,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
                 paddingBottom: insets.bottom,
               }}
             >
-              <View className="flex-row flex-wrap justify-between">
+              <View className="flex-row  flex-wrap justify-between">
                 {communities.map((community, index) => (
                   <CommunityCard
                     key={index}

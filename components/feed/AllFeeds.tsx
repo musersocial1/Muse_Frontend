@@ -52,20 +52,22 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   variant = "default",
   containerClassName = "",
 }) => {
-  const baseRow = "flex-row  justify-between items-center px-2 pt-2 pb-3  ";
+  const baseRow = "flex-row  justify-between items-center  pt-2 pb-3  ";
   const overlayWrap =
-    variant === "overlay" ? "absolute top-0 left-0 right-0 z-10" : "";
+    variant === "overlay" ? "absolute top-0 left-0 right-0 z-10 px-2" : "px-4";
 
   return (
     <View
       pointerEvents="box-none"
-      className={[overlayWrap, containerClassName].filter(Boolean).join(" ")}
+      className={`${[overlayWrap, containerClassName]
+        .filter(Boolean)
+        .join(" ")} z-[88]`}
     >
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
           className={`flex-row shrink ${
-            overlayWrap ? "bg-[#36363666]/[40%]" : ""
+            overlayWrap ? "bg-[#36363666]/[0%]" : ""
           }  rounded-full pl-1  pr-2 py-1  `}
           style={{
             shadowColor: "#000",
@@ -77,14 +79,14 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           }}
           activeOpacity={0.8}
         >
-          {overlayWrap && (
+          {/* {overlayWrap && (
             <BlurView
               intensity={50}
               style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
               experimentalBlurMethod="dimezisBlurView"
               tint="dark"
             />
-          )}
+          )} */}
 
           <View className="w-11 h-11 rounded-full overflow-hidden mr-1.5">
             <Image
@@ -96,7 +98,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
 
           <View>
             <View className="flex-col">
-              <View className="flex-row items-center pt-1">
+              <View className="flex-row  items-center pt-1">
                 <Text className="text-white capitalize font-sfpro-bold text-[12px]  mr-1">
                   {post.author.username}
                 </Text>
@@ -114,19 +116,19 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           </View>
         </TouchableOpacity>
 
-        <BlurView
-          intensity={50}
-          tint="dark"
+        <View
+          // intensity={50}
+          // tint="dark"
           className="flex-row gap-1  items-center p-2 rounded-full overflow-hidden"
         >
-          <Text className="text-white/70 ml-1 font-sfpro-medium text-[15px]">
+          <Text className="text-white ml-1 font-sfpro-medium text-[15px]">
             {post.timestamp}
           </Text>
 
           <TouchableOpacity onPress={onMenuPress} hitSlop={8}>
             <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
           </TouchableOpacity>
-        </BlurView>
+        </View>
       </View>
     </View>
   );
@@ -147,12 +149,16 @@ export interface PostCardProps {
 export function CollapsibleText({
   text,
   lines = 2,
+  post,
+  hasMedia,
 }: {
   text: string;
   lines?: number;
+  post: any;
+  hasMedia: any;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const MAX_WORDS = 13; // Adjust this number based on your needs
+  const MAX_WORDS = !hasMedia ? 30 : 13; // Adjust this number based on your needs
 
   const words = text.split(" ");
   const shouldTruncate = words.length > MAX_WORDS;
@@ -161,16 +167,24 @@ export function CollapsibleText({
 
   return (
     <TouchableOpacity
+      key={displayText}
       onPress={() => setExpanded((v) => !v)}
       activeOpacity={0.9}
     >
       <Text
-        className="font-sfpro-medium text-white text-[16px]"
-        style={{ flexShrink: 1 }}
+        className="font-sfpro-medium text-white text-[14.5px]"
+        // style={{ flexShrink: 1 }}
       >
+        {hasMedia && (
+          <>
+            <Text className="  text-white text-[16px] font-sfpro-bold ">
+              {post.author.username}{" "}
+            </Text>{" "}
+          </>
+        )}
         {displayText}
         {shouldTruncate && (
-          <Text className="text-[white]/60 text-[15px] font-sfpro-bold">
+          <Text className="text-[white]/70 text-[15px] font-sfpro-bold">
             {expanded ? " Read less" : " Read more"}
           </Text>
         )}
@@ -233,8 +247,8 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "image" && post.images && post.images.length > 0 && (
-          <View className="px-2 mt-2">
-            <View className="relative mb-3 w-full aspect-[2/1.5] rounded-[25px] overflow-hidden">
+          <View className="px-2  mt-2">
+            <View className="relative mb-3 w-full aspect-[2/1.7] rounded-[25px] overflow-hidden ">
               <PostHeader
                 post={post}
                 onAuthorPress={() => setIsOpen(true)}
@@ -242,6 +256,18 @@ export const PostCard: React.FC<PostCardProps> = ({
                 variant="overlay"
               />
 
+              <View
+                className="w-full h-16 z-[10] "
+                style={StyleSheet.absoluteFill}
+              >
+                <LinearGradient
+                  colors={["rgba(28, 28, 28, 1)", "rgba(0, 0, 0, 0)"]}
+                  start={{ x: 0.5, y: 0 }}
+                  end={{ x: 0.5, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                  // className="z-[1000]"
+                />
+              </View>
               <ScrollView
                 horizontal
                 pagingEnabled
@@ -301,6 +327,18 @@ export const PostCard: React.FC<PostCardProps> = ({
                   onMenuPress={() => {}}
                   variant="overlay"
                 />
+                <View
+                  className="w-full h-16 z-[10] "
+                  style={StyleSheet.absoluteFill}
+                >
+                  <LinearGradient
+                    colors={["rgba(28, 28, 28, 1)", "rgba(0, 0, 0, 0)"]}
+                    start={{ x: 0.5, y: 0 }}
+                    end={{ x: 0.5, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                    // className="z-[1000]"
+                  />
+                </View>
                 <View className="overflow-hidden ">
                   <View className="relative overflow-hidden aspect-[2/1.5] rounded-[15px] w-full">
                     <Image
@@ -380,7 +418,12 @@ export const PostCard: React.FC<PostCardProps> = ({
         <View className="pb-3 px-6">
           <View className="flex-row flex-wrap items-baseline">
             <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
-              <CollapsibleText text={post.content} lines={2} />
+              <CollapsibleText
+                text={post.content}
+                hasMedia={hasMedia}
+                lines={2}
+                post={post}
+              />
             </Text>
           </View>
         </View>
@@ -684,8 +727,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
             className="w-full"
           >
             <SwipeableCard
-              onSwipeLeft={() => removePostWithDislike(item.id)}
-              onSwipeRight={() => removePostWithLike(item.id)}
+              onSwipeRight={() => removePostWithDislike(item.id)}
+              onSwipeLeft={() => removePostWithLike(item.id)}
               index={index}
               activeSwipeIndex={activeSwipeIndex}
               disabled={imageScrollingStates[item.id] || false}

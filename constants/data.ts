@@ -8,7 +8,7 @@ export const dummyAllPosts: Post[] = [
     id: "1",
     author: {
       name: "Sarah Chen",
-      username: "@sarahc_tech",
+      username: "sarahc_tech",
       avatar: "https://randomuser.me/api/portraits/women/44.jpg",
       verified: true,
     },
@@ -46,7 +46,7 @@ export const dummyAllPosts: Post[] = [
     id: "2",
     author: {
       name: "Marcus Johnson",
-      username: "@marcusj_dev",
+      username: "marcusj_dev",
       avatar:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -58,7 +58,7 @@ export const dummyAllPosts: Post[] = [
     likes: 1542,
     comments: 234,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -85,7 +85,7 @@ export const dummyAllPosts: Post[] = [
     id: "3",
     author: {
       name: "Elena Rodriguez",
-      username: "@elena_writes",
+      username: "elena_writes",
       avatar:
         "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -103,7 +103,7 @@ export const dummyAllPosts: Post[] = [
     id: "4",
     author: {
       name: "David Kim",
-      username: "@davidk_startup",
+      username: "davidk_startup",
       avatar:
         "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -141,7 +141,7 @@ export const dummyAllPosts: Post[] = [
     id: "5",
     author: {
       name: "Alex Thompson",
-      username: "@alexthompson",
+      username: "alexthompson",
       avatar:
         "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -154,7 +154,7 @@ export const dummyAllPosts: Post[] = [
     likes: 4567,
     comments: 1023,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -182,7 +182,7 @@ export const dummyAllPosts: Post[] = [
     communityName: "Chef Valentina",
     author: {
       name: "Isabella Martinez",
-      username: "@chef_bella",
+      username: "chef_bella",
       avatar:
         "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -193,7 +193,7 @@ export const dummyAllPosts: Post[] = [
     likes: 2156,
     comments: 445,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -221,7 +221,7 @@ export const dummyAllPosts: Post[] = [
     communityName: "Mentors united",
     author: {
       name: "James Wilson",
-      username: "@jameswilson_mentor",
+      username: "jameswilson_mentor",
       avatar:
         "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -233,7 +233,7 @@ export const dummyAllPosts: Post[] = [
     likes: 1789,
     comments: 334,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -261,7 +261,7 @@ export const dummyAllPosts: Post[] = [
     communityName: "Tesla Super Owners",
     author: {
       name: "Ryan Parker",
-      username: "@ryanp_tesla",
+      username: "ryanp_tesla",
       avatar:
         "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -273,7 +273,7 @@ export const dummyAllPosts: Post[] = [
     likes: 5234,
     comments: 876,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -301,7 +301,7 @@ export const dummyAllPosts: Post[] = [
     communityName: "Tesla Super Owners",
     author: {
       name: "Sophia Lee",
-      username: "@sophialee_tech",
+      username: "sophialee_tech",
       avatar:
         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -313,7 +313,7 @@ export const dummyAllPosts: Post[] = [
     likes: 3456,
     comments: 567,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -340,7 +340,7 @@ export const dummyAllPosts: Post[] = [
     id: "10",
     author: {
       name: "Priya Patel",
-      username: "@priya_immigrant",
+      username: "priya_immigrant",
       avatar:
         "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -378,7 +378,7 @@ export const dummyAllPosts: Post[] = [
     id: "11",
     author: {
       name: "Michael Roberts",
-      username: "@mikeroberts_media",
+      username: "mikeroberts_media",
       avatar:
         "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -389,7 +389,7 @@ export const dummyAllPosts: Post[] = [
     likes: 2890,
     comments: 678,
     type: "text",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -416,7 +416,7 @@ export const dummyAllPosts: Post[] = [
     id: "12",
     author: {
       name: "Jennifer Chang",
-      username: "@jenchang_policy",
+      username: "jenchang_policy",
       avatar:
         "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -454,7 +454,7 @@ export const dummyAllPosts: Post[] = [
     id: "13",
     author: {
       name: "Carlos Mendez",
-      username: "@carlosm_business",
+      username: "carlosm_business",
       avatar:
         "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -465,7 +465,7 @@ export const dummyAllPosts: Post[] = [
     likes: 3245,
     comments: 567,
     type: "text",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -492,7 +492,7 @@ export const dummyAllPosts: Post[] = [
     id: "14",
     author: {
       name: "Amanda Foster",
-      username: "@amandaf_observer",
+      username: "amandaf_observer",
       avatar:
         "https://images.unsplash.com/photo-1464863979621-258859e62245?w=100&h=100&fit=crop&crop=face",
       verified: false,
@@ -530,7 +530,7 @@ export const dummyAllPosts: Post[] = [
     id: "15",
     author: {
       name: "Taylor Swift",
-      username: "@taylorswift13",
+      username: "taylorswift13",
       avatar:
         "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -546,7 +546,7 @@ export const dummyAllPosts: Post[] = [
     id: "16",
     author: {
       name: "Raj Sharma",
-      username: "@rajsharma_analyst",
+      username: "rajsharma_analyst",
       avatar:
         "https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face",
       verified: true,
@@ -664,7 +664,7 @@ export const moderators = [
 
 export const user = {
   name: "beyonce",
-  username: "@beyonceknowle",
+  username: "beyonceknowle",
   profileImage:
     "https://images.unsplash.com/photo-1494790108755-2616c2e8e0e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
   verified: true,
@@ -992,62 +992,61 @@ export const MOCK_REPLY_TO = {
 export const MOCK_POSTER =
   "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=687&q=80";
 
-
-  export const categories: Category[] = [
-    {
-      id: 1,
-      name: "Food",
-      img: images.cat1,
-    },
-    {
-      id: 2,
-      name: "Entertainment",
-      img: images.cat2,
-    },
-    {
-      id: 3,
-      name: "Comedy",
-      img: images.cat3,
-    },
-    {
-      id: 4,
-      name: "Food",
-      img: images.cat4,
-    },
-    {
-      id: 5,
-      name: "Entertainment",
-      img: images.cat5,
-    },
-    {
-      id: 6,
-      name: "Comedy",
-      img: images.cat6,
-    },
-    {
-      id: 7,
-      name: "Food",
-      img: images.cat7,
-    },
-    {
-      id: 8,
-      name: "Entertainment",
-      img: images.cat8,
-    },
-    {
-      id: 9,
-      name: "Comedy",
-      img: images.cat9,
-    },
-    { id: 10, name: "Food", img: images.cat10 },
-    { id: 11, name: "Entertainment", img: images.cat11 },
-    { id: 12, name: "Comedy", img: images.cat12 },
-    { id: 13, name: "Food", img: images.cat13 },
-    { id: 14, name: "Entertainment", img: images.cat14 },
-    { id: 15, name: "Comedy", img: images.cat15 },
-    { id: 16, name: "Food", img: images.cat16 },
-    { id: 17, name: "Entertainment", img: images.cat17 },
-    { id: 18, name: "Comedy", img: images.cat18 },
-    { id: 19, name: "Food", img: images.cat19 },
-    { id: 20, name: "Entertainment", img: images.cat20 },
-  ];
+export const categories: Category[] = [
+  {
+    id: 1,
+    name: "Food",
+    img: images.cat1,
+  },
+  {
+    id: 2,
+    name: "Entertainment",
+    img: images.cat2,
+  },
+  {
+    id: 3,
+    name: "Comedy",
+    img: images.cat3,
+  },
+  {
+    id: 4,
+    name: "Food",
+    img: images.cat4,
+  },
+  {
+    id: 5,
+    name: "Entertainment",
+    img: images.cat5,
+  },
+  {
+    id: 6,
+    name: "Comedy",
+    img: images.cat6,
+  },
+  {
+    id: 7,
+    name: "Food",
+    img: images.cat7,
+  },
+  {
+    id: 8,
+    name: "Entertainment",
+    img: images.cat8,
+  },
+  {
+    id: 9,
+    name: "Comedy",
+    img: images.cat9,
+  },
+  { id: 10, name: "Food", img: images.cat10 },
+  { id: 11, name: "Entertainment", img: images.cat11 },
+  { id: 12, name: "Comedy", img: images.cat12 },
+  { id: 13, name: "Food", img: images.cat13 },
+  { id: 14, name: "Entertainment", img: images.cat14 },
+  { id: 15, name: "Comedy", img: images.cat15 },
+  { id: 16, name: "Food", img: images.cat16 },
+  { id: 17, name: "Entertainment", img: images.cat17 },
+  { id: 18, name: "Comedy", img: images.cat18 },
+  { id: 19, name: "Food", img: images.cat19 },
+  { id: 20, name: "Entertainment", img: images.cat20 },
+];

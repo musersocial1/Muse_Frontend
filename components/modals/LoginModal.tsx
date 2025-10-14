@@ -693,7 +693,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                   activeOpacity={0.8}
                 >
                   <Text className="text-[#FFFFFF] text-center font-semibold text-[16px]">
-                    Login with email
+                    Login with Email
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -706,14 +706,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ visible, onClose }) => {
                     router.replace(RouterConstantUtil.tabs.home as any)
                   }
                 >
-                  <Text className="text-center font-semibold text-[16px]">
-                    Login with goggle
-                  </Text>
                   <Image
                     source={icons.google}
                     className="w-8 h-10"
                     resizeMode="contain"
                   />
+                  <Text className="text-center font-semibold text-[16px]">
+                    Login with Google
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
