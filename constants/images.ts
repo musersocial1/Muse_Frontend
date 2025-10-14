@@ -84,7 +84,6 @@ import post4 from "@/assets/demoImages/post4.jpg";
 import playlis1 from "@/assets/images/playlist1.png";
 import playlis2 from "@/assets/images/playlist2.png";
 
-
 // categories boooooowwwwwwm😎🤪
 import cat1 from "@/assets/images/categories/ct1.webp";
 import cat10 from "@/assets/images/categories/ct10.webp";
@@ -107,7 +106,9 @@ import cat7 from "@/assets/images/categories/ct7.webp";
 import cat8 from "@/assets/images/categories/ct8.webp";
 import cat9 from "@/assets/images/categories/ct9.webp";
 import gold from "@/assets/images/gold.webp";
-
+import pan from "@/assets/images/pan.png";
+import retake from "@/assets/images/retake.png";
+import story from "@/assets/images/story.jpg";
 
 export const images = {
   splash,
@@ -212,6 +213,9 @@ export const images = {
   cat17,
   cat18,
   cat19,
-  cat20,  
-  gold
+  cat20,
+  gold,
+  retake,
+  story,
+  pan,
 };

@@ -1,10 +1,12 @@
 import AllFeeds from "@/components/feed/AllFeeds";
 import UploadToast from "@/components/feed/UploadToast";
 import CommunitySwitcher from "@/components/modals/CommunitySwitcher";
+import StoryCreator from "@/components/modals/StoryCreatorModal";
+import StoryModal from "@/components/modals/StoryModal";
 import PuffySmoke from "@/components/ui/PuffySmoke";
-import { dummyAllPosts } from "@/constants/data";
+import { DUMMY_STORIES, dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
-import { Feather } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -23,7 +25,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
-// Move static data outside component
 const STORIES = [
   images.img6,
   images.img7,
@@ -52,6 +53,8 @@ const Home: React.FC = () => {
   const [showDislikePuff, setShowDislikePuff] = useState(false);
   const [topBarHeight, setTopBarHeight] = useState(0);
   const [visibleIds, setVisibleIds] = useState<any[]>([]);
+  const [createStory, setCreateStory] = useState(false);
+  const [viewStory, setViewStory] = useState(false);
 
   const scrollY = useRef(new Animated.Value(0)).current;
   const prevScrollY = useRef(0);
@@ -62,8 +65,7 @@ const Home: React.FC = () => {
   const SCROLL_THRESHOLD = 5;
   StatusBar.setBarStyle("light-content");
 
-  // Optimized scroll listener with proper cleanup
-  const scrollDirection = useRef<"up" | "down" | null>(null); // Change to null initially
+  const scrollDirection = useRef<"up" | "down" | null>(null);
 
   useEffect(() => {
     const listenerId = scrollY.addListener(({ value }) => {
@@ -71,7 +73,6 @@ const Home: React.FC = () => {
 
       if (Math.abs(diff) > SCROLL_THRESHOLD) {
         if (diff > 0 && value > 50) {
-          // Scrolling down - hide header
           if (scrollDirection.current !== "down") {
             scrollDirection.current = "down";
             Animated.timing(headerTranslateYAnim, {
@@ -82,7 +83,6 @@ const Home: React.FC = () => {
             }).start();
           }
         } else if (diff < 0) {
-          // Scrolling up - show header
           if (scrollDirection.current !== "up") {
             scrollDirection.current = "up";
             Animated.timing(headerTranslateYAnim, {
@@ -103,7 +103,6 @@ const Home: React.FC = () => {
     };
   }, [scrollY, topBarHeight, insets.top, headerTranslateYAnim]);
 
-  // Create scroll event handler once
   const onFeedScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: scrollY } } }],
     { useNativeDriver: true }
@@ -136,7 +135,6 @@ const Home: React.FC = () => {
   //   }, 100);
   // };
 
-  // Cleanup upload interval on unmount
   useEffect(() => {
     return () => {
       if (uploadIntervalRef.current) {
@@ -149,7 +147,7 @@ const Home: React.FC = () => {
     return (
       <View style={{ paddingVertical: 8 }}>
         <FlatList
-          data={STORIES}
+          data={[{ id: "add" }, ...STORIES]}
           onViewableItemsChanged={({ viewableItems }) => {
             const visibleItems = viewableItems.map((vi) => vi.item).slice(0, 5);
             setVisibleIds(visibleItems);
@@ -165,17 +163,44 @@ const Home: React.FC = () => {
             paddingLeft: 10,
             paddingRight: 10,
           }}
-          renderItem={({ item }) => (
-            <View className="relative ">
-              <View className="w-16 h-16 justify-center items-center rounded-full overflow-hidden border-[1.5px] border-[#FFFFFF]/70">
-                <Image
-                  source={item}
-                  className="w-[85%] h-[85%] rounded-full"
-                  resizeMode="cover"
-                />
+          renderItem={({ item, index }) => {
+            if (item.id === "add") {
+              return (
+                <View className="relative">
+                  <TouchableOpacity
+                    className="w-16 h-16 justify-center items-center rounded-full overflow-hidden bg-[#F3F3F326]/[15%]"
+                    onPress={() => setCreateStory(true)}
+                  >
+                    <BlurView
+                      intensity={25}
+                      tint="dark"
+                      className="w-16 h-16 rounded-full items-center justify-center"
+                    >
+                      <Ionicons name="add" size={28} color="white" />
+                    </BlurView>
+                  </TouchableOpacity>
+                  <Text className="text-white/80 text-xs text-center mt-1">
+                    Add Story
+                  </Text>
+                </View>
+              );
+            }
+
+            return (
+              <View className="relative">
+                <TouchableOpacity
+                  className="w-16 h-16 justify-center items-center rounded-full overflow-hidden border-[1.5px] border-[#FFFFFF]/70"
+                  onPress={() => setViewStory(true)}
+                >
+                  <Image
+                    source={item}
+                    className="w-[85%] h-[85%] rounded-full"
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
               </View>
-            </View>
-          )}
+            );
+          }}
         />
       </View>
     );
@@ -321,7 +346,6 @@ const Home: React.FC = () => {
         onComplete={() => setShowDislikePuff(false)}
       />
 
-      {/* Community Switcher Modal */}
       {openSwitcher && (
         <>
           <TouchableOpacity
@@ -337,6 +361,21 @@ const Home: React.FC = () => {
             <CommunitySwitcher onClose={() => setOpenSwitcher(false)} />
           </View>
         </>
+      )}
+
+      {viewStory && (
+        <StoryModal
+          visible={viewStory}
+          onClose={() => setViewStory(false)}
+          stories={DUMMY_STORIES}
+          initialUserIndex={1}
+        />
+      )}
+      {createStory && (
+        <StoryCreator
+          visible={createStory}
+          onClose={() => setCreateStory(false)}
+        />
       )}
     </View>
   );

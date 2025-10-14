@@ -58,7 +58,7 @@ export const dummyAllPosts: Post[] = [
     likes: 1542,
     comments: 234,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -154,7 +154,7 @@ export const dummyAllPosts: Post[] = [
     likes: 4567,
     comments: 1023,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -193,7 +193,7 @@ export const dummyAllPosts: Post[] = [
     likes: 2156,
     comments: 445,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -233,7 +233,7 @@ export const dummyAllPosts: Post[] = [
     likes: 1789,
     comments: 334,
     type: "image",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -273,7 +273,7 @@ export const dummyAllPosts: Post[] = [
     likes: 5234,
     comments: 876,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -313,7 +313,7 @@ export const dummyAllPosts: Post[] = [
     likes: 3456,
     comments: 567,
     type: "video",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -389,7 +389,7 @@ export const dummyAllPosts: Post[] = [
     likes: 2890,
     comments: 678,
     type: "text",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -465,7 +465,7 @@ export const dummyAllPosts: Post[] = [
     likes: 3245,
     comments: 567,
     type: "text",
-        vComments: [
+    vComments: [
       {
         type: "video",
         url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
@@ -992,62 +992,254 @@ export const MOCK_REPLY_TO = {
 export const MOCK_POSTER =
   "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=687&q=80";
 
+export const categories: Category[] = [
+  {
+    id: 1,
+    name: "Food",
+    img: images.cat1,
+  },
+  {
+    id: 2,
+    name: "Entertainment",
+    img: images.cat2,
+  },
+  {
+    id: 3,
+    name: "Comedy",
+    img: images.cat3,
+  },
+  {
+    id: 4,
+    name: "Food",
+    img: images.cat4,
+  },
+  {
+    id: 5,
+    name: "Entertainment",
+    img: images.cat5,
+  },
+  {
+    id: 6,
+    name: "Comedy",
+    img: images.cat6,
+  },
+  {
+    id: 7,
+    name: "Food",
+    img: images.cat7,
+  },
+  {
+    id: 8,
+    name: "Entertainment",
+    img: images.cat8,
+  },
+  {
+    id: 9,
+    name: "Comedy",
+    img: images.cat9,
+  },
+  { id: 10, name: "Food", img: images.cat10 },
+  { id: 11, name: "Entertainment", img: images.cat11 },
+  { id: 12, name: "Comedy", img: images.cat12 },
+  { id: 13, name: "Food", img: images.cat13 },
+  { id: 14, name: "Entertainment", img: images.cat14 },
+  { id: 15, name: "Comedy", img: images.cat15 },
+  { id: 16, name: "Food", img: images.cat16 },
+  { id: 17, name: "Entertainment", img: images.cat17 },
+  { id: 18, name: "Comedy", img: images.cat18 },
+  { id: 19, name: "Food", img: images.cat19 },
+  { id: 20, name: "Entertainment", img: images.cat20 },
+];
 
-  export const categories: Category[] = [
-    {
-      id: 1,
-      name: "Food",
-      img: images.cat1,
-    },
-    {
-      id: 2,
-      name: "Entertainment",
-      img: images.cat2,
-    },
-    {
-      id: 3,
-      name: "Comedy",
-      img: images.cat3,
-    },
-    {
-      id: 4,
-      name: "Food",
-      img: images.cat4,
-    },
-    {
-      id: 5,
-      name: "Entertainment",
-      img: images.cat5,
-    },
-    {
-      id: 6,
-      name: "Comedy",
-      img: images.cat6,
-    },
-    {
-      id: 7,
-      name: "Food",
-      img: images.cat7,
-    },
-    {
-      id: 8,
-      name: "Entertainment",
-      img: images.cat8,
-    },
-    {
-      id: 9,
-      name: "Comedy",
-      img: images.cat9,
-    },
-    { id: 10, name: "Food", img: images.cat10 },
-    { id: 11, name: "Entertainment", img: images.cat11 },
-    { id: 12, name: "Comedy", img: images.cat12 },
-    { id: 13, name: "Food", img: images.cat13 },
-    { id: 14, name: "Entertainment", img: images.cat14 },
-    { id: 15, name: "Comedy", img: images.cat15 },
-    { id: 16, name: "Food", img: images.cat16 },
-    { id: 17, name: "Entertainment", img: images.cat17 },
-    { id: 18, name: "Comedy", img: images.cat18 },
-    { id: 19, name: "Food", img: images.cat19 },
-    { id: 20, name: "Entertainment", img: images.cat20 },
-  ];
+// Example data you can use in your screen/component
+export const DUMMY_STORIES = [
+  {
+    id: 1,
+    name: "Richard",
+    avatar: "https://i.pravatar.cc/150?u=richard",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "Morning Hike Views 🏔️",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/11/1080/1920",
+        caption: "Coffee Time",
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Beyonce",
+    avatar: "https://i.pravatar.cc/150?u=beyonce",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "Todays outfit check",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/21/1080/1920",
+        caption: "Studio Vibes ✨",
+      },
+      { id: 3, uri: "https://picsum.photos/id/22/1080/1920" },
+    ],
+  },
+  {
+    id: 3,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 11,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 12,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 13,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 14,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+];
