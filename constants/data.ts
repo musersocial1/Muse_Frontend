@@ -1050,3 +1050,196 @@ export const categories: Category[] = [
   { id: 19, name: "Food", img: images.cat19 },
   { id: 20, name: "Entertainment", img: images.cat20 },
 ];
+
+// Example data you can use in your screen/component
+export const DUMMY_STORIES = [
+  {
+    id: 1,
+    name: "Richard",
+    avatar: "https://i.pravatar.cc/150?u=richard",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "Morning Hike Views 🏔️",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/11/1080/1920",
+        caption: "Coffee Time",
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Beyonce",
+    avatar: "https://i.pravatar.cc/150?u=beyonce",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "Todays outfit check",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/21/1080/1920",
+        caption: "Studio Vibes ✨",
+      },
+      { id: 3, uri: "https://picsum.photos/id/22/1080/1920" },
+    ],
+  },
+  {
+    id: 3,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://res.cloudinary.com/dddc4rjme/image/upload/v1760441046/story_vz9kep.jpg",
+        caption: "City Lights",
+      },
+      {
+        id: 2,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 9,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 10,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 11,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 12,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 13,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+  {
+    id: 14,
+    name: "Storm",
+    avatar: "https://i.pravatar.cc/150?u=storm",
+    items: [
+      {
+        id: 1,
+        uri: "https://picsum.photos/id/30/1080/1920",
+        caption: "City Lights",
+      },
+    ],
+  },
+];
