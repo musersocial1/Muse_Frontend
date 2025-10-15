@@ -99,7 +99,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <View>
             <View className="flex-col">
               <View className="flex-row  items-center pt-1">
-                <Text className="text-white capitalize font-sfpro-bold text-[12px]  mr-1">
+                <Text className="text-white capitalize font-sfpro-bold text-[13px]  mr-1">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
@@ -109,7 +109,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
                 )}
               </View>
 
-              <Text className="text-white font-sfpro-bold text-[10px] pt-[5px]">
+              <Text className="text-white font-sfpro-bold text-[11px] pt-[4px]">
                 TBD Podcast
               </Text>
             </View>
