@@ -328,7 +328,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   );
 
   const renderContent = () => (
-    <View className="relative overflow-hidden rounded-[30px] bg-black w-full max-w-[90%] aspect-[1/0.6] mx-auto">
+    <View className="relative overflow-hidden rounded-[13px] bg-black w-full max-w-[95%] aspect-[1/0.6] mx-auto">
       {activeTab === "Video" ? (
         <View className="w-full h-full bg-black items-center justify-center">
           {currentTrack ? (
@@ -385,7 +385,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
         if (g.dy > 0) slideAnim.setValue(g.dy);
       },
       onPanResponderRelease: (_, g) => {
-        if (g.dy > height / 2) {
+        if (g.dy > height / 4) {
           Animated.timing(slideAnim, {
             toValue: height,
             duration: 220,
@@ -462,7 +462,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
           {renderHeader()}
           {renderContent()}
 
-          <View className="mt-5 flex-1 justify-between w-full mx-auto">
+          <View className="mt-5   flex-1 justify-between w-full mx-auto">
             <View className="gap-3">
               <View className="overflow-hidden w-full px-[5%]  max-w-[95%] mx-auto">
                 <Animated.Text
@@ -484,7 +484,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
               </View>
             </View>
 
-            <View className="max-w-[90%] mx-auto w-full px-4 mb-5">
+            <View className="max-w-[90%]  mx-auto w-full px-4 mb-5">
               <PanGestureHandler
                 onGestureEvent={({ nativeEvent: { x } }) => {
                   if (
@@ -652,7 +652,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
               <View className="bg-[#FFFFFF12]/[7%] rounded-full p-2">
                 <Image source={icons.downlaod} className="h-9 w-9" />
               </View>
-              <View className="flex-row items-center bg-[white]/[20%] py-3 px-6 rounded-full">
+              <View className="flex-row items-center  py-3 px-6 rounded-full">
                 <Text className="text-white font-sfpro-medium text-[14px]">
                   Time remaining {getRemainingTime()}
                 </Text>
@@ -724,7 +724,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                     <View className="w-full aspect-square rounded-full bg-[#F94141]" />
                   </View>
                   <Text className="text-white font-sfpro-medium text-base">
-                    Record a comment
+                    Record a post
                   </Text>
                 </TouchableOpacity>
               </View>
