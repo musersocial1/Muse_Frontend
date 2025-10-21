@@ -26,7 +26,7 @@
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
     "emoji-mart-native": "^0.6.5-beta",
-    "expo": "~53.0.17",
+    "expo": "~54.0.0",
     "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-camera": "~16.1.11",

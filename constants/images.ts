@@ -110,6 +110,26 @@ import pan from "@/assets/images/pan.png";
 import retake from "@/assets/images/retake.png";
 import story from "@/assets/images/story.jpg";
 
+// Folder 1_1
+import five_1_1 from "@/assets/demoImages2/1_1/five_1_1.webp";
+import four_1_1 from "@/assets/demoImages2/1_1/four_1_1.webp";
+import one_1_1 from "@/assets/demoImages2/1_1/one_1_1.webp";
+import three_1_1 from "@/assets/demoImages2/1_1/three_1_1.webp";
+import two_1_1 from "@/assets/demoImages2/1_1/two_1_1.webp";
+
+// Folder 4_5
+import five_4_5 from "@/assets/demoImages2/4_5/five_4_5.webp";
+import four_4_5 from "@/assets/demoImages2/4_5/four_4_5.webp";
+import one_4_5 from "@/assets/demoImages2/4_5/one_4_5.webp";
+import three_4_5 from "@/assets/demoImages2/4_5/three_4_5.webp";
+import two_4_5 from "@/assets/demoImages2/4_5/two_4_5.webp";
+
+// Folder 16_9
+import four_16_9 from "@/assets/demoImages2/16_9/four_16_9.webp";
+import one_16_9 from "@/assets/demoImages2/16_9/one_16_9.webp";
+import three_16_9 from "@/assets/demoImages2/16_9/three_16_9.webp";
+import two_16_9 from "@/assets/demoImages2/16_9/two_16_9.webp";
+
 export const images = {
   splash,
   logo,
@@ -218,4 +238,24 @@ export const images = {
   retake,
   story,
   pan,
+
+  // 1:1 aspect ratio images
+  one_1_1,
+  two_1_1,
+  three_1_1,
+  four_1_1,
+  five_1_1,
+
+  // 4:5 aspect ratio images
+  one_4_5,
+  two_4_5,
+  three_4_5,
+  four_4_5,
+  five_4_5,
+
+  // 16:9 aspect ratio images
+  one_16_9,
+  two_16_9,
+  three_16_9,
+  four_16_9,
 };
