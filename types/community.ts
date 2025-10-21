@@ -24,6 +24,7 @@ export interface Post {
   content: string;
   thumbnail?: number;
   images?: (string | number)[];
+  aspectRatio?: "1:1" | "4:5" | "16:9"; // Optional aspect ratio for image posts
   vComments?: Array<{
     type: "image" | "video";
     url: string;

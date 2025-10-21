@@ -248,7 +248,19 @@ export const PostCard: React.FC<PostCardProps> = ({
 
         {post.type === "image" && post.images && post.images.length > 0 && (
           <View className="px-2  mt-2">
-            <View className="relative mb-3 w-full aspect-[2/1.7] rounded-[25px] overflow-hidden ">
+            <View
+              style={{
+                aspectRatio:
+                  post.aspectRatio === "1:1"
+                    ? 1 / 1
+                    : post.aspectRatio === "4:5"
+                    ? 4 / 5
+                    : post.aspectRatio === "16:9"
+                    ? 16 / 9
+                    : 2 / 1.7, // default fallback
+              }}
+              className="relative mb-3 w-full   rounded-[25px] overflow-hidden "
+            >
               <PostHeader
                 post={post}
                 onAuthorPress={() => setIsOpen(true)}

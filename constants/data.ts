@@ -12,7 +12,8 @@ export const dummyAllPosts: Post[] = [
       avatar: "https://randomuser.me/api/portraits/women/44.jpg",
       verified: true,
     },
-    images: [images.mainpost1],
+    images: [images.one_1_1], // 1:1 aspect ratio
+    aspectRatio: "1:1",
     content:
       "Friedberg should have his own podcast, along with Chamath ... and Sacks. hm.. What am I trying to say here?",
     vComments: [
@@ -51,7 +52,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
       verified: false,
     },
-    images: [images.mainpost2],
+    images: [images.one_4_5], // 4:5 aspect ratio (portrait)
+    aspectRatio: "4:5",
     content:
       "Jason's arguments on the Kimmel situation no different from his apology to Palmer Luckey for getting him fired…not the truth but just a token gesture which has clearly been rejected by him…",
     timestamp: "45m",
@@ -90,7 +92,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
-    images: [images.mainpost3],
+    images: [images.one_16_9], // 16:9 aspect ratio (landscape)
+    aspectRatio: "16:9",
     content:
       "Would Elon Musk have been able to do his first start up if there was a $100k fee for H1-B? Elon promised to go to war over H1-B but I don't think he has said anything about the new rules.",
     timestamp: "1h",
@@ -135,7 +138,7 @@ export const dummyAllPosts: Post[] = [
     timestamp: "6h",
     likes: 892,
     comments: 156,
-    type: "text",
+    type: "text", // TEXT ONLY POST (no image)
   },
   {
     id: "5",
@@ -148,7 +151,7 @@ export const dummyAllPosts: Post[] = [
     },
     content:
       'Jason needs to watch the Kimmel clip again, this time very carefully. Kimmel DID say the kid was MAGA, perhaps not directly, but it was heavily implied. Seriously, why does Jason think the FCC was so annoyed at Kimmel"s comments?',
-    videos: [images.mainpost5],
+    videos: [images.mainpost5], // VIDEO POST - UNCHANGED
     thumbnail: images.mainpost5,
     timestamp: "12m",
     likes: 4567,
@@ -188,7 +191,8 @@ export const dummyAllPosts: Post[] = [
       verified: true,
     },
     content: "Be honest, what's the best drink for this meal ?",
-    images: [images.mainpost6],
+    images: [images.two_1_1], // 1:1 aspect ratio
+    aspectRatio: "1:1",
     timestamp: "2h",
     likes: 2156,
     comments: 445,
@@ -226,7 +230,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100&h=100&fit=crop&crop=face",
       verified: false,
     },
-    images: [images.mainpost7],
+    images: [images.two_4_5], // 4:5 aspect ratio (portrait)
+    aspectRatio: "4:5",
     content:
       "Bro to bro: If you can grind 18 hours a day, 7 days a week. No days off. Just God, hustle, eat, sleep. You will find a way out from your messed up life",
     timestamp: "4h",
@@ -267,7 +272,7 @@ export const dummyAllPosts: Post[] = [
       verified: true,
     },
     content: "Elon with optimus Caption this",
-    videos: [images.mainpost5],
+    videos: [images.mainpost5], // VIDEO POST - UNCHANGED
     thumbnail: images.mainpost8,
     timestamp: "30m",
     likes: 5234,
@@ -307,7 +312,7 @@ export const dummyAllPosts: Post[] = [
       verified: false,
     },
     content: "LiDAR is absolutely game-changing technology",
-    videos: [images.mainpost9],
+    videos: [images.mainpost9], // VIDEO POST - UNCHANGED
     thumbnail: images.mainpost9,
     timestamp: "1h",
     likes: 3456,
@@ -345,6 +350,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop&crop=face",
       verified: false,
     },
+    images: [images.three_1_1], // 1:1 aspect ratio
+    aspectRatio: "1:1",
     content:
       "This is heartbreaking. Many folks are waiting for green cards for decades but unfortunately they have to be on non immigrant visa because USA doesn't have an intermediary status. There hasn't been discussion on this in the podcast, very disappointing...",
     timestamp: "8h",
@@ -372,7 +379,7 @@ export const dummyAllPosts: Post[] = [
     ],
     likes: 1234,
     comments: 445,
-    type: "text",
+    type: "image",
   },
   {
     id: "11",
@@ -383,12 +390,14 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
+    images: [images.two_16_9], // 16:9 aspect ratio (landscape)
+    aspectRatio: "16:9",
     content:
       "Last week Chamath and Sacks say no one watches Kimmel and cited his poor ratings but this week say Kimmel was the leading voice? How does that math make sense if no one watches him? Let's try to stay consistent here.",
     timestamp: "5h",
     likes: 2890,
     comments: 678,
-    type: "text",
+    type: "image",
     vComments: [
       {
         type: "video",
@@ -421,6 +430,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face",
       verified: false,
     },
+    images: [images.three_4_5], // 4:5 aspect ratio (portrait)
+    aspectRatio: "4:5",
     content:
       "While your analysis of H1B problems was good, it completely ignores the rampant corruption by those processing applicants. The average applicant nets only about half the salary after kickbacks and fraud. Indenture servitude is a very real issue.",
     timestamp: "3h",
@@ -448,7 +459,7 @@ export const dummyAllPosts: Post[] = [
     ],
     likes: 1567,
     comments: 289,
-    type: "text",
+    type: "image",
   },
   {
     id: "13",
@@ -459,12 +470,14 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
+    images: [images.four_1_1], // 1:1 aspect ratio
+    aspectRatio: "1:1",
     content:
       "Thank you for exposing the abusive practices by Wipro, Infosys, HCLTech and Cognizant. Don't forget how big US companies leverage them with a two-tiered contractor system allowing zero notice terminations.",
     timestamp: "7h",
     likes: 3245,
     comments: 567,
-    type: "text",
+    type: "image",
     vComments: [
       {
         type: "video",
@@ -497,6 +510,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1464863979621-258859e62245?w=100&h=100&fit=crop&crop=face",
       verified: false,
     },
+    images: [images.three_16_9], // 16:9 aspect ratio (landscape)
+    aspectRatio: "16:9",
     content:
       'I like how these guys said they dont do ads on the pod, but every episode starts with a subtle "commentary ad" about a brand or product. Today was Emirates Airlines. You can fool everyone, but not me! Still a smart move though!',
     vComments: [
@@ -524,7 +539,7 @@ export const dummyAllPosts: Post[] = [
     timestamp: "2h",
     likes: 1456,
     comments: 234,
-    type: "text",
+    type: "image",
   },
   {
     id: "15",
@@ -540,7 +555,7 @@ export const dummyAllPosts: Post[] = [
     timestamp: "15m",
     likes: 45678,
     comments: 8923,
-    type: "text",
+    type: "text", // TEXT ONLY POST (no image)
   },
   {
     id: "16",
@@ -551,6 +566,8 @@ export const dummyAllPosts: Post[] = [
         "https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face",
       verified: true,
     },
+    images: [images.five_1_1], // 1:1 aspect ratio
+    aspectRatio: "1:1",
     vComments: [
       {
         type: "video",
@@ -579,9 +596,78 @@ export const dummyAllPosts: Post[] = [
     likes: 2789,
     thumbnail: images.latest2,
     comments: 445,
-    type: "text",
+    type: "image",
+  },
+  {
+    id: "17",
+    author: {
+      name: "Emily Watson",
+      username: "emilyw_tech",
+      avatar: "https://randomuser.me/api/portraits/women/50.jpg",
+      verified: false,
+    },
+    images: [images.four_4_5], // 4:5 aspect ratio (portrait)
+    aspectRatio: "4:5",
+    content:
+      "The future of AI is not just about building smarter machines, it's about creating systems that understand human context and emotion. We're at an inflection point.",
+    timestamp: "6h",
+    likes: 3892,
+    comments: 542,
+    type: "image",
+  },
+  {
+    id: "18",
+    author: {
+      name: "Nathan Brooks",
+      username: "nathan_entrepreneur",
+      avatar: "https://randomuser.me/api/portraits/men/51.jpg",
+      verified: true,
+    },
+    images: [images.five_4_5], // 4:5 aspect ratio (portrait)
+    aspectRatio: "4:5",
+    content:
+      "After 10 years in Silicon Valley, I've learned that the best founders aren't the ones with the best ideas - they're the ones who execute relentlessly and adapt quickly.",
+    timestamp: "9h",
+    likes: 5234,
+    comments: 789,
+    type: "image",
+  },
+  {
+    id: "19",
+    author: {
+      name: "Lisa Chen",
+      username: "lisachen_finance",
+      avatar: "https://randomuser.me/api/portraits/women/52.jpg",
+      verified: false,
+    },
+    images: [images.four_16_9], // 16:9 aspect ratio (landscape)
+    aspectRatio: "16:9",
+    content:
+      "Markets are showing interesting patterns this quarter. The divergence between tech and traditional sectors has never been more pronounced. Time to reassess portfolios?",
+    timestamp: "11h",
+    likes: 2345,
+    comments: 398,
+    type: "image",
+  },
+  {
+    id: "20",
+    author: {
+      name: "Robert Martinez",
+      username: "robert_startup",
+      avatar: "https://randomuser.me/api/portraits/men/53.jpg",
+      verified: true,
+    },
+    content:
+      "Hot take: The obsession with 'work-life balance' is overrated when you're building something from scratch. There's a season for everything, and the early days require sacrifice.",
+    timestamp: "14h",
+    likes: 1876,
+    comments: 623,
+    type: "text", // TEXT ONLY POST (no image)
   },
 ];
+
+// ADDITIONAL POSTS WITH REMAINING IMAGES
+// Add these to your feed to use all 14 demo images:
 
 export const dummyLongFormContent: LongFormContent[] = [
   {
