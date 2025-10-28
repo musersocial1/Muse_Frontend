@@ -12,8 +12,8 @@ import { View } from "react-native-animatable";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = width - 15;
-const GAP_SIZE = 20;
+const ITEM_WIDTH = width - 7;
+const GAP_SIZE = 0;
 
 interface SwipeableCardProps {
   children: React.ReactNode;
@@ -51,9 +51,11 @@ export default function SwipeableCard({
   // Convert children to array for FlatList and create 3-item array
   const childrenArray = React.Children.toArray(children);
   const threeItemArray = [
-    <View style={{ width: ITEM_WIDTH }} />, // 1st item: empty space
-    <View style={{ width: ITEM_WIDTH }}>{childrenArray}</View>, // 2nd item: main children
-    <View style={{ width: ITEM_WIDTH }} />, // 3rd item: empty space
+    <View className=" " style={{ width: ITEM_WIDTH }} />, // 1st item: empty space
+    <View className="" style={{ width: ITEM_WIDTH }}>
+      {childrenArray}
+    </View>, // 2nd item: main children
+    <View className=" " style={{ width: ITEM_WIDTH }} />, // 3rd item: empty space
   ];
 
   const insets = useSafeAreaInsets();
@@ -230,11 +232,11 @@ export default function SwipeableCard({
         contentContainerStyle={{
           flexDirection: "row",
           gap: GAP_SIZE,
-          paddingLeft: 7,
+          paddingLeft: 3.2,
         }}
       >
         {threeItemArray.map((item, index) => (
-          <View key={index} style={{ width: ITEM_WIDTH }}>
+          <View className="" key={index} style={{ width: ITEM_WIDTH }}>
             {item}
           </View>
         ))}

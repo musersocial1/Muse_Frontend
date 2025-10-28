@@ -52,7 +52,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   variant = "default",
   containerClassName = "",
 }) => {
-  const baseRow = "flex-row  justify-between items-center  pt-2 pb-3  ";
+  const baseRow = "flex-row   justify-between items-center  pt-2 pb-3  ";
   const overlayWrap =
     variant === "overlay" ? "absolute top-0 left-0 right-0 z-10 px-2" : "px-4";
 
@@ -68,7 +68,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           onPress={onAuthorPress}
           className={`flex-row shrink ${
             overlayWrap ? "bg-[#36363666]/[0%]" : ""
-          }  rounded-full pl-1  pr-2 py-1  `}
+          }  rounded-full    pr-2   `}
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -99,7 +99,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           <View>
             <View className="flex-col">
               <View className="flex-row  items-center pt-1">
-                <Text className="text-white capitalize font-sfpro-bold text-[13px]  mr-1">
+                <Text className="text-white capitalize font-sfpro-bold text-[15px]  mr-1">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
@@ -121,7 +121,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           // tint="dark"
           className="flex-row gap-1  items-center p-2 rounded-full overflow-hidden"
         >
-          <Text className="text-white ml-1 font-sfpro-medium text-[15px]">
+          <Text className="text-white ml-1 font-sfpro-medium text-[17px]">
             {post.timestamp}
           </Text>
 
@@ -172,17 +172,17 @@ export function CollapsibleText({
       activeOpacity={0.9}
     >
       <Text
-        className="font-sfpro-medium text-white text-[14.5px]"
+        className="font-sfpro-medium text-white text-[16.2px]"
         // style={{ flexShrink: 1 }}
       >
         {hasMedia && (
           <>
-            <Text className="  text-white text-[16px] font-sfpro-bold ">
+            <Text className="  text-white text-[14.5px] font-sfpro-bold ">
               {post.author.username}{" "}
             </Text>{" "}
           </>
         )}
-        {displayText}
+        {displayText}{" "}
         {shouldTruncate && (
           <Text className="text-[white]/70 text-[15px] font-sfpro-bold">
             {expanded ? " Read less" : " Read more"}
@@ -235,8 +235,8 @@ export const PostCard: React.FC<PostCardProps> = ({
   );
 
   return (
-    <View className="my-[4px]  ">
-      <Animated.View className="bg-[#1C1C1C] border border-white/10 rounded-[30px]  overflow-hidden relative">
+    <View className="my-[1.5px]   ">
+      <Animated.View className="bg-[#2A2A2A] border border-black rounded-[30px]  overflow-hidden relative">
         {!hasMedia && (
           <PostHeader
             post={post}
@@ -247,7 +247,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "image" && post.images && post.images.length > 0 && (
-          <View className="px-2  mt-2">
+          <View className="px-1   mt-1">
             <View
               style={{
                 aspectRatio:
@@ -259,7 +259,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                     ? 16 / 9
                     : 2 / 1.7, // default fallback
               }}
-              className="relative mb-3 w-full   rounded-[25px] overflow-hidden "
+              className="relative  w-full   rounded-[25px] overflow-hidden "
             >
               <PostHeader
                 post={post}
@@ -273,7 +273,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 style={StyleSheet.absoluteFill}
               >
                 <LinearGradient
-                  colors={["rgba(28, 28, 28, 1)", "rgba(0, 0, 0, 0)"]}
+                  colors={["rgba(28, 28, 28, 0.7)", "rgba(0, 0, 0, 0)"]}
                   start={{ x: 0.5, y: 0 }}
                   end={{ x: 0.5, y: 1 }}
                   style={StyleSheet.absoluteFill}
@@ -291,7 +291,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                   <View
                     key={index}
                     style={{
-                      width: width - 30,
+                      width: width - 16,
                       height: "100%",
                       justifyContent: "center",
                       alignItems: "center",
@@ -324,7 +324,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {post.type === "video" && post.videos && post.videos.length > 0 && (
-          <View className="px-1 mt-2 ">
+          <View className="px-0.5 mt-1 ">
             <View className=" px-1  overflow-hidden  rounded-[20px]">
               <LinearGradient
                 colors={["rgba(0, 0, 0, 0)", "rgba(18, 18, 18, 1)"]}
@@ -376,16 +376,16 @@ export const PostCard: React.FC<PostCardProps> = ({
                 </View>
 
                 <View className="flex-row  pb-4 px-3 justify-between items-start">
-                  <View className="w-[80%]">
-                    <Text className="text-white text-[16px] font-sfpro-bold">
+                  <View className="max-w-[70%]">
+                    <Text
+                      numberOfLines={2}
+                      className="text-white  text-[17px] font-sfpro-bold"
+                    >
                       The travails of being a dancer in the modern age
-                    </Text>
-                    <Text className="text-white/50 text-[13px] font-sfpro-medium mt-2">
-                      Content from TBD Podcast
                     </Text>
                   </View>
                   <View className="bg-[black]/[70%] rounded-full px-3 py-3 self-start">
-                    <Text className="text-white font-medium text-[12px]">
+                    <Text className="text-white font-medium text-[14px]">
                       45:54
                     </Text>
                   </View>
@@ -396,7 +396,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {hasMedia && (
-          <View className="flex-row px-6 items-center pb-4 justify-between pt-3">
+          <View className="flex-row px-4 items-center pb-4 justify-between pt-3">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setOpenComments(true)}
@@ -405,7 +405,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 <View className="w-8 h-8 rounded-full items-center justify-center mr-1">
                   <Image source={icons.likes} className="w-7 h-7" />
                 </View>
-                <Text className="text-white font-sfpro-bold text-[14px]">
+                <Text className="text-white font-sfpro-bold text-[15px]">
                   {post.likes}
                 </Text>
               </TouchableOpacity>
@@ -413,7 +413,7 @@ export const PostCard: React.FC<PostCardProps> = ({
                 <View className="w-8 h-8 rounded-full items-center justify-center">
                   <Image source={icons.share} className="w-[23px] h-[23px]" />
                 </View>
-                <Text className="text-white font-sfpro-bold text-[14px]">
+                <Text className="text-white font-sfpro-bold text-[15px]">
                   Share
                 </Text>
               </TouchableOpacity>
@@ -427,7 +427,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           </View>
         )}
 
-        <View className="pb-3 px-6">
+        <View className="pb-3 px-4">
           <View className="flex-row flex-wrap items-baseline">
             <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
               <CollapsibleText
@@ -441,7 +441,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         </View>
 
         {!hasMedia && (
-          <View className="flex-row px-6 items-center pb-4 justify-between pt-1">
+          <View className="flex-row px-4 items-center pb-4 justify-between pt-1">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setOpenComments(true)}
@@ -472,7 +472,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           </View>
         )}
 
-        <View className="flex-row px-6 items-center pb-4 justify-between pt-2">
+        <View className="flex-row px-4 items-center pb-4 justify-between pt-2">
           <TouchableOpacity
             onPress={() => setShowVideoReply(true)}
             className="flex-row items-center"
@@ -481,7 +481,7 @@ export const PostCard: React.FC<PostCardProps> = ({
               {post.vComments?.slice(0, 4).map((commentItem, index) => (
                 <View
                   key={index}
-                  className="w-8 h-8 rounded-full overflow-hidden   bg-black"
+                  className="w-7 h-7 rounded-full overflow-hidden   bg-black"
                   style={{ marginLeft: index === 0 ? 0 : -16 }}
                 >
                   {commentItem.type === "video" ? (
@@ -509,8 +509,8 @@ export const PostCard: React.FC<PostCardProps> = ({
             </View>
 
             <View className="flex-row items-center ml-1">
-              <Ionicons name="play" size={16} color="white" />
-              <Text className="text-white ml-1 text-[15px] font-sfpro-medium">
+              <Ionicons name="play" size={16} color="#ffffff" />
+              <Text className="text-white ml-0.5  text-[14px] font-sfpro-medium">
                 Watch comments
               </Text>
             </View>
@@ -518,9 +518,9 @@ export const PostCard: React.FC<PostCardProps> = ({
 
           <TouchableOpacity
             onPress={() => setShowRecordModal(true)}
-            className="flex-row items-center bg-[#363636]/[40%] rounded-full p-4"
+            className="flex-row items-center bg-[#36363666]/[70%] rounded-full p-3.5"
           >
-            <View className="w-5 h-5 rounded-full items-center justify-center mr-2">
+            <View className="w-4 h-4 rounded-full items-center justify-center mr-1.5">
               <Image source={icons.record} className="h-full w-full" />
             </View>
             <Text className="text-white font-sfpro-regular text-sm">
@@ -723,7 +723,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         stickyHeaderIndices={stickyHeaderIndices}
         ListHeaderComponentStyle={ListHeaderComponentStyle}
         ListEmptyComponent={
-          <View className="h-[300px] w-full items-center justify-center">
+          <View className="h-[300px]  w-full items-center justify-center">
             <Text className="text-white/50 text-[16px]">
               No more posts to show
             </Text>
@@ -736,7 +736,7 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
               cardRefs.current[item.id] = ref;
             }}
             collapsable={false}
-            className="w-full"
+            className="w-full "
           >
             <SwipeableCard
               onSwipeRight={() => removePostWithDislike(item.id)}
