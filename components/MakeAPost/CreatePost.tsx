@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  ImageSourcePropType,
   StyleSheet,
   Text,
   TextInput,
@@ -20,6 +21,7 @@ interface CreatePostProps {
   media: MediaItem[];
   removeItem: (id: string) => void;
   processing: boolean;
+  preMedia: any;
   inputRef: React.RefObject<TextInput | null>; // ✅ allow null
 }
 
@@ -30,9 +32,15 @@ export default function CreatePost({
   removeItem,
   processing,
   inputRef,
+  preMedia,
 }: CreatePostProps) {
   const [playingId, setPlayingId] = useState<string | null>(null);
-
+  const resolveImageSource = (uri: string | ImageSourcePropType) => {
+    if (typeof uri === "string") {
+      return { uri }; // remote URL
+    }
+    return uri; // already an ImageSourcePropType (require()/images.x)
+  };
   return (
     <View className=" flex-1 gap-5  justify-between ">
       {/* Input box */}
@@ -78,7 +86,7 @@ export default function CreatePost({
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 12 }}
             renderItem={({ item }) => (
-              <View className="relative border-white/20 border rounded-[28px] ml-5 w-[315px] aspect-[1/0.7] overflow-hidden  mb-2">
+              <View className="relative  border-white/20 border rounded-[28px] ml-5 w-[315px] flex justify-center items-center aspect-[1/0.7] overflow-hidden  mb-2">
                 {item.type === "video" ? (
                   <Video
                     source={{ uri: item.uri }}
@@ -87,6 +95,7 @@ export default function CreatePost({
                       aspectRatio: 1 / 0.7,
                       borderRadius: 28,
                     }}
+                    className=""
                     useNativeControls
                     resizeMode={ResizeMode.COVER}
                     shouldPlay={playingId === item.id}
@@ -100,10 +109,25 @@ export default function CreatePost({
                   />
                 ) : (
                   <Image
-                    source={{ uri: item.uri }}
-                    className=" w-full h-full "
+                    source={resolveImageSource(item.uri)} // 👈 handles both string + static
+                    className=" w-full   h-full "
                     resizeMode="cover"
                   />
+                )}
+
+                {preMedia && (
+                  <View
+                    style={StyleSheet.absoluteFill}
+                    className=" flex justify-center items-center"
+                  >
+                    <View className=" border-white/60 overflow-hidden bg-white/20 flex justify-center items-center w-14 h-14 border rounded-full">
+                      <BlurView
+                        style={StyleSheet.absoluteFill}
+                        intensity={40}
+                      />
+                      <Ionicons name="play" size={28} color="white" />
+                    </View>
+                  </View>
                 )}
 
                 {/* X button */}

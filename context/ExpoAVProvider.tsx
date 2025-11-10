@@ -44,79 +44,108 @@ export const ExpoAVProvider: React.FC<{
 
   const playTrack = async (track: Track) => {
     console.log("🎬 playTrack called with:", track.url);
-
-    if (!videoRef.current) {
-      setCurrentTrack(track);
-      return;
-    }
-
-    try {
-      await videoRef.current.unloadAsync();
-      console.log("✅ Previous video unloaded");
-
-      await videoRef.current.loadAsync(
-        { uri: track.url },
-        { shouldPlay: true, rate: playbackRate }
-      );
-
-      console.log("▶️ New video loaded and playing");
-      setCurrentTrack(track);
-      setIsPlaying(true);
-    } catch (e) {
-      console.log("⚠️ Error loading track:", e);
-    }
+    setCurrentTrack(track);
+    setIsPlaying(false);
+    console.log("✅ Track set, Video component will load it");
   };
 
   const onVideoLoad = async () => {
-    console.log(
-      "🎥 Video loaded, playbackRate:",
-      playbackRate,
-      "isPlaying:",
-      isPlaying
-    );
-    try {
-      await videoRef.current?.setRateAsync(playbackRate, true);
-      if (isPlaying) {
-        console.log("▶️ Auto-playing video");
-        await videoRef.current?.playAsync();
+    console.log("🎥 Video loaded, playbackRate:", playbackRate);
+
+    if (videoRef.current) {
+      try {
+        const status = await videoRef.current.getStatusAsync();
+        if (status.isLoaded) {
+          setDuration((status.durationMillis ?? 0) / MS);
+        }
+      } catch (e) {
+        console.log("Status check error:", e);
       }
-    } catch (e) {
-      console.log("❌ Error in onVideoLoad:", e);
     }
   };
 
   const togglePlayPause = async () => {
-    if (isPlaying) {
-      await videoRef.current?.pauseAsync();
-      setIsPlaying(false);
-    } else {
-      await videoRef.current?.playAsync();
-      setIsPlaying(true);
+    if (!videoRef.current) return;
+
+    try {
+      if (isPlaying) {
+        await videoRef.current.pauseAsync();
+        setIsPlaying(false);
+      } else {
+        await videoRef.current.playAsync();
+        setIsPlaying(true);
+      }
+    } catch (e) {
+      console.log("Toggle error:", e);
     }
   };
 
   const play = async () => {
-    await videoRef.current?.playAsync();
-    setIsPlaying(true);
+    if (!videoRef.current) return;
+
+    try {
+      await videoRef.current.playAsync();
+      setIsPlaying(true);
+    } catch (e) {
+      console.log("Play error:", e);
+    }
   };
 
   const pause = async () => {
-    await videoRef.current?.pauseAsync();
-    setIsPlaying(false);
+    if (!videoRef.current) return;
+
+    try {
+      await videoRef.current.pauseAsync();
+      setIsPlaying(false);
+    } catch (e) {
+      console.log("Pause error:", e);
+    }
   };
 
   const seekTo = async (s: number) => {
-    await videoRef.current?.setPositionAsync(Math.max(0, s) * MS);
+    if (!videoRef.current) return;
+
+    try {
+      await videoRef.current.setPositionAsync(Math.max(0, s) * MS);
+    } catch (e) {
+      console.log("Seek error:", e);
+    }
   };
 
   const setRate = async (r: number) => {
-    await videoRef.current?.setRateAsync(r, true);
-    setPlaybackRate(r);
+    if (!videoRef.current) return;
+
+    try {
+      await videoRef.current.setRateAsync(r, true);
+      setPlaybackRate(r);
+    } catch (e) {
+      console.log("Set rate error:", e);
+    }
   };
 
   const skipForward = async (s: number) =>
     seekTo(Math.min(position + s, duration));
   const skipBackward = async (s: number) => seekTo(Math.max(position - s, 0));
+  // 🔥 NEW: Export a component that renders the video
+  const renderVideo = () => {
+    if (!currentTrack) return null;
+
+    return (
+      <Video
+        key={currentTrack.url}
+        ref={videoRef}
+        source={{ uri: currentTrack.url }}
+        style={StyleSheet.absoluteFillObject}
+        isMuted={false}
+        shouldPlay={false}
+        useNativeControls={false}
+        onLoad={onVideoLoad}
+        onPlaybackStatusUpdate={onPlaybackStatusUpdate}
+        resizeMode={ResizeMode.COVER}
+        progressUpdateIntervalMillis={500}
+      />
+    );
+  };
 
   const value: PlayerContextType = useMemo(
     () => ({
@@ -140,6 +169,7 @@ export const ExpoAVProvider: React.FC<{
       setShowModalVideo,
       onPlaybackStatusUpdate,
       onVideoLoad,
+      renderVideo, // 🔥 Export the render function
     }),
     [
       currentTrack,
@@ -156,20 +186,10 @@ export const ExpoAVProvider: React.FC<{
     <PlayerContext.Provider value={value}>
       {children}
 
-      {/* Render hidden video when modal is NOT showing */}
+      {/* 🔥 Only render hidden video when modal is NOT showing */}
       {currentTrack && !showModalVideo && (
         <View style={styles.hidden} pointerEvents="none">
-          <Video
-            ref={videoRef}
-            source={{ uri: currentTrack.url }}
-            style={{ width: 1, height: 1 }}
-            isMuted={false}
-            useNativeControls={false}
-            onLoad={onVideoLoad}
-            onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-            resizeMode={ResizeMode.COVER}
-            progressUpdateIntervalMillis={500}
-          />
+          {renderVideo()}
         </View>
       )}
     </PlayerContext.Provider>

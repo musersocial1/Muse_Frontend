@@ -2,7 +2,6 @@ import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { usePlayer } from "@/context/PlayerContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
-import { ResizeMode, Video } from "expo-av";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -41,15 +40,8 @@ interface MediaPlayerModalProps {
   duration: number;
   author: string;
   thumbnail?: ImageSourcePropType;
+  previews?: ImageSourcePropType[]; // 👈 new
 }
-
-const media: MediaItem[] = [
-  {
-    id: "1",
-    uri: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp",
-    type: "video",
-  },
-];
 
 const DOT_SIZE = 24;
 const DOT_RADIUS = DOT_SIZE / 2;
@@ -64,9 +56,17 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   title,
   author,
   thumbnail,
+  previews = [], // 👈 have an array available
 }) => {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const insets = useSafeAreaInsets();
+  const media: MediaItem[] = [
+    {
+      id: "1",
+      uri: previews[3],
+      type: "image",
+    },
+  ];
 
   const {
     isPlaying,
@@ -84,7 +84,9 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
     setShowModalVideo,
     videoRef,
     onPlaybackStatusUpdate,
+    renderVideo, // 🔥 Get the render function
     onVideoLoad,
+    showModalVideo,
   } = usePlayer();
 
   const [activeTab, setActiveTab] = useState<"Audio" | "Video">("Video");
@@ -183,27 +185,69 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
     };
   }, []);
 
+  const [videoKey, setVideoKey] = useState(0);
+
+  const closeAndDock = async () => {
+    if (setShowModalVideo) {
+      setShowModalVideo(false);
+    }
+
+    // 🔥 DON'T pause - let it keep playing in background
+    // Just show the mini player
+    setShowMini(true);
+
+    onClose();
+  };
+
   useEffect(() => {
     if (!isVisible || !videoUrl) return;
 
-    // Always reload the video when the modal opens
     const loadNewTrack = async () => {
       try {
-        await playTrack({
-          id: `track-${Date.now()}`,
-          url: videoUrl,
-          title,
-          artist: author,
-          artwork: images.media,
-        });
+        // Set modal video to true FIRST
+        if (setShowModalVideo) {
+          setShowModalVideo(true);
+        }
+
+        // 🔥 Only load new track if it's different
+        if (currentTrack?.url !== videoUrl) {
+          await playTrack({
+            id: `track-${Date.now()}`,
+            url: videoUrl,
+            title,
+            artist: author,
+            artwork: images.media,
+          });
+
+          // Play after loading
+          setTimeout(async () => {
+            console.log("🎬 Starting playback");
+            await play();
+          }, 300);
+        } else {
+          // Same track, just continue playing
+          console.log("🎬 Continuing same track");
+          if (!isPlaying) {
+            await play();
+          }
+        }
       } catch (e) {
         console.log("⚠️ Error loading video:", e);
       }
     };
 
     loadNewTrack();
-  }, [isVisible, videoUrl]);
 
+    return () => {
+      if (!isVisible) {
+        if (setShowModalVideo) {
+          setShowModalVideo(false);
+        }
+        // 🔥 DON'T pause here - let it keep playing
+        // pause(); // ❌ Remove this
+      }
+    };
+  }, [isVisible, videoUrl]);
   useEffect(() => {
     if (setShowModalVideo) {
       setShowModalVideo(isVisible && activeTab === "Video");
@@ -248,18 +292,6 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
       clearAutoHideTimer();
     }
   }, [isVisible]);
-
-  const closeAndDock = () => {
-    if (setShowModalVideo) {
-      setShowModalVideo(false);
-    }
-
-    if (isPlaying) {
-      setShowMini(true);
-    }
-
-    onClose();
-  };
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -332,37 +364,20 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   );
 
   const renderContent = () => (
-    <View className="relative overflow-hidden rounded-[13px] bg-black w-full max-w-[95%] aspect-[1/0.6] mx-auto">
+    <View className="relative  overflow-hidden rounded-[13px] bg-black w-full max-w-[95%] aspect-[1/0.6] mx-auto">
       {activeTab === "Video" ? (
         <View className="w-full h-full bg-black items-center justify-center">
-          {currentTrack ? (
-            <Video
-              ref={videoRef}
-              source={{ uri: currentTrack.url }}
-              style={StyleSheet.absoluteFillObject}
-              isMuted={false}
-              useNativeControls={false}
-              onPlaybackStatusUpdate={onPlaybackStatusUpdate}
-              onLoad={onVideoLoad}
-              resizeMode={ResizeMode.COVER}
-              progressUpdateIntervalMillis={500}
-            />
-          ) : null}
+          {/* 🔥 NO Video component here - it's handled by Provider */}
+          {/* The provider's video will fill this space automatically */}
+          {showModalVideo && renderVideo()}
         </View>
       ) : (
-        <View className="relative  overflow-hidden rounded-[30px] bg-primary w-full  aspect-[1/1] mx-auto">
+        <View className="relative  overflow-hidden rounded-[10px] bg-primary w-full  aspect-[1/1] mx-auto">
           <Image
-            source={thumbnail || images.media}
+            source={previews[3] || images.media}
             resizeMode="cover"
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              width: "100%",
-              height: "100%",
-            }}
+            className="w-full h-full"
+            style={StyleSheet.absoluteFill}
           />
         </View>
       )}
@@ -740,6 +755,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
           visible={showClipModal}
           onClose={() => setShowClipModal(false)}
           handleContinue={handleContinue}
+          previews={previews} // 👈 send the frames in
         />
         <RelatedPosts
           visible={showRelatedPost}

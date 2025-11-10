@@ -53,7 +53,6 @@ export const PostsProvider: React.FC<React.PropsWithChildren> = ({
         visible={visible}
         onClose={close}
         likedPosts={liked}
-        dislikedPosts={disliked}
         initialTab={initialTab}
       />
     </PostsContext.Provider>

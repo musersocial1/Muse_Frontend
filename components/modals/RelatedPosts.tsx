@@ -1,5 +1,7 @@
 import { dummyAllPosts } from "@/constants/data";
+import MaskedView from "@react-native-masked-view/masked-view";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -70,35 +72,50 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
   const ListHeader = (
     <View
       style={{
-        paddingTop: insets.top + 15,
+        paddingTop: insets.top + 4,
         paddingBottom: 8,
         paddingHorizontal: 16,
       }}
+      className=""
     >
+      <View style={StyleSheet.absoluteFill}>
+        <MaskedView
+          style={StyleSheet.absoluteFill}
+          maskElement={
+            <LinearGradient
+              colors={["rgba(0,0,0,1)", "rgba(0,0,0,0)"]} // fade from opaque → transparent
+              start={{ x: 0.5, y: 0.4 }}
+              end={{ x: 0.5, y: 1 }} // diagonal fade
+              style={StyleSheet.absoluteFill}
+            />
+          }
+        >
+          <BlurView
+            intensity={100}
+            tint="dark"
+            style={StyleSheet.absoluteFill}
+          />
+        </MaskedView>
+      </View>
+      {/* <BlurView style={StyleSheet.absoluteFill} /> */}
       <View className="items-center mb-4">
         <Pressable
           onPress={closeWithSlide}
           accessibilityRole="button"
           accessibilityLabel="Close"
-          className="w-14 h-14 rounded-full items-center justify-center"
+          className="w-14 h-14 rounded-full overflow-hidden items-center justify-center"
           style={{ backgroundColor: "rgba(243, 243, 243, 0.15)" }}
         >
+          <BlurView
+            intensity={70}
+            tint="light"
+            style={StyleSheet.absoluteFill}
+          />
           <Text style={{ color: "white", fontSize: 25, fontWeight: "600" }}>
             ×
           </Text>
         </Pressable>
       </View>
-
-      <Text
-        style={{
-          color: "white",
-          fontSize: 21,
-          fontWeight: "600",
-          textAlign: "center",
-        }}
-      >
-        Related Posts
-      </Text>
     </View>
   );
 
@@ -153,10 +170,10 @@ const RelatedPosts: React.FC<RelatedPostsProps> = ({ visible, onClose }) => {
               onShowDislikePuff={() => setShowLikePuff(true)}
               ListHeaderComponent={ListHeader}
               stickyHeaderIndices={[0]}
-              ListHeaderComponentStyle={{
-                backgroundColor: "rgba(18,18,18,0.9)",
-                zIndex: 10,
-              }}
+              // ListHeaderComponentStyle={{
+              //   backgroundColor: "rgba(18,18,18,0.9)",
+              //   zIndex: 10,
+              // }}
             />
           </View>
         </Animated.View>

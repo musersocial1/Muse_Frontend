@@ -125,7 +125,7 @@ const NormalFeeds: React.FC<NormalFeedsProps> = ({
               cardRefs.current[item.id] = ref;
             }}
             collapsable={false}
-            className="w-full"
+            className="w-full px-1"
           >
             <PostCard
               post={item}

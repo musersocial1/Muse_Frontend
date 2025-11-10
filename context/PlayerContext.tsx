@@ -31,6 +31,7 @@ export type PlayerContextType = {
   setShowModalVideo: (v: boolean) => void;
   onPlaybackStatusUpdate: (s: AVPlaybackStatus) => void;
   onVideoLoad: () => void;
+  renderVideo: () => React.ReactElement | null; // 🔥 Changed from JSX.Element to React.ReactElement
 };
 
 const PlayerContext = React.createContext<PlayerContextType | null>(null);

@@ -6,12 +6,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Platform } from "react-native";
 import * as Animatable from "react-native-animatable";
 
+import { isVideoCached, prefetchVideos } from "@/utils/videoPrefetch";
 import { useRouter } from "expo-router";
 import {
   Dimensions,
   FlatList,
   Image,
   ImageBackground,
+  ImageSourcePropType,
   ScrollView,
   StyleSheet,
   Text,
@@ -32,6 +34,7 @@ type Video = {
   age: string; // e.g. "5 Months ago"
   isNew?: boolean;
   links?: string;
+  previews?: ImageSourcePropType[]; // 👈 previews are local images
 };
 
 type Community = {
@@ -55,24 +58,52 @@ const FILTERS = [
   "Music",
 ];
 
+// 🎬 Clip image arrays
+const clip1Images: ImageSourcePropType[] = [
+  images.latest1_1,
+  images.latest1_2,
+  images.latest1_3,
+  images.latest1_4,
+  images.latest1_5,
+  images.latest1_6,
+  images.latest1_7,
+  images.latest1_8,
+  images.latest1_9,
+  images.latest1_10,
+  images.latest1_11,
+];
+
+const clip2Images: ImageSourcePropType[] = [
+  images.latest2_1,
+  images.latest2_2,
+  images.latest2_3,
+  images.latest2_4,
+  images.latest2_5,
+  images.latest2_10,
+  images.latest2_12,
+];
+
 const LATEST: Video[] = [
   {
     id: "1",
     title: "Why Vertical LLM Agents Are The New $1 Billion SaaS Opportunities",
-    thumb: images.latest1, // your local image
+    thumb: images.latest1,
     age: "1 Week ago",
     isNew: true,
+    previews: clip2Images, // 👈 Add clip2 images array here
+
     links:
       "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2Fvideoplayback.mp4?alt=media&token=40e4fe12-21e8-49c7-b101-1237a549a637",
   },
   {
     id: "2",
     title: "Conversations with Bornfrosh & Al",
-    thumb: images.latest2, // your local image
+    thumb: images.latest2,
     age: "2 Weeks ago",
     isNew: true,
     links:
-      "https://cubbyproduct.s3.amazonaws.com/hatespeech/output/hateSpeech_10min_output/index.m3u8",
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2FhateSpeech%20(online-video-cutter.com).mp4?alt=media&token=b928ad2a-cc6a-4d0b-82c8-067679ab6f5e",
+    previews: clip1Images, // 👈 Add clip1 images array here
   },
   {
     id: "3",
@@ -87,20 +118,6 @@ const LATEST: Video[] = [
     thumb:
       "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1600&auto=format&fit=crop",
     age: "2 Months ago",
-  },
-  {
-    id: "5",
-    title: "Tech Talks Weekly",
-    thumb:
-      "https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=1600&auto=format&fit=crop",
-    age: "3 Months ago",
-  },
-  {
-    id: "6",
-    title: "All In with Founders",
-    thumb:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop",
-    age: "5 Months ago",
   },
 ];
 
@@ -200,23 +217,84 @@ const CONTINUE: (Video & { progress: number })[] = [
 const router = useRouter();
 
 export default function DiscoveryExclusivesScreen() {
-  const [activeFilter, setActiveFilter] = useState(FILTERS[0]);
-
   const [currentMedia, setCurrentMedia] = useState<
     | {
         url: string;
         title: string;
+        previews?: ImageSourcePropType[];
       }
     | any
   >(null);
 
-  const openPlayer = (item: Video | (Video & { progress?: number })) => {
+  const [cachedUrls, setCachedUrls] = useState<Record<string, string>>({});
+  const [prefetchProgress, setPrefetchProgress] = useState(0);
+
+  // Updated section of DiscoveryExclusivesScreen
+
+  // 🔥 PREFETCH ONLY 30% OF VIDEOS ON MOUNT
+  useEffect(() => {
+    const prefetchAllVideos = async () => {
+      // Get all video URLs
+      const videoUrls = LATEST.filter((item) => item.links).map(
+        (item) => item.links!
+      );
+
+      console.log("🎬 Starting 30% prefetch for", videoUrls.length, "videos");
+
+      // 🔥 Prefetch only 30% of each video in background
+      prefetchVideos(
+        videoUrls,
+        (index, progress) => {
+          console.log(`Video ${index + 1}: ${(progress * 100).toFixed(0)}%`);
+          setPrefetchProgress(((index + progress) / videoUrls.length) * 100);
+        },
+        30 // 👈 Only download 30% of each video!
+      ).then(() => {
+        console.log("✅ All videos 30% ready!");
+      });
+
+      // Check each video for cached version
+      const cached: Record<string, string> = {};
+      for (const item of LATEST) {
+        if (item.links) {
+          const cachedPath = await isVideoCached(item.links);
+          if (cachedPath) {
+            cached[item.id] = cachedPath;
+          }
+        }
+      }
+      setCachedUrls(cached);
+    };
+
+    // Start prefetch after 1 second (let UI load first)
+    const timer = setTimeout(prefetchAllVideos, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 🔥 USE CACHED URL WHEN OPENING PLAYER
+  const openPlayer = async (item: Video | (Video & { progress?: number })) => {
+    let videoUrl = item.links ?? images.media;
+
+    // Check if we have a cached version (30% preloaded)
+    if (item.links) {
+      const cachedPath = await isVideoCached(item.links);
+      if (cachedPath) {
+        console.log("⚡ Using 30% cached video - will stream rest");
+        videoUrl = cachedPath;
+      } else {
+        console.log("📡 Streaming full video");
+        videoUrl = item.links; // Stream from original URL
+      }
+    }
+
     setCurrentMedia({
-      url: item.links ?? images.media, // fallback to local if no URL
+      url: videoUrl,
       title: item.title,
+      previews: item.previews, // 👈 attach previews here
     });
     setShowPlayer(true);
   };
+  const [activeFilter, setActiveFilter] = useState(FILTERS[0]);
 
   const { width } = Dimensions.get("window");
   const headerChips = useMemo(
@@ -282,6 +360,7 @@ export default function DiscoveryExclusivesScreen() {
             title={Array(3).fill(currentMedia.title).join(" • ")} // 👈 repeated title
             author="John"
             duration={0}
+            previews={currentMedia.previews || []} // 👈 here
           />
         )}
 
@@ -342,7 +421,7 @@ export default function DiscoveryExclusivesScreen() {
             <Section title="Latest">
               <View className="flex-row flex-wrap px-3 gap-4">
                 {LATEST.slice(0, showAll ? LATEST.length : 2).map((item) => (
-                  <View key={item.id} className="w-[48%] ">
+                  <View key={item.id} className="w-[48%]  ">
                     <VideoCard
                       item={item}
                       onPress={() => openPlayer(item)}
@@ -445,7 +524,7 @@ function VideoCard({
 }) {
   return (
     <TouchableOpacity onPress={onPress}>
-      <View className="rounded-[13px]  overflow-hidden bg-[#141414]">
+      <View className="rounded-[13px]  border border-white/5  overflow-hidden bg-[#141414]">
         <ImageBackground
           source={
             typeof item.thumb === "string" ? { uri: item.thumb } : item.thumb

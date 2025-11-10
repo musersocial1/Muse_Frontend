@@ -150,6 +150,29 @@ import Newpost7 from "@/assets/images/feed/post7.webp";
 import Newpost8 from "@/assets/images/feed/post8.webp";
 import Newpost9 from "@/assets/images/feed/post9.webp";
 
+// ⬇️ NEW CLIP FOLDERS
+// clip1
+import latest1_1 from "@/assets/images/Xcontent/clip1/latest1_1.webp";
+import latest1_10 from "@/assets/images/Xcontent/clip1/latest1_10.webp";
+import latest1_11 from "@/assets/images/Xcontent/clip1/latest1_11.webp";
+import latest1_2 from "@/assets/images/Xcontent/clip1/latest1_2.webp";
+import latest1_3 from "@/assets/images/Xcontent/clip1/latest1_3.webp";
+import latest1_4 from "@/assets/images/Xcontent/clip1/latest1_4.webp";
+import latest1_5 from "@/assets/images/Xcontent/clip1/latest1_5.webp";
+import latest1_6 from "@/assets/images/Xcontent/clip1/latest1_6.webp";
+import latest1_7 from "@/assets/images/Xcontent/clip1/latest1_7.webp";
+import latest1_8 from "@/assets/images/Xcontent/clip1/latest1_8.webp";
+import latest1_9 from "@/assets/images/Xcontent/clip1/latest1_9.webp";
+
+// clip2
+import latest2_1 from "@/assets/images/Xcontent/clip2/latest2_1.webp";
+import latest2_10 from "@/assets/images/Xcontent/clip2/latest2_10.webp";
+import latest2_12 from "@/assets/images/Xcontent/clip2/latest2_12.webp";
+import latest2_2 from "@/assets/images/Xcontent/clip2/latest2_2.webp";
+import latest2_3 from "@/assets/images/Xcontent/clip2/latest2_3.webp";
+import latest2_4 from "@/assets/images/Xcontent/clip2/latest2_4.webp";
+import latest2_5 from "@/assets/images/Xcontent/clip2/latest2_5.webp";
+
 export const images = {
   splash,
   logo,
@@ -297,4 +320,26 @@ export const images = {
   Newpost14,
   Newpost15,
   Newpost16,
+
+  // Xcontent Clip1
+  latest1_1,
+  latest1_2,
+  latest1_3,
+  latest1_4,
+  latest1_5,
+  latest1_6,
+  latest1_7,
+  latest1_8,
+  latest1_9,
+  latest1_10,
+  latest1_11,
+
+  // Xcontent Clip2
+  latest2_1,
+  latest2_2,
+  latest2_3,
+  latest2_4,
+  latest2_5,
+  latest2_10,
+  latest2_12,
 };

@@ -24,7 +24,6 @@ interface InteractedPostsModalProps {
   visible: boolean;
   onClose: () => void;
   likedPosts: Post[];
-  dislikedPosts: Post[];
   initialTab?: "liked" | "disliked";
 }
 
@@ -32,7 +31,6 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
   visible,
   onClose,
   likedPosts,
-  dislikedPosts,
   initialTab = "liked",
 }) => {
   const insets = useSafeAreaInsets();
@@ -73,10 +71,7 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
   const [tab, setTab] = useState<"liked" | "disliked">(initialTab);
   useEffect(() => setTab(initialTab), [initialTab, visible]);
 
-  const posts = useMemo(
-    () => (tab === "liked" ? likedPosts : dislikedPosts),
-    [tab, likedPosts, dislikedPosts]
-  );
+  const posts = useMemo(() => likedPosts, [likedPosts]);
 
   if (!visible) return null;
 
@@ -114,68 +109,21 @@ const InteractedPostsModal: React.FC<InteractedPostsModalProps> = ({
           onPress={closeWithSlide}
           accessibilityRole="button"
           accessibilityLabel="Close"
-          className="w-14 h-14 rounded-full items-center justify-center"
+          className="w-14 h-14 rounded-full overflow-hidden items-center justify-center"
           style={{ backgroundColor: "rgba(243, 243, 243, 0.15)" }}
         >
+          <BlurView
+            intensity={70}
+            tint="light"
+            style={StyleSheet.absoluteFill}
+          />
           <Text style={{ color: "white", fontSize: 25, fontWeight: "600" }}>
             ×
           </Text>
         </Pressable>
       </View>
-
-      {/* <View
-        className="flex-row rounded-full overflow-hidden"
-        style={{
-          backgroundColor: "rgba(255, 255, 255, 0.03)",
-          height: 53,
-        }}
-      >
-        <BlurView style={StyleSheet.absoluteFill} />
-        <Pressable
-          onPress={() => setTab("liked")}
-          className="flex-1 items-center justify-center"
-          style={{
-            backgroundColor: tab === "liked" ? "white" : "transparent",
-            borderRadius: 999,
-            margin: 4,
-            marginRight: 2,
-          }}
-        >
-          <Text
-            style={{
-              color: tab === "liked" ? "black" : "rgba(255,255,255,0.75)",
-              fontWeight: "600",
-              fontSize: 16,
-            }}
-          >
-            Liked
-          </Text>
-        </Pressable>
-
-        <Pressable
-          onPress={() => setTab("disliked")}
-          className="flex-1 items-center justify-center"
-          style={{
-            backgroundColor: tab === "disliked" ? "white" : "transparent",
-            borderRadius: 999,
-            margin: 4,
-            marginLeft: 2,
-          }}
-        >
-          <Text
-            style={{
-              color: tab === "disliked" ? "black" : "rgba(255,255,255,0.75)",
-              fontWeight: "600",
-              fontSize: 16,
-            }}
-          >
-            Disliked
-          </Text>
-        </Pressable>
-      </View> */}
     </View>
   );
-
   return (
     <View
       pointerEvents="box-none"

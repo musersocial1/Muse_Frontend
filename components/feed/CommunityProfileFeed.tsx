@@ -6,13 +6,7 @@ import { Feather, Ionicons } from "@expo/vector-icons";
 import { ResizeMode, Video } from "expo-av";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -22,20 +16,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import {
-  FlatList as GHFlatList,
-  ScrollView,
-} from "react-native-gesture-handler";
+import { ScrollView } from "react-native-gesture-handler";
 import NudgeSuccessModal from "../modals/NudgeSuccessModal";
 import RecordCommentModal from "../modals/RecordCommentModal";
 import UserProfileModal from "../modals/UserProfileModal";
 import VideoReply from "../modals/video-reply";
 import VideoCommentsModal from "../modals/VideoComments";
-import SwipeableCard from "./SwipeableCard";
 
 const { width, height } = Dimensions.get("window");
-
-const AnimatedGHFlatList = Animated.createAnimatedComponent(GHFlatList as any);
 
 export type PostHeaderProps = {
   post: any; // Replace with your Post type
@@ -55,8 +43,8 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   const baseRow = "flex-row    justify-between items-center  pt-[10px] pb-3  ";
   const overlayWrap =
     variant === "overlay"
-      ? "absolute top-0 left-0 right-0  z-10 px-[10px]"
-      : "px-[12px]   ";
+      ? "absolute top-0 left-0 right-0 z-10 px-[10px]"
+      : "px-[10px]  ";
 
   return (
     <View
@@ -81,15 +69,6 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           }}
           activeOpacity={0.8}
         >
-          {/* {overlayWrap && (
-            <BlurView
-              intensity={50}
-              style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
-              experimentalBlurMethod="dimezisBlurView"
-              tint="dark"
-            />
-          )} */}
-
           <View className="w-11 h-11  rounded-full overflow-hidden mr-1.5">
             <Image
               source={{ uri: post.author.avatar }}
@@ -118,11 +97,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
           </View>
         </TouchableOpacity>
 
-        <View
-          // intensity={50}
-          // tint="dark"
-          className="flex-row gap-1  items-center py-2 rounded-full overflow-hidden"
-        >
+        <View className="flex-row gap-1  items-center py-2 rounded-full overflow-hidden">
           <Text className="text-white/50 ml-1 font-sfpro-medium text-[13px]">
             {post.timestamp}
           </Text>
@@ -173,10 +148,7 @@ export function CollapsibleText({
       onPress={() => setExpanded((v) => !v)}
       activeOpacity={0.9}
     >
-      <Text
-        className="font-sfpro-medium  text-white text-[14.2px]"
-        // style={{ flexShrink: 1 }}
-      >
+      <Text className="font-sfpro-medium  text-white text-[14.2px]">
         {hasMedia && (
           <>
             <Text className="  text-white text-[14.5px] font-sfpro-bold ">
@@ -194,6 +166,7 @@ export function CollapsibleText({
     </TouchableOpacity>
   );
 }
+
 export const PostCard: React.FC<PostCardProps> = ({
   post,
   setIsOpen,
@@ -279,7 +252,6 @@ export const PostCard: React.FC<PostCardProps> = ({
                   start={{ x: 0.5, y: 0 }}
                   end={{ x: 0.5, y: 1 }}
                   style={StyleSheet.absoluteFill}
-                  // className="z-[1000]"
                 />
               </View>
               <ScrollView
@@ -350,7 +322,6 @@ export const PostCard: React.FC<PostCardProps> = ({
                     start={{ x: 0.5, y: 0 }}
                     end={{ x: 0.5, y: 1 }}
                     style={StyleSheet.absoluteFill}
-                    // className="z-[1000]"
                   />
                 </View>
                 <View className="overflow-hidden ">
@@ -535,7 +506,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   );
 };
 
-interface AllFeedsProps {
+interface CommunityFeedProps {
   posts?: Post[];
   addPost?: () => void;
   setUploadVisible?: (val: boolean) => void;
@@ -552,7 +523,7 @@ interface AllFeedsProps {
   ListHeaderComponentStyle?: any;
 }
 
-const AllFeeds: React.FC<AllFeedsProps> = ({
+const CommunityFeed: React.FC<CommunityFeedProps> = ({
   posts,
   addPost,
   setUploadVisible,
@@ -581,7 +552,8 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   const [modalVisible, setModalVisible] = useState(false);
   const [videoData, setVideoData] = useState<any>(null);
   const [showRecordModal, setShowRecordModal] = useState(false);
-  const { setLiked } = usePostContext();
+  const { setLiked, setDisliked } = usePostContext();
+
   const [activeSwipeIndex, setActiveSwipeIndex] = useState<number | null>(null);
   const [imageScrollingStates, setImageScrollingStates] = useState<{
     [key: string]: boolean;
@@ -614,32 +586,17 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
       setModalVisible(true);
     }, 100);
   };
-  const pushToInteracted = (id: string, type: "like" | "dislike") => {
-    if (type === "like") {
-      onShowLikePuff?.();
-    } else {
-      onShowDislikePuff?.();
-    }
-
-    setFeedPosts((prev) => prev.filter((p) => p.id !== id));
-
-    setLiked((prev) => {
-      const target = posts?.find((p) => p.id === id);
-      if (!target) return prev;
-
-      // avoid duplicates
-      if (prev.some((p) => p.id === target.id)) return prev;
-
-      return [target, ...prev];
-    });
-  };
 
   const removePostWithLike = (id: string) => {
-    pushToInteracted(id, "like");
+    onShowLikePuff?.();
+    setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+    setLiked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const removePostWithDislike = (id: string) => {
-    pushToInteracted(id, "dislike");
+    onShowDislikePuff?.();
+    setFeedPosts((prev) => prev.filter((p) => p.id !== id));
+    setDisliked((prev) => [...prev, posts?.find((p) => p.id === id)!]);
   };
 
   const handleGestureStateChange = (postId: string, isActive: boolean) => {
@@ -650,7 +607,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
         clearTimeout(scrollStateTimeoutRef.current);
       }
 
-      // Debounce to avoid flapping scrollEnabled
       // @ts-ignore: setTimeout type
       scrollStateTimeoutRef.current = setTimeout(() => {
         const hasActiveGestures = Object.values(newState).some(Boolean);
@@ -713,15 +669,6 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   const [visiblePostIds, setVisiblePostIds] = useState<string[]>([]);
 
-  const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
-    const ids = viewableItems.map((v: any) => v.item.id);
-    setVisiblePostIds(ids);
-  }).current;
-
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 80,
-  };
-
   const [showVideoReply, setShowVideoReply] = useState(false);
   const handleVideoCommentPress = () => {
     setShowVideoReply(true);
@@ -729,74 +676,43 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
 
   const effectiveScrollEnabled = externalScrollEnabled ?? true;
 
-  const keyExtractor = useCallback((item: Post) => item.id, []);
-
   return (
-    <View className="relative w-full ">
-      <AnimatedGHFlatList
-        data={feedPosts}
-        keyExtractor={keyExtractor as any}
-        nestedScrollEnabled
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-        onScroll={onScroll} // animated onScroll from parent (useNativeDriver)
-        scrollEventThrottle={scrollEventThrottle ?? 16}
-        ListHeaderComponent={ListHeaderComponent}
-        stickyHeaderIndices={stickyHeaderIndices}
-        ListHeaderComponentStyle={ListHeaderComponentStyle}
-        ListEmptyComponent={
-          <View className="h-[300px]  w-full items-center justify-center">
-            <Text className="text-white/50 text-[16px]">
-              No more posts to show
-            </Text>
-          </View>
-        }
-        renderItem={({ item, index }: any) => (
+    <View className="relative w-full">
+      {/* Render header if provided */}
+      {ListHeaderComponent}
+
+      {/* Map posts directly without FlatList */}
+      {feedPosts.length === 0 ? (
+        <View className="h-[300px] w-full items-center justify-center">
+          <Text className="text-white/50 text-[16px]">
+            No more posts to show
+          </Text>
+        </View>
+      ) : (
+        feedPosts.map((item, index) => (
           <View
             key={item.id}
             ref={(ref) => {
               cardRefs.current[item.id] = ref;
             }}
             collapsable={false}
-            className="w-full "
+            className="w-full"
           >
-            <SwipeableCard
-              onSwipeRight={() => removePostWithDislike(item.id)}
-              onSwipeLeft={() => removePostWithLike(item.id)}
-              index={index}
-              activeSwipeIndex={activeSwipeIndex}
-              disabled={imageScrollingStates[item.id] || false}
-              onSwipeProgress={(progress, isActive) =>
-                handleSwipeProgress(item.id, progress, isActive)
+            <PostCard
+              post={item}
+              setIsOpen={setIsOpen}
+              setOpenComments={setOpenComments}
+              setShowRecordModal={setShowRecordModal}
+              onImageScrollStateChange={(isScrolling) =>
+                handleImageScrollStateChange(item.id, isScrolling)
               }
-              onGestureStateChange={(isActive) =>
-                handleGestureStateChange(item.id, isActive)
-              }
-            >
-              <PostCard
-                post={item}
-                setIsOpen={setIsOpen}
-                setOpenComments={setOpenComments}
-                setShowRecordModal={setShowRecordModal}
-                onImageScrollStateChange={(isScrolling) =>
-                  handleImageScrollStateChange(item.id, isScrolling)
-                }
-                handleVideoCommentPress={handleVideoCommentPress}
-                isVisible={visiblePostIds.includes(item.id)}
-                setShowVideoReply={setShowVideoReply}
-              />
-            </SwipeableCard>
+              handleVideoCommentPress={handleVideoCommentPress}
+              isVisible={true}
+              setShowVideoReply={setShowVideoReply}
+            />
           </View>
-        )}
-        scrollEnabled={effectiveScrollEnabled}
-        showsVerticalScrollIndicator={false}
-        // Replaced contentContainerClassName with style for compatibility
-        contentContainerStyle={contentContainerStyle}
-        maxToRenderPerBatch={2}
-        windowSize={2}
-        initialNumToRender={1}
-        removeClippedSubviews
-      />
+        ))
+      )}
 
       {showVideoReply && (
         <VideoReply
@@ -849,4 +765,4 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   );
 };
 
-export default AllFeeds;
+export default CommunityFeed;

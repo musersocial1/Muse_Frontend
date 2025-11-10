@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  ImageSourcePropType,
   StatusBar,
   StyleSheet,
   Text,
@@ -18,57 +19,29 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 const { width, height } = Dimensions.get("window");
 
-const thumbnails = [
-  {
-    id: "1",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-  {
-    id: "2",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: true,
-  },
-  {
-    id: "3",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-  {
-    id: "4",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-  {
-    id: "5",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-  {
-    id: "6",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-  {
-    id: "7",
-    uri: "https://www.nairaland.com/attachments/13176796_giftd_jpeg8632e7921ad238188c916faf46cd8641",
-    isSelected: false,
-  },
-];
+interface ClipModalProps {
+  visible: boolean;
+  onClose: () => void;
+  handleContinue: () => void;
+  previews: ImageSourcePropType[];
+}
 
 export default function ClipModal({
   visible,
   onClose,
   handleContinue,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  handleContinue: () => void;
-}) {
+  previews,
+}: ClipModalProps) {
   const slideAnim = useRef(new Animated.Value(height)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const [selectedThumbnail, setSelectedThumbnail] = useState("2");
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const insets = useSafeAreaInsets();
+
+  // ✨ Convert previews into a thumbnail list
+  const thumbnails = previews.map((source, index) => ({
+    id: String(index),
+    source,
+  }));
 
   useEffect(() => {
     if (visible) {
@@ -103,34 +76,42 @@ export default function ClipModal({
     }
   }, [visible]);
 
-  const handleThumbnailSelect = (id: string) => {
-    setSelectedThumbnail(id);
+  const handleThumbnailSelect = (index: number) => {
+    setSelectedIndex(index);
   };
 
-  const renderThumbnail = ({ item }: { item: any }) => {
-    const isSelected = selectedThumbnail === item.id;
+  const renderThumbnail = ({
+    item,
+    index,
+  }: {
+    item: { id: string; source: ImageSourcePropType };
+    index: number;
+  }) => {
+    const isSelected = selectedIndex === index;
 
     return (
       <TouchableOpacity
-        style={{
-          borderRadius: 12,
-          marginHorizontal: 6,
-          borderWidth: isSelected ? 3 : 2,
-          borderColor: isSelected ? "#fff" : "transparent",
-          overflow: "hidden",
-          transform: [{ scale: isSelected ? 1.05 : 1 }],
-        }}
-        onPress={() => handleThumbnailSelect(item.id)}
+        onPress={() => handleThumbnailSelect(index)}
         activeOpacity={0.8}
+        style={{
+          borderRadius: 10,
+          marginHorizontal: 2.5,
+          borderWidth: isSelected ? 2.3 : 0,
+          borderColor: isSelected ? "#fff" : "transparent",
+          // overflow: "hidden",
+          transform: [{ scale: isSelected ? 1 : 1 }],
+        }}
+        className=""
       >
         <Image
-          source={{ uri: item.uri }}
+          source={item.source}
           style={{
             width: 56,
-            height: 70,
+            height: 65,
             borderRadius: 10,
             opacity: isSelected ? 1 : 0.8,
           }}
+          resizeMode="cover"
         />
         {isSelected && (
           <View
@@ -166,6 +147,7 @@ export default function ClipModal({
         },
       ]}
     >
+      {/* 🟡 Background gradient */}
       <View style={StyleSheet.absoluteFill}>
         <Svg height={height} width={width}>
           <Defs>
@@ -191,7 +173,7 @@ export default function ClipModal({
         </Svg>
       </View>
 
-      {/* Modal Content */}
+      {/* 🟢 Modal Content */}
       <View
         style={[
           StyleSheet.absoluteFill,
@@ -202,6 +184,7 @@ export default function ClipModal({
           },
         ]}
       >
+        {/* Header */}
         <View
           style={{
             position: "absolute",
@@ -252,13 +235,14 @@ export default function ClipModal({
           </TouchableOpacity>
         </View>
 
+        {/* Preview Player */}
         <Animated.View
           style={{
-            marginTop: "20%",
-            borderRadius: 28,
+            marginTop: "15%",
+            borderRadius: 20,
             overflow: "hidden",
             backgroundColor: "rgba(0, 0, 0, 0.25)",
-            width: width * 0.86,
+            width: width * 0.9,
             aspectRatio: 1.07,
             elevation: 24,
             shadowColor: "rgba(0, 0, 0, 0.25)",
@@ -268,9 +252,14 @@ export default function ClipModal({
             justifyContent: "center",
             alignItems: "center",
           }}
+          className={""}
         >
           <Image
-            source={images.Xcomm2}
+            source={
+              thumbnails[selectedIndex]
+                ? thumbnails[selectedIndex].source
+                : images.Xcomm2
+            }
             style={{
               width: "100%",
               height: "100%",
@@ -299,6 +288,7 @@ export default function ClipModal({
           </TouchableOpacity>
         </Animated.View>
 
+        {/* Thumbnails */}
         <View
           style={{
             position: "absolute",
@@ -336,17 +326,19 @@ export default function ClipModal({
               }}
               style={{
                 flexGrow: 0,
-                maxWidth: width * 0.92,
+                maxWidth: width,
               }}
+              contentContainerClassName=" py-2"
               decelerationRate="fast"
               snapToInterval={58}
               snapToAlignment="center"
             />
           </View>
 
+          {/* Continue Button */}
           <TouchableOpacity
             style={{
-              marginTop: 18,
+              marginTop: 14,
               width: 180,
               backgroundColor: "#fff",
               paddingVertical: 16,
@@ -358,15 +350,13 @@ export default function ClipModal({
               shadowOffset: { width: 0, height: 4 },
               shadowRadius: 10,
             }}
-            onPress={() => {
-              handleContinue();
-            }}
+            onPress={() => handleContinue()}
             activeOpacity={0.95}
           >
             <Text
               style={{
                 color: "#393623",
-                fontWeight: "800",
+                fontWeight: "700",
                 fontSize: 17,
                 letterSpacing: 0.3,
               }}

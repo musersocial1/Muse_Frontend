@@ -23,7 +23,7 @@ import PostCommunities from "../MakeAPost/PostCommunities";
 
 export type MediaItem = {
   id: string;
-  uri: string;
+  uri: any;
   type: "image" | "video";
 };
 
@@ -262,7 +262,7 @@ export default function CreatePostStart({
               style={{
                 opacity: contentOpacity,
               }}
-              className={"flex-1"}
+              className={"flex-1 "}
             >
               <CreatePost
                 text={text}
@@ -271,6 +271,7 @@ export default function CreatePostStart({
                 removeItem={removeItem}
                 processing={processing}
                 inputRef={inputRef}
+                preMedia={preMedia}
               />
             </Animated.View>
           </ScrollView>

@@ -5,135 +5,17 @@ import { images } from "./images";
 
 export const dummyAllPosts: Post[] = [
   {
-    id: "new1",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost1], // 1:1 aspect ratio
-    aspectRatio: "16:9",
-    content:
-      "We turned off our analytics dashboard for a week and tracked nothing but raw user behavior. What we found: users weren’t clicking fancy features—they were simply ‘sticking’ if the core loop worked. The rest? Noise. Has anyone else pulled the plug on metrics to find truth?",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/60.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/61.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/62.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/63.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new2",
-    author: {
-      name: "Marcus Johnson",
-      username: "marcus_momentum",
-      avatar: "https://randomuser.me/api/portraits/men/33.jpg",
-      verified: false,
-    },
-    images: [images.one_4_5], // 4:5 aspect ratio (portrait)
-    aspectRatio: "4:5",
-    content:
-      "Everyone says “build something people want.” I say: build something people can’t stop talking about. That’s where the magic happens.",
-    timestamp: "45m",
-    likes: 1542,
-    comments: 234,
-    type: "text",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/64.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/65.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/66.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/67.jpg",
-      },
-    ],
-  },
-  {
-    id: "new3",
-    author: {
-      name: "Elena Rodriguez",
-      username: "elena_networks",
-      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
-      verified: true,
-    },
-    images: [images.one_16_9], // 16:9 aspect ratio (landscape)
-    aspectRatio: "16:9",
-    content:
-      "The next Silicon Valley won’t be a place — it’ll be a network. Founders, users, and capital already move faster than geography. The ones who build for that distributed reality — who see community as infrastructure, not marketing — will own the next decade.",
-    timestamp: "1h",
-    likes: 3421,
-    thumbnail: images.latest2,
-    comments: 567,
-    type: "text",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/38.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/39.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/40.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/41.jpg",
-      },
-    ],
-  },
-  {
     id: "new4",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      name: "Maya Patel",
+      username: "maya_innovates",
+      avatar: "https://randomuser.me/api/portraits/women/32.jpg",
       verified: true,
     },
-    images: [images.Newpost4], // 1:1 aspect ratio
+    images: [images.Newpost4],
     aspectRatio: "16:9",
     content:
-      "Great pod. They’re arguing that biology is the new software stack. Not just building apps, but building life-systems. What struck me: when a startup says ‘we’ll build something in 10 years’, it usually dies. Their bet: they’ll build something that spans 10–15 years. Image",
+      "Great pod. They're arguing that biology is the new software stack. Not just building apps, but building life-systems. What struck me: when a startup says 'we'll build something in 10 years', it usually dies. Their bet: they'll build something that spans 10–15 years. Image",
     vComments: [
       {
         type: "video",
@@ -162,92 +44,14 @@ export const dummyAllPosts: Post[] = [
     type: "image",
   },
   {
-    id: "new5",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost5], // 1:1 aspect ratio
-    aspectRatio: "16:9",
-    content:
-      " I get what Andrew Ross Sorkin is saying here — but what about when the next major AI regulation hits and the entire distribution model for content gets rewired? How are founders preparing for that shift?”Image",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/72.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/73.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/74.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/75.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new6",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost6], // 1:1 aspect ratio
-    aspectRatio: "16:9",
-    content:
-      "Aravind is saying Perplexity wins by forcing every answer to be backed by citations. Smart. But in my startup I’m watching that timing, UX and integration beat perfect citation every time. What do you think: is the citation criterion the moat—or just a nice-to-have?",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/76.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/77.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/78.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/79.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
     id: "new7",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
+      name: "Jordan Mitchell",
+      username: "jordan_tech",
+      avatar: "https://randomuser.me/api/portraits/men/54.jpg",
+      verified: false,
     },
-    images: [images.Newpost7], // 1:1 aspect ratio
+    images: [images.Newpost7],
     aspectRatio: "4:5",
     content:
       "Feels like a lifetime ago when apple was actually innovating. Image",
@@ -278,96 +82,23 @@ export const dummyAllPosts: Post[] = [
     comments: 893,
     type: "image",
   },
+
   {
-    id: "new8",
+    id: "new2",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      name: "Alexis Rivera",
+      username: "alexis_builds",
+      avatar: "https://randomuser.me/api/portraits/women/45.jpg",
       verified: true,
     },
-    images: [images.Newpost8], // 1:1 aspect ratio
-    aspectRatio: "16:9",
-    content:
-      "Anyone around Byd Park, SF ? We’re looking for people to test out some of new features. Willing to connect and help out down the line too. Image",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new16",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost16], // 1:1 aspect ratio
-    aspectRatio: "16:9",
-    content:
-      " I swear the best product ideas come from zooming down the SF coast at 40mph (or from talking to me:) Looking for a few founders to start a biking crew with. 2-4 hrs Saturday mornings loop around all of SF to start, Marin and Berkeley next DM me if you'd be down! ",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new15",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost15], // 1:1 aspect ratio
+    images: [images.one_4_5],
     aspectRatio: "4:5",
     content:
-      "Ready to ship a new feature this weekend at vibecon - ycombinator HQ w/@MadlenerNikolai @getmiora ",
+      "Everyone says 'build something people want.' I say: build something people can't stop talking about. That's where the magic happens.",
+    timestamp: "45m",
+    likes: 1542,
+    comments: 234,
+    type: "text",
     vComments: [
       {
         type: "video",
@@ -375,189 +106,32 @@ export const dummyAllPosts: Post[] = [
       },
       {
         type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
+        url: "https://randomuser.me/api/portraits/women/64.jpg",
       },
       {
         type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
+        url: "https://randomuser.me/api/portraits/men/65.jpg",
       },
       {
         type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
+        url: "https://randomuser.me/api/portraits/women/66.jpg",
       },
       {
         type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
+        url: "https://randomuser.me/api/portraits/men/67.jpg",
       },
     ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
   },
-  {
-    id: "new14",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost14], // 1:1 aspect ratio
-    aspectRatio: "4:5",
-    content: 'calling it "building in stealth" instead of "unemployed" ',
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new13",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost13], // 1:1 aspect ratio
-    aspectRatio: "4:5",
-    content: "The one trillion dollar man. ",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new12",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost12], // 1:1 aspect ratio
-    aspectRatio: "1:1",
-    content:
-      "Hey everyone at YC, this is my first start up but i wanted to ask - How did you know when to stop iterating on your product and start focusing on getting your first paying customers?",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/84.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/85.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/86.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/87.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
-  {
-    id: "new11",
-    author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      verified: true,
-    },
-    images: [images.Newpost11], // 1:1 aspect ratio
-    aspectRatio: "4:5",
-    content:
-      "All those late nights, weekend grinds, and quiet moments when no one's watching, they'll pay off. One day you'll look back and be proud of the person who never gave up. Everyone's journey has its own timing ",
-    vComments: [
-      {
-        type: "video",
-        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/88.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/89.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/women/90.jpg",
-      },
-      {
-        type: "image",
-        url: "https://randomuser.me/api/portraits/men/91.jpg",
-      },
-    ],
-    timestamp: "3h",
-    likes: 2678,
-    comments: 893,
-    type: "image",
-  },
+
   {
     id: "new10",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      name: "Kai Anderson",
+      username: "kai_founder",
+      avatar: "https://randomuser.me/api/portraits/men/67.jpg",
       verified: true,
     },
-    images: [images.Newpost10], // 1:1 aspect ratio
+    images: [images.Newpost10],
     aspectRatio: "4:5",
     content:
       "The goal is to build a company lina khan wants to break up in 20 years. Until then, build on! YC2025 ",
@@ -588,18 +162,59 @@ export const dummyAllPosts: Post[] = [
     comments: 893,
     type: "image",
   },
+
+  {
+    id: "new12",
+    author: {
+      name: "Nina Torres",
+      username: "nina_startup",
+      avatar: "https://randomuser.me/api/portraits/women/58.jpg",
+      verified: false,
+    },
+    images: [images.Newpost12],
+    aspectRatio: "1:1",
+    content:
+      "Hey everyone at YC, this is my first start up but i wanted to ask - How did you know when to stop iterating on your product and start focusing on getting your first paying customers?",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
   {
     id: "new9",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      name: "Derek Zhang",
+      username: "derek_strategy",
+      avatar: "https://randomuser.me/api/portraits/men/72.jpg",
       verified: true,
     },
-    images: [images.Newpost9], // 1:1 aspect ratio
+    images: [images.Newpost9],
     aspectRatio: "16:9",
     content:
-      "That’s a powerful reframing — but for many founders, the risk isn’t just where you build, it’s how fast you iterate. Ignoring “software first” because you’re chasing rare atoms can lead to paralysis by domain. ",
+      "That's a powerful reframing — but for many founders, the risk isn't just where you build, it's how fast you iterate. Ignoring 'software first' because you're chasing rare atoms can lead to paralysis by domain. ",
     vComments: [
       {
         type: "video",
@@ -627,15 +242,415 @@ export const dummyAllPosts: Post[] = [
     comments: 893,
     type: "image",
   },
+
+  {
+    id: "new14",
+    author: {
+      name: "Bella Santos",
+      username: "bella_stealth",
+      avatar: "https://randomuser.me/api/portraits/women/67.jpg",
+      verified: false,
+    },
+    images: [images.Newpost14],
+    aspectRatio: "4:5",
+    content: 'calling it "building in stealth" instead of "unemployed" ',
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new3",
+    author: {
+      name: "Olivia Chen",
+      username: "olivia_networks",
+      avatar: "https://randomuser.me/api/portraits/women/73.jpg",
+      verified: true,
+    },
+    images: [images.one_16_9],
+    aspectRatio: "16:9",
+    content:
+      "The next Silicon Valley won't be a place — it'll be a network. Founders, users, and capital already move faster than geography. The ones who build for that distributed reality — who see community as infrastructure, not marketing — will own the next decade.",
+    timestamp: "1h",
+    likes: 3421,
+    thumbnail: images.latest2,
+    comments: 567,
+    type: "text",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/38.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/39.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/40.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/41.jpg",
+      },
+    ],
+  },
+
+  {
+    id: "new5",
+    author: {
+      name: "Lucas Harper",
+      username: "lucas_ai",
+      avatar: "https://randomuser.me/api/portraits/men/88.jpg",
+      verified: true,
+    },
+    images: [images.Newpost5],
+    aspectRatio: "16:9",
+    content:
+      " I get what Andrew Ross Sorkin is saying here — but what about when the next major AI regulation hits and the entire distribution model for content gets rewired? How are founders preparing for that shift?",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/72.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/73.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/74.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/75.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new16",
+    author: {
+      name: "Sophie Kim",
+      username: "sophie_rides",
+      avatar: "https://randomuser.me/api/portraits/women/91.jpg",
+      verified: false,
+    },
+    images: [images.Newpost16],
+    aspectRatio: "16:9",
+    content:
+      " I swear the best product ideas come from zooming down the SF coast at 40mph (or from talking to me:) Looking for a few founders to start a biking crew with. 2-4 hrs Saturday mornings loop around all of SF to start, Marin and Berkeley next DM me if you'd be down! ",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new15",
+    author: {
+      name: "Max Coleman",
+      username: "max_ships",
+      avatar: "https://randomuser.me/api/portraits/men/94.jpg",
+      verified: true,
+    },
+    images: [images.Newpost15],
+    aspectRatio: "4:5",
+    content:
+      "Ready to ship a new feature this weekend at vibecon - ycombinator HQ w/@MadlenerNikolai @getmiora ",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new8",
+    author: {
+      name: "Aria Thompson",
+      username: "aria_tests",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      verified: true,
+    },
+    images: [images.Newpost8],
+    aspectRatio: "16:9",
+    content:
+      "Anyone around Byd Park, SF ? We're looking for people to test out some of new features. Willing to connect and help out down the line too. Image",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new13",
+    author: {
+      name: "Ethan Brooks",
+      username: "ethan_ventures",
+      avatar: "https://randomuser.me/api/portraits/men/76.jpg",
+      verified: false,
+    },
+    images: [images.Newpost13],
+    aspectRatio: "4:5",
+    content: "The one trillion dollar man. ",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/84.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/85.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/86.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/87.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new1",
+    author: {
+      name: "Zoe Martinez",
+      username: "zoe_metrics",
+      avatar: "https://randomuser.me/api/portraits/women/53.jpg",
+      verified: true,
+    },
+    images: [images.Newpost1],
+    aspectRatio: "16:9",
+    content:
+      "We turned off our analytics dashboard for a week and tracked nothing but raw user behavior. What we found: users weren't clicking fancy features—they were simply 'sticking' if the core loop worked. The rest? Noise. Has anyone else pulled the plug on metrics to find truth?",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/60.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/61.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/62.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/63.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new6",
+    author: {
+      name: "Ryan Cooper",
+      username: "ryan_search",
+      avatar: "https://randomuser.me/api/portraits/men/82.jpg",
+      verified: true,
+    },
+    images: [images.Newpost6],
+    aspectRatio: "16:9",
+    content:
+      "Aravind is saying Perplexity wins by forcing every answer to be backed by citations. Smart. But in my startup I'm watching that timing, UX and integration beat perfect citation every time. What do you think: is the citation criterion the moat—or just a nice-to-have?",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/76.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/77.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/78.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/79.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
+  {
+    id: "new11",
+    author: {
+      name: "Mia Johnson",
+      username: "mia_grinds",
+      avatar: "https://randomuser.me/api/portraits/women/88.jpg",
+      verified: false,
+    },
+    images: [images.Newpost11],
+    aspectRatio: "4:5",
+    content:
+      "All those late nights, weekend grinds, and quiet moments when no one's watching, they'll pay off. One day you'll look back and be proud of the person who never gave up. Everyone's journey has its own timing ",
+    vComments: [
+      {
+        type: "video",
+        url: "https://cubbyproduct.s3.us-east-2.amazonaws.com/hatespeech/How+to+crack+the+Ugc-Net+Exam+in+the+very+first+attempt_.mp4",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/88.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/89.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/women/90.jpg",
+      },
+      {
+        type: "image",
+        url: "https://randomuser.me/api/portraits/men/91.jpg",
+      },
+    ],
+    timestamp: "3h",
+    likes: 2678,
+    comments: 893,
+    type: "image",
+  },
+
   {
     id: "1",
     author: {
-      name: "Sarah Chen",
-      username: "sarahchen_builds",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      name: "Tyler Reed",
+      username: "tyler_podcasts",
+      avatar: "https://randomuser.me/api/portraits/men/58.jpg",
       verified: true,
     },
-    images: [images.one_1_1], // 1:1 aspect ratio
+    images: [images.one_1_1],
     aspectRatio: "1:1",
     content:
       "Friedberg should have his own podcast, along with Chamath ... and Sacks. hm.. What am I trying to say here?",
@@ -669,12 +684,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "2",
     author: {
-      name: "Marcus Johnson",
-      username: "marcus_momentum",
-      avatar: "https://randomuser.me/api/portraits/men/33.jpg",
+      name: "Liam Davis",
+      username: "liam_debates",
+      avatar: "https://randomuser.me/api/portraits/men/62.jpg",
       verified: false,
     },
-    images: [images.one_4_5], // 4:5 aspect ratio (portrait)
+    images: [images.one_4_5],
     aspectRatio: "4:5",
     content:
       "Jason's arguments on the Kimmel situation no different from his apology to Palmer Luckey for getting him fired…not the truth but just a token gesture which has clearly been rejected by him…",
@@ -708,12 +723,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "3",
     author: {
-      name: "Elena Rodriguez",
-      username: "elena_networks",
-      avatar: "https://randomuser.me/api/portraits/women/21.jpg",
+      name: "Chloe Anderson",
+      username: "chloe_policy",
+      avatar: "https://randomuser.me/api/portraits/women/78.jpg",
       verified: true,
     },
-    images: [images.one_16_9], // 16:9 aspect ratio (landscape)
+    images: [images.one_16_9],
     aspectRatio: "16:9",
     content:
       "Would Elon Musk have been able to do his first start up if there was a $100k fee for H1-B? Elon promised to go to war over H1-B but I don't think he has said anything about the new rules.",
@@ -748,9 +763,9 @@ export const dummyAllPosts: Post[] = [
   {
     id: "4",
     author: {
-      name: "David Kim",
-      username: "davidk_global",
-      avatar: "https://randomuser.me/api/portraits/men/41.jpg",
+      name: "Aiden Wu",
+      username: "aiden_immigration",
+      avatar: "https://randomuser.me/api/portraits/men/71.jpg",
       verified: false,
     },
     content:
@@ -780,19 +795,19 @@ export const dummyAllPosts: Post[] = [
     timestamp: "6h",
     likes: 892,
     comments: 156,
-    type: "text", // TEXT ONLY POST (no image)
+    type: "text",
   },
   {
     id: "5",
     author: {
-      name: "Alex Thompson",
-      username: "alex_mediawatch",
-      avatar: "https://randomuser.me/api/portraits/men/28.jpg",
+      name: "Brooklyn Foster",
+      username: "brooklyn_media",
+      avatar: "https://randomuser.me/api/portraits/women/65.jpg",
       verified: true,
     },
     content:
       'Jason needs to watch the Kimmel clip again, this time very carefully. Kimmel DID say the kid was MAGA, perhaps not directly, but it was heavily implied. Seriously, why does Jason think the FCC was so annoyed at Kimmel"s comments?',
-    videos: [images.mainpost5], // VIDEO POST - UNCHANGED
+    videos: [images.mainpost5],
     thumbnail: images.mainpost5,
     timestamp: "12m",
     likes: 4567,
@@ -825,13 +840,13 @@ export const dummyAllPosts: Post[] = [
     id: "6",
     communityName: "Chef Valentina",
     author: {
-      name: "Isabella Martinez",
-      username: "bella_cooks",
-      avatar: "https://randomuser.me/api/portraits/women/15.jpg",
+      name: "Luna Garcia",
+      username: "luna_foodie",
+      avatar: "https://randomuser.me/api/portraits/women/34.jpg",
       verified: true,
     },
     content: "Be honest, what's the best drink for this meal ?",
-    images: [images.two_1_1], // 1:1 aspect ratio
+    images: [images.two_1_1],
     aspectRatio: "1:1",
     timestamp: "2h",
     likes: 2156,
@@ -864,12 +879,12 @@ export const dummyAllPosts: Post[] = [
     id: "7",
     communityName: "Mentors united",
     author: {
-      name: "James Wilson",
-      username: "mentor_james",
-      avatar: "https://randomuser.me/api/portraits/men/36.jpg",
+      name: "Mason Taylor",
+      username: "mason_hustle",
+      avatar: "https://randomuser.me/api/portraits/men/86.jpg",
       verified: false,
     },
-    images: [images.two_4_5], // 4:5 aspect ratio (portrait)
+    images: [images.two_4_5],
     aspectRatio: "4:5",
     content:
       "Bro to bro: If you can grind 18 hours a day, 7 days a week. No days off. Just God, hustle, eat, sleep. You will find a way out from your messed up life",
@@ -904,13 +919,13 @@ export const dummyAllPosts: Post[] = [
     id: "8",
     communityName: "Tesla Super Owners",
     author: {
-      name: "Ryan Parker",
-      username: "ryan_drives_tesla",
-      avatar: "https://randomuser.me/api/portraits/men/44.jpg",
+      name: "Noah Bennett",
+      username: "noah_tesla",
+      avatar: "https://randomuser.me/api/portraits/men/91.jpg",
       verified: true,
     },
     content: "Elon with optimus Caption this",
-    videos: [images.mainpost5], // VIDEO POST - UNCHANGED
+    videos: [images.mainpost5],
     thumbnail: images.mainpost8,
     timestamp: "30m",
     likes: 5234,
@@ -943,13 +958,13 @@ export const dummyAllPosts: Post[] = [
     id: "9",
     communityName: "Tesla Super Owners",
     author: {
-      name: "Sophia Lee",
-      username: "sophia_autonomy",
-      avatar: "https://randomuser.me/api/portraits/women/19.jpg",
+      name: "Ava Rodriguez",
+      username: "ava_autonomous",
+      avatar: "https://randomuser.me/api/portraits/women/87.jpg",
       verified: false,
     },
     content: "LiDAR is absolutely game-changing technology",
-    videos: [images.mainpost9], // VIDEO POST - UNCHANGED
+    videos: [images.mainpost9],
     thumbnail: images.mainpost9,
     timestamp: "1h",
     likes: 3456,
@@ -981,12 +996,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "10",
     author: {
-      name: "Priya Patel",
-      username: "priya_onimmigration",
-      avatar: "https://randomuser.me/api/portraits/women/25.jpg",
+      name: "Sanjay Kapoor",
+      username: "sanjay_visa",
+      avatar: "https://randomuser.me/api/portraits/men/79.jpg",
       verified: false,
     },
-    images: [images.three_1_1], // 1:1 aspect ratio
+    images: [images.three_1_1],
     aspectRatio: "1:1",
     content:
       "This is heartbreaking. Many folks are waiting for green cards for decades but unfortunately they have to be on non immigrant visa because USA doesn't have an intermediary status. There hasn't been discussion on this in the podcast, very disappointing...",
@@ -1020,12 +1035,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "11",
     author: {
-      name: "Michael Roberts",
-      username: "mike_mediawatch",
-      avatar: "https://randomuser.me/api/portraits/men/48.jpg",
+      name: "Harper Lee",
+      username: "harper_critic",
+      avatar: "https://randomuser.me/api/portraits/women/92.jpg",
       verified: true,
     },
-    images: [images.two_16_9], // 16:9 aspect ratio (landscape)
+    images: [images.two_16_9],
     aspectRatio: "16:9",
     content:
       "Last week Chamath and Sacks say no one watches Kimmel and cited his poor ratings but this week say Kimmel was the leading voice? How does that math make sense if no one watches him? Let's try to stay consistent here.",
@@ -1059,12 +1074,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "12",
     author: {
-      name: "Jennifer Chang",
-      username: "jen_policywatch",
-      avatar: "https://randomuser.me/api/portraits/women/29.jpg",
+      name: "Iris Nakamura",
+      username: "iris_h1b",
+      avatar: "https://randomuser.me/api/portraits/women/63.jpg",
       verified: false,
     },
-    images: [images.three_4_5], // 4:5 aspect ratio (portrait)
+    images: [images.three_4_5],
     aspectRatio: "4:5",
     content:
       "While your analysis of H1B problems was good, it completely ignores the rampant corruption by those processing applicants. The average applicant nets only about half the salary after kickbacks and fraud. Indenture servitude is a very real issue.",
@@ -1098,12 +1113,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "13",
     author: {
-      name: "Carlos Mendez",
-      username: "carlosm_business",
-      avatar: "https://randomuser.me/api/portraits/men/52.jpg",
+      name: "Diego Silva",
+      username: "diego_corporate",
+      avatar: "https://randomuser.me/api/portraits/men/68.jpg",
       verified: true,
     },
-    images: [images.four_1_1], // 1:1 aspect ratio
+    images: [images.four_1_1],
     aspectRatio: "1:1",
     content:
       "Thank you for exposing the abusive practices by Wipro, Infosys, HCLTech and Cognizant. Don't forget how big US companies leverage them with a two-tiered contractor system allowing zero notice terminations.",
@@ -1137,12 +1152,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "14",
     author: {
-      name: "Amanda Foster",
-      username: "amanda_observes",
-      avatar: "https://randomuser.me/api/portraits/women/31.jpg",
+      name: "Jade Williams",
+      username: "jade_watcher",
+      avatar: "https://randomuser.me/api/portraits/women/76.jpg",
       verified: false,
     },
-    images: [images.three_16_9], // 16:9 aspect ratio (landscape)
+    images: [images.three_16_9],
     aspectRatio: "16:9",
     content:
       'I like how these guys said they dont do ads on the pod, but every episode starts with a subtle "commentary ad" about a brand or product. Today was Emirates Airlines. You can fool everyone, but not me! Still a smart move though!',
@@ -1176,9 +1191,9 @@ export const dummyAllPosts: Post[] = [
   {
     id: "15",
     author: {
-      name: "Taylor Swift",
-      username: "taylor_styles",
-      avatar: "https://randomuser.me/api/portraits/women/17.jpg",
+      name: "Phoenix Carter",
+      username: "phoenix_style",
+      avatar: "https://randomuser.me/api/portraits/women/89.jpg",
       verified: true,
     },
     content:
@@ -1186,7 +1201,7 @@ export const dummyAllPosts: Post[] = [
     timestamp: "15m",
     likes: 45678,
     comments: 8923,
-    type: "text", // TEXT ONLY POST (no image)
+    type: "text",
     vComments: [
       {
         type: "video",
@@ -1213,12 +1228,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "16",
     author: {
-      name: "Raj Sharma",
-      username: "raj_h1b_analyst",
-      avatar: "https://randomuser.me/api/portraits/men/39.jpg",
+      name: "Rohan Gupta",
+      username: "rohan_analyst",
+      avatar: "https://randomuser.me/api/portraits/men/84.jpg",
       verified: true,
     },
-    images: [images.five_1_1], // 1:1 aspect ratio
+    images: [images.five_1_1],
     aspectRatio: "1:1",
     vComments: [
       {
@@ -1253,12 +1268,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "17",
     author: {
-      name: "Emily Watson",
-      username: "emily_ai_future",
-      avatar: "https://randomuser.me/api/portraits/women/26.jpg",
+      name: "Skylar Morgan",
+      username: "skylar_future",
+      avatar: "https://randomuser.me/api/portraits/women/51.jpg",
       verified: false,
     },
-    images: [images.four_4_5], // 4:5 aspect ratio (portrait)
+    images: [images.four_4_5],
     aspectRatio: "4:5",
     content:
       "The future of AI is not just about building smarter machines, it's about creating systems that understand human context and emotion. We're at an inflection point.",
@@ -1292,12 +1307,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "18",
     author: {
-      name: "Nathan Brooks",
-      username: "nathan_executes",
-      avatar: "https://randomuser.me/api/portraits/men/46.jpg",
+      name: "Cameron Stone",
+      username: "cameron_sv",
+      avatar: "https://randomuser.me/api/portraits/men/75.jpg",
       verified: true,
     },
-    images: [images.five_4_5], // 4:5 aspect ratio (portrait)
+    images: [images.five_4_5],
     aspectRatio: "4:5",
     content:
       "After 10 years in Silicon Valley, I've learned that the best founders aren't the ones with the best ideas - they're the ones who execute relentlessly and adapt quickly.",
@@ -1331,12 +1346,12 @@ export const dummyAllPosts: Post[] = [
   {
     id: "19",
     author: {
-      name: "Lisa Chen",
-      username: "lisa_marketwatch",
-      avatar: "https://randomuser.me/api/portraits/women/38.jpg",
+      name: "Morgan Ellis",
+      username: "morgan_markets",
+      avatar: "https://randomuser.me/api/portraits/women/94.jpg",
       verified: false,
     },
-    images: [images.four_16_9], // 16:9 aspect ratio (landscape)
+    images: [images.four_16_9],
     aspectRatio: "16:9",
     content:
       "Markets are showing interesting patterns this quarter. The divergence between tech and traditional sectors has never been more pronounced. Time to reassess portfolios?",
@@ -1370,9 +1385,9 @@ export const dummyAllPosts: Post[] = [
   {
     id: "20",
     author: {
-      name: "Robert Martinez",
-      username: "robert_builds",
-      avatar: "https://randomuser.me/api/portraits/men/50.jpg",
+      name: "Julian Hayes",
+      username: "julian_grind",
+      avatar: "https://randomuser.me/api/portraits/men/92.jpg",
       verified: true,
     },
     content:
@@ -1380,7 +1395,7 @@ export const dummyAllPosts: Post[] = [
     timestamp: "14h",
     likes: 1876,
     comments: 623,
-    type: "text", // TEXT ONLY POST (no image)
+    type: "text",
     vComments: [
       {
         type: "video",
