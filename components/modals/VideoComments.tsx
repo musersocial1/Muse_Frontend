@@ -431,13 +431,13 @@ const VideoCommentsModal: React.FC<VideoCommentsModalProps> = ({
 
           <TouchableOpacity
             onPress={onRecordComment}
-            className="flex-row items-center bg-[#00000066]/[40%] rounded-full p-4"
+            className="flex-row items-center bg-[#00000066]/[40%] rounded-full py-3 px-4"
           >
             <View className="w-5 h-5 rounded-full items-center justify-center mr-2">
               <Image source={icons.record} className="h-full w-full" />
             </View>
-            <Text className="text-white font-sfpro-regular tracking-tighter text-sm">
-              Record a comment
+            <Text className="text-white font-sfpro-medium tracking-tighter text-base">
+              Send{" "}
             </Text>
           </TouchableOpacity>
         </View>

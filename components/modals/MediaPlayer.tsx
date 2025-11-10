@@ -184,21 +184,25 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (isVisible) {
-      const trackUrl =
-        "https://cubbyproduct.s3.amazonaws.com/hatespeech/output/hateSpeech_10min_output/index.m3u8";
+    if (!isVisible || !videoUrl) return;
 
-      if (!currentTrack || currentTrack.url !== trackUrl) {
-        playTrack({
+    // Always reload the video when the modal opens
+    const loadNewTrack = async () => {
+      try {
+        await playTrack({
           id: `track-${Date.now()}`,
-          url: trackUrl,
-          title: title,
+          url: videoUrl,
+          title,
           artist: author,
           artwork: images.media,
         });
+      } catch (e) {
+        console.log("⚠️ Error loading video:", e);
       }
-    }
-  }, [isVisible, videoUrl, audioUrl]);
+    };
+
+    loadNewTrack();
+  }, [isVisible, videoUrl]);
 
   useEffect(() => {
     if (setShowModalVideo) {
@@ -724,7 +728,7 @@ const MediaPlayerModal: React.FC<MediaPlayerModalProps> = ({
                     <View className="w-full aspect-square rounded-full bg-[#F94141]" />
                   </View>
                   <Text className="text-white font-sfpro-medium text-base">
-                    Record a post
+                    Comment
                   </Text>
                 </TouchableOpacity>
               </View>

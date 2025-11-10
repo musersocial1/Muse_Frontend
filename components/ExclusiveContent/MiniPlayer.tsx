@@ -30,9 +30,9 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
     showMini,
   } = usePlayer();
 
-  // Geometry (thicker ring)
-  const outerRadius = 30; // overall radius
-  const ringThickness = 5; // thick progress ring
+  // Geometry (same as before)
+  const outerRadius = 30;
+  const ringThickness = 5;
   const innerRadius = outerRadius - ringThickness;
   const innerSize = innerRadius * 2;
   const size = outerRadius * 2;
@@ -42,14 +42,13 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
 
   const dashOffset = useRef(new Animated.Value(circumference)).current;
 
-  // Progress from context
   const progress = useMemo(() => {
     if (!duration || duration <= 0) return 0;
     const p = Math.min(1, Math.max(0, position / duration));
     return Number.isFinite(p) ? p : 0;
   }, [position, duration]);
 
-  // Animate progress ring
+  // 👇 keep these hooks always running
   useEffect(() => {
     const to = circumference * (1 - progress);
     Animated.timing(dashOffset, {
@@ -84,10 +83,17 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
   const EMPTY = "rgba(188, 188, 188, 0.11)";
   const PROGRESS = "#FFFFFF";
 
-  if (!currentTrack || !showMini) return null;
+  // 👇 instead of returning null, hide the component
+  const hidden = !currentTrack || !showMini;
 
   return (
-    <View pointerEvents="box-none" style={styles.floatingContainer}>
+    <View
+      pointerEvents={hidden ? "none" : "box-none"}
+      style={[
+        styles.floatingContainer,
+        hidden && { opacity: 0, transform: [{ scale: 0.8 }] },
+      ]}
+    >
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={onPress}
@@ -124,7 +130,6 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
           >
             {/* Progress ring */}
             <Svg width={size} height={size} style={StyleSheet.absoluteFill}>
-              {/* Empty track */}
               <Circle
                 cx={half}
                 cy={half}
@@ -133,7 +138,6 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
                 strokeWidth={ringThickness}
                 fill="none"
               />
-              {/* Progress arc (starts at 12 o'clock) */}
               <AnimatedCircle
                 cx={half}
                 cy={half}
@@ -150,7 +154,7 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
               />
             </Svg>
 
-            {/* Inner circle using SVG gold gradient */}
+            {/* Inner circle */}
             <View
               style={{
                 position: "absolute",
@@ -191,23 +195,6 @@ const MiniCirclePlayer: React.FC<MiniCirclePlayerProps> = ({ onPress }) => {
                   fill="url(#goldGradient)"
                 />
               </Svg>
-
-              {/* Commented out RN Image approach */}
-              {/* <Animated.View
-                style={[
-                  StyleSheet.absoluteFill,
-                  { transform: [{ rotate: rotation }] },
-                ]}
-              >
-                <RNImage
-                  source={images.gold}
-                  resizeMode="cover"
-                  style={[
-                    StyleSheet.absoluteFill,
-                    { transform: [{ scale: 2 }] },
-                  ]}
-                />
-              </Animated.View> */}
 
               <View
                 style={[

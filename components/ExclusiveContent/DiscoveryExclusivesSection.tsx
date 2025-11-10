@@ -31,6 +31,7 @@ type Video = {
   thumb: string;
   age: string; // e.g. "5 Months ago"
   isNew?: boolean;
+  links?: string;
 };
 
 type Community = {
@@ -57,17 +58,21 @@ const FILTERS = [
 const LATEST: Video[] = [
   {
     id: "1",
-    title: " Tucker Carlson Business Roundtable",
+    title: "Why Vertical LLM Agents Are The New $1 Billion SaaS Opportunities",
     thumb: images.latest1, // your local image
     age: "1 Week ago",
     isNew: true,
+    links:
+      "https://firebasestorage.googleapis.com/v0/b/davis-d2094.appspot.com/o/muse%2Fvideoplayback.mp4?alt=media&token=40e4fe12-21e8-49c7-b101-1237a549a637",
   },
   {
     id: "2",
-    title: "Huda Love Island - Cast Tell All",
+    title: "Conversations with Bornfrosh & Al",
     thumb: images.latest2, // your local image
     age: "2 Weeks ago",
     isNew: true,
+    links:
+      "https://cubbyproduct.s3.amazonaws.com/hatespeech/output/hateSpeech_10min_output/index.m3u8",
   },
   {
     id: "3",
@@ -197,6 +202,22 @@ const router = useRouter();
 export default function DiscoveryExclusivesScreen() {
   const [activeFilter, setActiveFilter] = useState(FILTERS[0]);
 
+  const [currentMedia, setCurrentMedia] = useState<
+    | {
+        url: string;
+        title: string;
+      }
+    | any
+  >(null);
+
+  const openPlayer = (item: Video | (Video & { progress?: number })) => {
+    setCurrentMedia({
+      url: item.links ?? images.media, // fallback to local if no URL
+      title: item.title,
+    });
+    setShowPlayer(true);
+  };
+
   const { width } = Dimensions.get("window");
   const headerChips = useMemo(
     () =>
@@ -255,9 +276,10 @@ export default function DiscoveryExclusivesScreen() {
           <MediaPlayerModal
             isVisible={showPlayer}
             onClose={() => setShowPlayer(false)}
-            videoUrl={images.media}
-            audioUrl={images.media}
-            title="Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al"
+            // title="Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al • Conversations with Bornfrosh & Al"
+            videoUrl={currentMedia.url}
+            audioUrl={currentMedia.url}
+            title={Array(3).fill(currentMedia.title).join(" • ")} // 👈 repeated title
             author="John"
             duration={0}
           />
@@ -321,7 +343,11 @@ export default function DiscoveryExclusivesScreen() {
               <View className="flex-row flex-wrap px-3 gap-4">
                 {LATEST.slice(0, showAll ? LATEST.length : 2).map((item) => (
                   <View key={item.id} className="w-[48%] ">
-                    <VideoCard item={item} setShowPlayer={setShowPlayer} />
+                    <VideoCard
+                      item={item}
+                      onPress={() => openPlayer(item)}
+                      setShowPlayer={setShowPlayer}
+                    />
                   </View>
                 ))}
               </View>
@@ -410,12 +436,15 @@ function SeeAll({
 function VideoCard({
   item,
   setShowPlayer,
+  onPress,
 }: {
   item: Video;
+  onPress: () => void;
+
   setShowPlayer: (val: boolean) => void;
 }) {
   return (
-    <TouchableOpacity onPress={() => setShowPlayer(true)}>
+    <TouchableOpacity onPress={onPress}>
       <View className="rounded-[13px]  overflow-hidden bg-[#141414]">
         <ImageBackground
           source={

@@ -6,6 +6,7 @@ import StoryModal from "@/components/modals/StoryModal";
 import PuffySmoke from "@/components/ui/PuffySmoke";
 import { DUMMY_STORIES, dummyAllPosts } from "@/constants/data";
 import { images } from "@/constants/images";
+import { useCommunity } from "@/context/CommunityContext";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -43,9 +44,13 @@ const STORIES = [
 ];
 
 const Home: React.FC = () => {
-  const [posts] = useState(dummyAllPosts);
+  // const [posts] = useState(dummyAllPosts);
+  const posts = dummyAllPosts;
+
   const [feedScrollEnabled, setFeedScrollEnabled] = useState(true);
-  const [selectedCommunity, setSelectedCommunity] = useState("All");
+  const { selectedCommunity } = useCommunity();
+
+  const selectedCommunityName = selectedCommunity?.name ?? "All";
   const [openSwitcher, setOpenSwitcher] = useState(false);
   const [uploadVisible, setUploadVisible] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -247,9 +252,9 @@ const Home: React.FC = () => {
 
                 <View className="flex-row space-x-3 gap-2">
                   <TouchableOpacity
-                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg shadow-sm z-20"
+                    className="flex-row items-center px-4 h-12 bg-[#3636365E]/[37%] overflow-hidden border-[#736F7366]/[40%] border rounded-full drop-shadow-lg  shadow-sm z-20"
                     activeOpacity={0.7}
-                    style={{ minWidth: 80, maxWidth: 160 }}
+                    style={{ minWidth: 80, maxWidth: 300 }}
                     onPress={() => setOpenSwitcher(true)}
                   >
                     <BlurView
@@ -257,10 +262,10 @@ const Home: React.FC = () => {
                       style={[StyleSheet.absoluteFill, { borderRadius: 28 }]}
                     />
                     <Text
-                      className="text-white font-medium text-[16px] flex-1"
+                      className="text-white mr-1 max-w-[100px] font-medium text-[16px]"
                       numberOfLines={1}
                     >
-                      {selectedCommunity}
+                      {selectedCommunityName}
                     </Text>
                     <Feather
                       name="server"

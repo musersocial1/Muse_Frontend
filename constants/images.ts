@@ -59,6 +59,9 @@ import latest2 from "@/assets/images/Xcontent/latest2.webp";
 import Xcomm1 from "@/assets/images/Xcontent/Xcomm1.webp";
 import Xcomm2 from "@/assets/images/Xcontent/Xcomm2.webp";
 import Xcomm3 from "@/assets/images/Xcontent/Xcomm3.webp";
+import Xcomm4 from "@/assets/images/Xcontent/Xcomm4.webp";
+import Xcomm5 from "@/assets/images/Xcontent/Xcomm5.webp";
+import Xcomm6 from "@/assets/images/Xcontent/Xcomm6.webp";
 
 // FEED IMAGES
 import feed1 from "@/assets/images/feed/feed1.webp";
@@ -130,6 +133,23 @@ import one_16_9 from "@/assets/demoImages2/16_9/one_16_9.webp";
 import three_16_9 from "@/assets/demoImages2/16_9/three_16_9.webp";
 import two_16_9 from "@/assets/demoImages2/16_9/two_16_9.webp";
 
+//
+
+import Newpost1 from "@/assets/images/feed/post1.webp";
+import Newpost10 from "@/assets/images/feed/post10.webp";
+import Newpost11 from "@/assets/images/feed/post11.webp";
+import Newpost12 from "@/assets/images/feed/post12.webp";
+import Newpost13 from "@/assets/images/feed/post13.webp";
+import Newpost14 from "@/assets/images/feed/post14.webp";
+import Newpost15 from "@/assets/images/feed/post15.webp";
+import Newpost16 from "@/assets/images/feed/post16.webp";
+import Newpost4 from "@/assets/images/feed/post4.webp";
+import Newpost5 from "@/assets/images/feed/post5.webp";
+import Newpost6 from "@/assets/images/feed/post6.webp";
+import Newpost7 from "@/assets/images/feed/post7.webp";
+import Newpost8 from "@/assets/images/feed/post8.webp";
+import Newpost9 from "@/assets/images/feed/post9.webp";
+
 export const images = {
   splash,
   logo,
@@ -186,6 +206,9 @@ export const images = {
   Xcomm1,
   Xcomm2,
   Xcomm3,
+  Xcomm4,
+  Xcomm5,
+  Xcomm6,
   latest1,
   latest2,
   Xpod1,
@@ -258,4 +281,20 @@ export const images = {
   two_16_9,
   three_16_9,
   four_16_9,
+
+  //NEW POST
+  Newpost1,
+  Newpost4,
+  Newpost5,
+  Newpost6,
+  Newpost7,
+  Newpost8,
+  Newpost9,
+  Newpost10,
+  Newpost11,
+  Newpost12,
+  Newpost13,
+  Newpost14,
+  Newpost15,
+  Newpost16,
 };

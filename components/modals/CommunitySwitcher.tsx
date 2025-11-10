@@ -26,39 +26,40 @@ interface Community {
 
 import { images } from "@/constants/images";
 import { RouterConstantUtil } from "@/constants/RouterConstantUtil";
+import { useCommunity } from "@/context/CommunityContext";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 
 const communities: Community[] = [
   {
     id: "1",
-    name: "Swifties",
-    image: images.comm1,
+    name: "JRE",
+    image: images.Xcomm1,
   },
   {
     id: "2",
-    name: "Designers",
-    image: images.comm2,
+    name: "Call Her Daddy",
+    image: images.Xcomm2,
   },
   {
     id: "3",
-    name: "Gamers",
-    image: images.comm3,
+    name: "All In",
+    image: images.Xcomm3,
   },
   {
     id: "4",
-    name: "Creators",
-    image: images.comm4,
+    name: "Yc",
+    image: images.Xcomm4,
   },
   {
     id: "5",
-    name: "Artists",
-    image: images.comm5,
+    name: "Acquired",
+    image: images.Xcomm5,
   },
   {
     id: "6",
-    name: "Musicians",
-    image: images.comm6,
+    name: "A16z",
+    image: images.Xcomm6,
   },
 ];
 
@@ -66,18 +67,14 @@ const CommunityCard: React.FC<{
   community: Community;
   size: number;
   onClose: any;
-}> = ({ community, size, onClose }) => {
-  const router = useRouter();
+  onSelect: (community: Community) => void;
+}> = ({ community, size, onClose, onSelect }) => {
   return (
     <TouchableOpacity
       className="items-center mb-10 w-[47%] "
       activeOpacity={0.9}
-      onPress={() => {
-        router.push(RouterConstantUtil.tabs.home as any);
-        setTimeout(() => {
-          onClose();
-        }, 100);
-      }}
+      onPress={() => onSelect(community)}
+
       // onPress={() => onClose()}
     >
       <View
@@ -113,6 +110,16 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
   onClose,
 }) => {
   const insets = useSafeAreaInsets();
+  const { setSelectedCommunity } = useCommunity();
+  const router = useRouter();
+  const handleSelect = (community: Community) => {
+    setSelectedCommunity(community); // 👉 save globally
+
+    router.push(RouterConstantUtil.tabs.home as any); // or router.back()
+    setTimeout(() => {
+      onClose();
+    }, 100);
+  };
 
   return (
     <>
@@ -145,9 +152,9 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
               >
                 <Image
                   source={community.image}
-                  className="rounded-full w-full h-full "
+                  className="rounded-full w-full opacity-40 h-full "
                   resizeMode="cover"
-                  blurRadius={Platform.OS == "android" ? 1000 : 1000}
+                  blurRadius={Platform.OS == "android" ? 1000 : 3000}
                 />
               </View>
             ))}
@@ -198,6 +205,7 @@ const CommunitySwitcher: React.FC<CommunitiesModalProps> = ({
                     community={community}
                     size={cardSize}
                     onClose={onClose}
+                    onSelect={handleSelect}
                   />
                 ))}
               </View>

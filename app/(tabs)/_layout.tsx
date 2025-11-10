@@ -95,7 +95,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   // Regular tabs - icon in circle
   return (
-    <View className="w-16 h-16 overflow-hidden rounded-full">
+    <View className="w-16 h-16   overflow-hidden rounded-full">
       <BlurView
         intensity={70} // Change for more/less blur
         tint={focused ? "extraLight" : "dark"}
@@ -116,7 +116,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
           <Image
             source={icon}
             style={{ tintColor: focused ? "#151312" : "#ffffff" }}
-            className="w-[50%] h-fit"
+            className="w-[50%]  h-fit"
             resizeMode="contain"
           />
         </Animated.View>
@@ -285,7 +285,7 @@ export default function TabsLayout({ panHandlers }: any) {
             // onPress={() => setShowModal(true)}
             onPress={openPost}
             activeOpacity={100}
-            className="w-16 h-16   rounded-full items-center justify-center shadow-lg"
+            className="w-16 h-16    rounded-full items-center justify-center shadow-lg"
           >
             <Image source={images.postIcon} className="h-full w-full" />
           </TouchableOpacity>

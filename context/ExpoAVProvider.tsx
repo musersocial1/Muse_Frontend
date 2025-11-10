@@ -25,13 +25,6 @@ export const ExpoAVProvider: React.FC<{
   const [showMini, setShowMini] = useState(false);
   const [showModalVideo, setShowModalVideo] = useState(false);
 
-  const [videoLayout, setVideoLayout] = useState({
-    width: 0,
-    height: 0,
-    x: 0,
-    y: 0,
-  });
-
   useEffect(() => {
     Audio.setAudioModeAsync({
       staysActiveInBackground: true,
@@ -50,17 +43,46 @@ export const ExpoAVProvider: React.FC<{
   };
 
   const playTrack = async (track: Track) => {
-    setCurrentTrack(track);
-    setIsPlaying(true);
+    console.log("🎬 playTrack called with:", track.url);
+
+    if (!videoRef.current) {
+      setCurrentTrack(track);
+      return;
+    }
+
+    try {
+      await videoRef.current.unloadAsync();
+      console.log("✅ Previous video unloaded");
+
+      await videoRef.current.loadAsync(
+        { uri: track.url },
+        { shouldPlay: true, rate: playbackRate }
+      );
+
+      console.log("▶️ New video loaded and playing");
+      setCurrentTrack(track);
+      setIsPlaying(true);
+    } catch (e) {
+      console.log("⚠️ Error loading track:", e);
+    }
   };
 
   const onVideoLoad = async () => {
+    console.log(
+      "🎥 Video loaded, playbackRate:",
+      playbackRate,
+      "isPlaying:",
+      isPlaying
+    );
     try {
       await videoRef.current?.setRateAsync(playbackRate, true);
       if (isPlaying) {
+        console.log("▶️ Auto-playing video");
         await videoRef.current?.playAsync();
       }
-    } catch {}
+    } catch (e) {
+      console.log("❌ Error in onVideoLoad:", e);
+    }
   };
 
   const togglePlayPause = async () => {
@@ -118,7 +140,6 @@ export const ExpoAVProvider: React.FC<{
       setShowModalVideo,
       onPlaybackStatusUpdate,
       onVideoLoad,
-      setVideoLayout,
     }),
     [
       currentTrack,
@@ -135,9 +156,7 @@ export const ExpoAVProvider: React.FC<{
     <PlayerContext.Provider value={value}>
       {children}
 
-      {/* Only render a hidden audio Video when the modal isn't showing video.
-          The visible <Video> should be rendered inline inside your Modal and
-          must pass onLoad={onVideoLoad} and onPlaybackStatusUpdate={onPlaybackStatusUpdate}. */}
+      {/* Render hidden video when modal is NOT showing */}
       {currentTrack && !showModalVideo && (
         <View style={styles.hidden} pointerEvents="none">
           <Video
@@ -164,11 +183,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: -9999,
     top: -9999,
-  },
-  videoOverlay: {
-    position: "absolute",
-    zIndex: 9999,
-    overflow: "hidden",
-    borderRadius: 30,
   },
 });

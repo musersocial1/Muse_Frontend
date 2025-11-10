@@ -61,7 +61,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   if (isProfile) {
     return (
-      <View className="w-14 h-14 overflow-hidden rounded-full">
+      <View className="w-16 h-16  overflow-hidden rounded-full">
         <BlurView
           intensity={70} // Change for more/less blur
           tint={focused ? "extraLight" : "dark"}
@@ -75,7 +75,7 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
               opacity: opacityValue,
               // ...shadowStyle,
             }}
-            className="w-14 h-14 rounded-full overflow-hidden"
+            className="w-full h-full rounded-full overflow-hidden"
           >
             <Image source={icon} className="w-full h-full" resizeMode="cover" />
           </Animated.View>
@@ -86,10 +86,10 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
 
   // Regular tabs - icon in circle
   return (
-    <View className="w-16 h-16 overflow-hidden rounded-full">
+    <View className="w-16 h-16  overflow-hidden rounded-full">
       <BlurView
-        intensity={70} // Change for more/less blur
-        tint={focused ? "extraLight" : "dark"}
+        intensity={60} // Change for more/less blur
+        tint={focused ? "extraLight" : "light"}
         className=" w-full h-full   "
         experimentalBlurMethod="dimezisBlurView" // For Android
       >
@@ -98,9 +98,9 @@ function TabIcon({ focused, icon, title, isProfile }: any) {
             transform: [{ scale: scaleValue }],
             opacity: opacityValue,
           }}
-          className={`w-full h-full rounded-full justify-center items-center border ${
+          className={`w-full h-full rounded-full justify-center items-center border-[0.6px] ${
             focused
-              ? "bg-white border-white"
+              ? "bg-white border-white/[13%]"
               : "bg-[#808080]/10 border-[#FFFFFF]/50"
           }`}
         >
@@ -146,7 +146,7 @@ export default function CustomNavBar({ panHandlers }: any) {
       style={{ paddingBottom: insets.bottom + 5, marginHorizontal: 0 }}
       // pointerEvents="none"
       {...panHandlers} // 👈 spread here
-      className="absolute  bottom-0 gap-3   px-[34px]  pb-[100px] left-[0px] right-[0px] flex-row justify-center "
+      className="absolute  bottom-0 gap-3   px-[50px]  pb-[100px] left-[0px] right-[0px] flex-row justify-center "
     >
       {/* {tabsConfig.map((tab) => (
             <TouchableOpacity

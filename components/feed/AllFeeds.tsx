@@ -52,9 +52,11 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
   variant = "default",
   containerClassName = "",
 }) => {
-  const baseRow = "flex-row   justify-between items-center  pt-2 pb-3  ";
+  const baseRow = "flex-row    justify-between items-center  pt-[10px] pb-3  ";
   const overlayWrap =
-    variant === "overlay" ? "absolute top-0 left-0 right-0 z-10 px-2" : "px-4";
+    variant === "overlay"
+      ? "absolute top-0 left-0 right-0 z-10 px-[10px]"
+      : "px-[10px]  ";
 
   return (
     <View
@@ -66,9 +68,9 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
       <View className={baseRow}>
         <TouchableOpacity
           onPress={onAuthorPress}
-          className={`flex-row shrink ${
+          className={`flex-row  items-center shrink ${
             overlayWrap ? "bg-[#36363666]/[0%]" : ""
-          }  rounded-full    pr-2   `}
+          }  rounded-full   pr-2   `}
           style={{
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 12 },
@@ -88,7 +90,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
             />
           )} */}
 
-          <View className="w-11 h-11 rounded-full overflow-hidden mr-1.5">
+          <View className="w-11 h-11  rounded-full overflow-hidden mr-1.5">
             <Image
               source={{ uri: post.author.avatar }}
               className="w-full h-full"
@@ -98,8 +100,8 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
 
           <View>
             <View className="flex-col">
-              <View className="flex-row  items-center pt-1">
-                <Text className="text-white capitalize font-sfpro-bold text-[15px]  mr-1">
+              <View className="flex-row  items-center ">
+                <Text className="text-white capitalize font-sfpro-bold text-[13px]  mr-1">
                   {post.author.username}
                 </Text>
                 {post.author.verified && (
@@ -109,7 +111,7 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
                 )}
               </View>
 
-              <Text className="text-white font-sfpro-bold text-[11px] pt-[4px]">
+              <Text className="text-white font-sfpro-medium text-[11px] pt-[2px]">
                 TBD Podcast
               </Text>
             </View>
@@ -119,14 +121,14 @@ export const PostHeader: React.FC<PostHeaderProps> = ({
         <View
           // intensity={50}
           // tint="dark"
-          className="flex-row gap-1  items-center p-2 rounded-full overflow-hidden"
+          className="flex-row gap-1  items-center py-2 rounded-full overflow-hidden"
         >
-          <Text className="text-white ml-1 font-sfpro-medium text-[17px]">
+          <Text className="text-white/50 ml-1 font-sfpro-medium text-[13px]">
             {post.timestamp}
           </Text>
 
-          <TouchableOpacity onPress={onMenuPress} hitSlop={8}>
-            <Ionicons name="ellipsis-vertical" size={20} color="#fff" />
+          <TouchableOpacity onPress={onMenuPress} hitSlop={8} className="">
+            <Ionicons name="ellipsis-vertical" size={18} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -172,7 +174,7 @@ export function CollapsibleText({
       activeOpacity={0.9}
     >
       <Text
-        className="font-sfpro-medium text-white text-[16.2px]"
+        className="font-sfpro-medium  text-white text-[14.2px]"
         // style={{ flexShrink: 1 }}
       >
         {hasMedia && (
@@ -184,7 +186,7 @@ export function CollapsibleText({
         )}
         {displayText}{" "}
         {shouldTruncate && (
-          <Text className="text-[white]/70 text-[15px] font-sfpro-bold">
+          <Text className="text-[white]/70 text-[14.2px] font-sfpro-bold">
             {expanded ? " Read less" : " Read more"}
           </Text>
         )}
@@ -236,7 +238,7 @@ export const PostCard: React.FC<PostCardProps> = ({
 
   return (
     <View className="my-[1.5px]   ">
-      <Animated.View className="bg-[#2A2A2A] border border-black rounded-[30px]  overflow-hidden relative">
+      <Animated.View className="bg-[#2A2A2A] border border-black rounded-[35px]  overflow-hidden relative">
         {!hasMedia && (
           <PostHeader
             post={post}
@@ -396,7 +398,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         )}
 
         {hasMedia && (
-          <View className="flex-row px-4 items-center pb-4 justify-between pt-3">
+          <View className="flex-row px-[10px] items-center pb-2 justify-between pt-3">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setOpenComments(true)}
@@ -427,7 +429,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           </View>
         )}
 
-        <View className="pb-3 px-4">
+        <View className="pb-1.5 px-4">
           <View className="flex-row flex-wrap items-baseline">
             <Text className="text-white text-[17px] inline-flex items-baseline  leading-[20px]">
               <CollapsibleText
@@ -441,7 +443,7 @@ export const PostCard: React.FC<PostCardProps> = ({
         </View>
 
         {!hasMedia && (
-          <View className="flex-row px-4 items-center pb-4 justify-between pt-1">
+          <View className="flex-row px-[10px] items-center pb-3 justify-between pt-1">
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={() => setOpenComments(true)}
@@ -472,7 +474,7 @@ export const PostCard: React.FC<PostCardProps> = ({
           </View>
         )}
 
-        <View className="flex-row px-4 items-center pb-4 justify-between pt-2">
+        <View className="flex-row px-[10px]  items-center pb-[10px] justify-between pt-2">
           <TouchableOpacity
             onPress={() => setShowVideoReply(true)}
             className="flex-row items-center"
@@ -508,7 +510,7 @@ export const PostCard: React.FC<PostCardProps> = ({
               ))}
             </View>
 
-            <View className="flex-row items-center ml-1">
+            <View className="flex-row opacity-50 items-center ml-1">
               <Ionicons name="play" size={16} color="#ffffff" />
               <Text className="text-white ml-0.5  text-[14px] font-sfpro-medium">
                 Watch comments
@@ -567,6 +569,12 @@ const AllFeeds: React.FC<AllFeedsProps> = ({
   ListHeaderComponentStyle,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    if (posts) {
+      setFeedPosts(posts);
+    }
+  }, [posts]);
+
   const [feedPosts, setFeedPosts] = useState<Post[]>(posts ?? []);
   const [openComponent, setOpenComments] = useState(false);
   const [videoModalVisible, setVideoModalVisible] = useState(false);
