@@ -295,7 +295,7 @@ export default function CreatePostStart({
               onPost={() => {
                 Keyboard.dismiss();
 
-                if (!shouldShowCommunities) {
+                if (!shouldShowCommunities || preMedia) {
                   router.replace({
                     pathname: "/(tabs)/home",
                     params: {

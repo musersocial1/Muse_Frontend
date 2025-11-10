@@ -1512,10 +1512,9 @@ export const user = {
   communities: [
     {
       id: "1",
-      name: "K.Dots community",
       memberCount: 456,
-      profileImage:
-        "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      name: "Y Combinator",
+      profileImage: images.Xcomm4, // ✅
       memberImages: [
         "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
         "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
@@ -1523,10 +1522,9 @@ export const user = {
     },
     {
       id: "2",
-      name: "Creative Minds",
       memberCount: 512,
-      profileImage:
-        "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      name: "A16z",
+      profileImage: images.Xcomm6, // 👈 was `image`
       memberImages: [
         "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
         "https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
@@ -1535,10 +1533,9 @@ export const user = {
     },
     {
       id: "3",
-      name: "Innovators Hub",
       memberCount: 389,
-      profileImage:
-        "https://images.unsplash.com/photo-1552058544-f2b08422138a?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
+      name: "Acquired",
+      profileImage: images.Xcomm5, // 👈 was `image`
       memberImages: [
         "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
         "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=687&q=80",
@@ -1547,7 +1544,6 @@ export const user = {
     },
   ],
 };
-
 export const videoComments: VideoComment[] = [
   {
     id: "1",

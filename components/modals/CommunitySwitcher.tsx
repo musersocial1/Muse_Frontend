@@ -32,34 +32,35 @@ import { useRouter } from "expo-router";
 
 const communities: Community[] = [
   {
+    id: "4",
+    name: "Y Combinator",
+    image: images.Xcomm4,
+  },
+  {
+    id: "6",
+    name: "A16z",
+    image: images.Xcomm6,
+  },
+  {
     id: "1",
     name: "JRE",
     image: images.Xcomm1,
-  },
-  {
-    id: "2",
-    name: "Call Her Daddy",
-    image: images.Xcomm2,
-  },
-  {
-    id: "3",
-    name: "All In",
-    image: images.Xcomm3,
-  },
-  {
-    id: "4",
-    name: "Yc",
-    image: images.Xcomm4,
   },
   {
     id: "5",
     name: "Acquired",
     image: images.Xcomm5,
   },
+
   {
-    id: "6",
-    name: "A16z",
-    image: images.Xcomm6,
+    id: "3",
+    name: "All In",
+    image: images.Xcomm3,
+  },
+  {
+    id: "2",
+    name: "Call Her Daddy",
+    image: images.Xcomm2,
   },
 ];
 

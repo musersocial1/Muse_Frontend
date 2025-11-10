@@ -171,7 +171,11 @@ const PostCommunities: React.FC<UserProfileModalProps> = ({
                   <View className="flex-row  items-center flex-1">
                     <View className="w-14 h-14 rounded-full overflow-hidden mr-2">
                       <Image
-                        source={{ uri: community.profileImage }}
+                        source={
+                          typeof community.profileImage === "string"
+                            ? { uri: community.profileImage } // remote URL
+                            : community.profileImage // local require() or imported asset
+                        }
                         className="w-full h-full"
                         resizeMode="cover"
                       />
