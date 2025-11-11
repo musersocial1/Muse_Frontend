@@ -343,15 +343,16 @@ export default function Index() {
                   resizeMode="contain"
                 />
               </View>
-              <View className="items-center mb-10">
+              {/* <View className="items-center mb-10"> */}
+              <View className="items-center mb-0">
                 <Text className="text-[#FFFFFF] text-3xl font-bold text-center leading-tight mb-2">
                   Access over 1000+{"\n"}tailored{" "}
                   <Text className="text-[#FFFFFF]">communities</Text>
                 </Text>
               </View>
 
-              <View className="w-full  space-y-3">
-                <BlurView
+              <View className="w-full   space-y-3">
+                {/* <BlurView
                   experimentalBlurMethod="dimezisBlurView"
                   intensity={20}
                   tint="light"
@@ -365,10 +366,13 @@ export default function Index() {
                       Already have an account
                     </Text>
                   </TouchableOpacity>
-                </BlurView>
+                </BlurView> */}
 
                 <TouchableOpacity
-                  onPress={handleGetStarted}
+                  // onPress={handleGetStarted}
+                  onPress={() => {
+                    router.replace(RouterConstantUtil.tabs.home as any);
+                  }}
                   className="bg-secondary rounded-2xl py-5 px-6 shadow-lg mt-4"
                   activeOpacity={0.9}
                 >
