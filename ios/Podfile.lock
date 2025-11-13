@@ -1,5 +1,6 @@
 PODS:
   - boost (1.84.0)
+  - Clarity (3.3.3)
   - DoubleConversion (1.1.6)
   - EXAV (15.1.7):
     - ExpoModulesCore
@@ -1731,6 +1732,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-clarity (4.4.1):
+    - Clarity (= 3.3.3)
+    - React-Core
   - react-native-date-picker (5.0.13):
     - DoubleConversion
     - glog
@@ -2719,6 +2723,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - "react-native-clarity (from `../node_modules/@microsoft/react-native-clarity`)"
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-track-player (from `../node_modules/react-native-track-player`)
@@ -2768,6 +2773,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Clarity
     - libavif
     - libdav1d
     - libwebp
@@ -2931,6 +2937,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-clarity:
+    :path: "../node_modules/@microsoft/react-native-clarity"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
   react-native-safe-area-context:
@@ -3026,6 +3034,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
+  Clarity: 9c93e8c23794a9a1dff63933cd6003144cf3f755
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
   EXAV: ae28256069c4cdde93d185c007d8f68d92902c2e
   EXConstants: 98bcf0f22b820f9b28f9fee55ff2daededadd2f8
@@ -3103,6 +3112,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 70a29536f84ddffca4a91097651d2b8f194f7c67
   React-microtasksnativemodule: ff05e894231c44c21135d1d23a82b87656d98eeb
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
+  react-native-clarity: 8343325b5861291008b05659c9bb0993933c308f
   react-native-date-picker: e687e018f66da4734b3db3ddf3d323e930425d56
   react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
   react-native-track-player: dd56f9948e03756a217c75e0a61aa04aab65b5a1
