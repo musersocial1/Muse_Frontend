@@ -21,17 +21,15 @@ import { BaseToast } from "react-native-toast-message";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import "./globals.css";
 
-import Clarity from "@microsoft/react-native-clarity";
-
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const [fontsLoaded, error] = useFonts(customFonts);
 
-  // Initialize Clarity
-  useEffect(() => {
-    Clarity.initialize("rwsmrf44ep");
-  }, []);
+  // // Initialize Clarity
+  // useEffect(() => {
+  //   Clarity.initialize("rwsmrf44ep");
+  // }, []);
 
   useEffect(() => {
     if (fontsLoaded || error) {
